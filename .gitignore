@@ -1,0 +1,78 @@
+# OS-specific
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.nfs*
+
+# IDEs and Editors
+# VSCode
+.vscode/
+.history/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin/Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+
+# Others
+*.swp
+*.swo
+
+# Local environment
+.env
+.env.*
+
+# Test reports
+/test-results/
+/test-output/
+/reports/
+
+# Mac QuickLook
+*.qlgenerator
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Node (if present)
+node_modules/
+
+# Backup files
+*.bak
+*.tmp
+
+# System Files
+ehthumbs.db
+Thumbs.db
+
+# End of .gitignore 
