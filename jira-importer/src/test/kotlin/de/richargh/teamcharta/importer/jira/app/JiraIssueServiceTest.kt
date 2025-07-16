@@ -27,6 +27,7 @@ class JiraIssueServiceTest {
 
     @Test
     fun `fetchIssues parses issues from mocked jira server`() {
+        // given
         val mockResponse = """
         {
           "issues": [
@@ -54,6 +55,7 @@ class JiraIssueServiceTest {
         server.enqueue(MockResponse().setBody(mockResponse).setHeader("Content-Type", "application/json"))
 
         val baseUrl = server.url("/").toString().removeSuffix("/")
+        // when
         val service = JiraIssueService()
         val issues = service.fetchIssues(
             username = "user",
@@ -61,6 +63,7 @@ class JiraIssueServiceTest {
             baseUrl = baseUrl,
             projectKey = "PROJ"
         )
+        // then
         issues.size shouldBe 1
         val issue = issues[0]
         issue.key shouldBe "PROJ-1"

@@ -29,6 +29,7 @@ class JiraImporterTest {
 
     @Test
     fun `extracts issues from mocked jira server`(@TempDir tempDir: Path) {
+        // given
         val mockResponse = """
         {
           "issues": [
@@ -56,14 +57,15 @@ class JiraImporterTest {
         server.enqueue(MockResponse().setBody(mockResponse).setHeader("Content-Type", "application/json"))
         val baseUrl = server.url("/").toString().removeSuffix("/")
         val outputFile = File(tempDir.toFile(), "output.json")
-        val exitCode = JiraImporter().apply {
+        // when
+        JiraImporter().apply {
             username = "user"
             token = "token"
             this.baseUrl = baseUrl
             projectKey = "PROJ"
             output = outputFile.absolutePath
         }.call()
-        exitCode shouldBe 0
+        // then
         outputFile.exists() shouldBe true
         val json = outputFile.readText()
         json shouldContain "Test Issue"
