@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.picocli)
     implementation(libs.jackson.module.kotlin)
     implementation(libs.jackson.databind)
+    implementation(libs.okhttp)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.mockwebserver)
     testImplementation(libs.kotest.assertions)
