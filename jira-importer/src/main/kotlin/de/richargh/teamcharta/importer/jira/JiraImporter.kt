@@ -1,5 +1,8 @@
 package de.richargh.teamcharta.importer.jira
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import de.richargh.teamcharta.importer.jira.app.JiraIssueService
 import de.richargh.teamcharta.importer.jira.app.api.JiraConnection
@@ -40,12 +43,19 @@ class JiraImporter : Callable<Int> {
         val jira = JiraConnection(username = username, token = token, baseUrl = baseUrl)
 
         val issues = JiraIssueService().fetchIssues(projectKey, jira)
-        val mapper = jacksonObjectMapper()
+        val mapper = createJacksonMapperWithJavaTime()
         File(output).writeText(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(issues))
 
         println("Extracted " + issues.size + " issues to $output")
         return 0
     }
+}
+
+fun createJacksonMapperWithJavaTime(): ObjectMapper {
+    val mapper = jacksonObjectMapper()
+    mapper.registerModule(JavaTimeModule())
+    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    return mapper
 }
 
 fun main(args: Array<String>) {

@@ -13,6 +13,7 @@ dependencies {
     implementation(libs.picocli)
     implementation(libs.jackson.module.kotlin)
     implementation(libs.jackson.databind)
+    implementation(libs.jackson.jsr310)
     implementation(libs.okhttp)
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
