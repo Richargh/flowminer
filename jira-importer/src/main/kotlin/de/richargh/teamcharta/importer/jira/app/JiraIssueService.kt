@@ -1,7 +1,8 @@
 package de.richargh.teamcharta.importer.jira.app
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
 import de.richargh.teamcharta.importer.jira.app.api.JiraConnection
 import de.richargh.teamcharta.importer.jira.app.api.JiraIssue
 import okhttp3.Credentials
@@ -11,11 +12,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.time.OffsetDateTime
 
-
 class JiraIssueService {
 
     private val client = OkHttpClient()
-    private val mapper = jacksonObjectMapper()
+    private val moshi = Moshi.Builder().build()
+    private val responseAdapter = moshi.adapter(JiraSearchResponse::class.java)
 
     fun fetchIssues(
         projectKey: String,
@@ -54,57 +55,42 @@ class JiraIssueService {
     }
 
     private fun parseIssues(responseBody: String): List<JiraIssue> {
-        val root: JsonNode = mapper.readTree(responseBody)
-        val issues: JsonNode? = root.get("issues")
+        val searchResponse = responseAdapter.fromJson(responseBody)
         val now = System.currentTimeMillis()
-        if (issues == null || !issues.isArray) return emptyList()
-        return issues.elements().asSequence().map { issue ->
-            extractIssueInfo(issue, now)
-        }.toList()
+        return searchResponse?.issues?.map { extractIssueInfo(it, now) } ?: emptyList()
     }
 
-    private fun extractIssueInfo(issue: JsonNode, now: Long): JiraIssue {
-        val key = issue.get("key")?.asText() ?: ""
-        val fields = issue.get("fields")
-        val name = fields?.get("summary")?.asText()
-        val type = fields?.get("issuetype")?.get("name")?.asText()
-        val state = fields?.get("status")?.get("name")?.asText()
-        val changelog = issue.get("changelog")
+    private fun extractIssueInfo(issue: JiraApiIssue, now: Long): JiraIssue {
+        val key = issue.key ?: ""
+        val name = issue.fields?.summary
+        val type = issue.fields?.issuetype?.name
+        val state = issue.fields?.status?.name
+        val changelog = issue.changelog
         var started: String? = null
         var finished: String? = null
         var stateDuration: Long? = null
-        if (changelog != null && changelog.has("histories")) {
-            val histories = changelog.get("histories")
+        if (changelog != null && changelog.histories != null) {
             var lastStateChange: Long? = null
-            if (histories != null && histories.isArray) {
-                val historyElements = histories.elements()
-                while (historyElements.hasNext()) {
-                    val history = historyElements.next()
-                    val items = history.get("items")
-                    if (items != null && items.isArray) {
-                        val itemElements = items.elements()
-                        while (itemElements.hasNext()) {
-                            val item = itemElements.next()
-                            if (item.get("field")?.asText() == "status") {
-                                val toString = item.get("toString")?.asText()
-                                val created = history.get("created")?.asText()
-                                val createdMillis = try {
-                                    created?.let {
-                                        OffsetDateTime.parse(it).toInstant().toEpochMilli()
-                                    }
-                                } catch (e: Exception) {
-                                    null
-                                }
-                                if (toString == "In Progress" && started == null) {
-                                    started = created
-                                }
-                                if ((toString == "Done" || toString == "Closed") && finished == null) {
-                                    finished = created
-                                }
-                                if (toString == state) {
-                                    lastStateChange = createdMillis
-                                }
+            for (history in changelog.histories) {
+                for (item in history.items ?: emptyList()) {
+                    if (item.field == "status") {
+                        val toString = item.toStringValue
+                        val created = history.created
+                        val createdMillis = try {
+                            created?.let {
+                                OffsetDateTime.parse(it).toInstant().toEpochMilli()
                             }
+                        } catch (e: Exception) {
+                            null
+                        }
+                        if (toString == "In Progress" && started == null) {
+                            started = created
+                        }
+                        if ((toString == "Done" || toString == "Closed") && finished == null) {
+                            finished = created
+                        }
+                        if (toString == state) {
+                            lastStateChange = createdMillis
                         }
                     }
                 }
@@ -116,3 +102,49 @@ class JiraIssueService {
         return JiraIssue(key, name, type, state, started, finished, stateDuration)
     }
 }
+
+@JsonClass(generateAdapter = true)
+data class JiraSearchResponse(
+    val issues: List<JiraApiIssue>
+)
+
+@JsonClass(generateAdapter = true)
+data class JiraApiIssue(
+    val key: String?,
+    val fields: JiraApiFields?,
+    val changelog: JiraApiChangelog?
+)
+
+@JsonClass(generateAdapter = true)
+data class JiraApiFields(
+    val summary: String?,
+    val issuetype: JiraApiIssueType?,
+    val status: JiraApiStatus?
+)
+
+@JsonClass(generateAdapter = true)
+data class JiraApiIssueType(
+    val name: String?
+)
+
+@JsonClass(generateAdapter = true)
+data class JiraApiStatus(
+    val name: String?
+)
+
+@JsonClass(generateAdapter = true)
+data class JiraApiChangelog(
+    val histories: List<JiraApiHistory>?
+)
+
+@JsonClass(generateAdapter = true)
+data class JiraApiHistory(
+    val created: String?,
+    val items: List<JiraApiHistoryItem>?
+)
+
+@JsonClass(generateAdapter = true)
+data class JiraApiHistoryItem(
+    val field: String?,
+    @Json(name = "toString") val toStringValue: String?
+)

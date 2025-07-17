@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.application)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 repositories {
@@ -13,6 +14,9 @@ dependencies {
     implementation(libs.jackson.module.kotlin)
     implementation(libs.jackson.databind)
     implementation(libs.okhttp)
+    implementation(libs.moshi)
+    implementation(libs.moshi.kotlin)
+    kapt(libs.moshi.codegen)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.mockwebserver)
     testImplementation(libs.kotest.assertions)

@@ -6,10 +6,12 @@ junit = "5.10.2"
 java = "21"
 kotest = "5.9.1"
 okhttp = "4.12.0"
+moshi = "1.15.2"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 application = { id = "application" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 
 [libraries]
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
@@ -18,4 +20,7 @@ jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", ver
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" } 
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
+moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" } 
+moshi-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
