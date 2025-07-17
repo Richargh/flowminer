@@ -4,21 +4,22 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import de.richargh.teamcharta.importer.jira.app.api.JiraConnection
-import de.richargh.teamcharta.importer.jira.app.api.WorkItem
 import de.richargh.teamcharta.importer.jira.app.api.StateTransition
+import de.richargh.teamcharta.importer.jira.app.api.WorkItem
 import okhttp3.Credentials
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.time.OffsetDateTime
-import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 class JiraIssueService {
 
     private val client = OkHttpClient()
     private val moshi = Moshi.Builder().build()
     private val responseAdapter = moshi.adapter(JiraSearchResponse::class.java)
+    private val jiraDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
     fun fetchIssues(
         projectKey: String,
@@ -63,43 +64,37 @@ class JiraIssueService {
     }
 
     private fun extractIssueInfo(issue: JiraApiIssue, now: Long): WorkItem {
-        val key = issue.key ?: ""
-        val name = issue.fields?.summary
-        val type = issue.fields?.issuetype?.name
-        val state = issue.fields?.status?.name
-        val changelog = issue.changelog
         var started: OffsetDateTime? = null
         var finished: OffsetDateTime? = null
-        var stateDuration: Long? = null
+
+        val changelog = issue.changelog
         val transitions = mutableListOf<StateTransition>()
-        if (changelog != null && changelog.histories != null) {
-            var lastStateChange: Long? = null
-            for (history in changelog.histories) {
-                val created = history.created
-                val createdOffset = try {
-                    created?.let {
-                        OffsetDateTime.parse(it).withOffsetSameInstant(ZoneOffset.UTC)
+        for (history in changelog?.histories ?: emptyList()) {
+            val created = history.created?.let { OffsetDateTime.parse(it, jiraDateTimeFormatter) }
+            for (item in history.items ?: emptyList()) {
+                if (item.field == "status") {
+                    val fromString = item.fromStringValue
+                    val toString = item.toStringValue
+                    transitions.add(StateTransition(fromString, toString, created))
+                    if (toString == "In Progress" && started == null) {
+                        started = created
                     }
-                } catch (e: Exception) {
-                    null
-                }
-                for (item in history.items ?: emptyList()) {
-                    if (item.field == "status") {
-                        val fromString = item.fromStringValue
-                        val toString = item.toStringValue
-                        transitions.add(StateTransition(fromString, toString, createdOffset))
-                        val createdMillis = createdOffset?.toInstant()?.toEpochMilli()
-                        if (toString == "In Progress" && started == null) {
-                            started = createdOffset
-                        }
-                        if ((toString == "Done" || toString == "Closed") && finished == null) {
-                            finished = createdOffset
-                        }
+                    if ((toString == "Done" || toString == "Closed") && finished == null) {
+                        finished = created
                     }
                 }
             }
         }
-        return WorkItem(key, name, type, state, started, finished, transitions)
+
+        return WorkItem(
+            issue.key ?: "",
+            issue.fields?.summary,
+            issue.fields?.issuetype?.name,
+            issue.fields?.status?.name,
+            started,
+            finished,
+            transitions
+        )
     }
 }
 
