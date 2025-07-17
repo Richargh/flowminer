@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.jira.app
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import de.richargh.teamcharta.importer.jira.app.api.JiraConnection
 import de.richargh.teamcharta.importer.jira.app.api.JiraIssue
 import okhttp3.Credentials
 import okhttp3.HttpUrl
@@ -17,27 +18,25 @@ class JiraIssueService {
     private val mapper = jacksonObjectMapper()
 
     fun fetchIssues(
-        username: String,
-        token: String,
-        baseUrl: String,
-        projectKey: String
+        projectKey: String,
+        jiraConnection: JiraConnection
     ): List<JiraIssue> {
-        val url = buildQuery(baseUrl, projectKey)
-        val request = buildRequest(url, username, token)
+        val url = buildQuery(projectKey, jiraConnection)
+        val request = buildRequest(url, jiraConnection)
         val responseBody = executeRequest(request)
         return parseIssues(responseBody)
     }
 
-    private fun buildQuery(baseUrl: String, projectKey: String): HttpUrl {
-        val urlBuilder = "$baseUrl/rest/api/3/search/jql".toHttpUrl().newBuilder()
+    private fun buildQuery(projectKey: String, jira: JiraConnection): HttpUrl {
+        val urlBuilder = "${jira.baseUrl}/rest/api/3/search/jql".toHttpUrl().newBuilder()
         urlBuilder.addQueryParameter("jql", "project=$projectKey ORDER BY created DESC")
         urlBuilder.addQueryParameter("expand", "changelog")
         urlBuilder.addQueryParameter("maxResults", "1000")
         return urlBuilder.build()
     }
 
-    private fun buildRequest(url: HttpUrl, username: String, token: String): Request {
-        val credentials = Credentials.basic(username, token)
+    private fun buildRequest(url: HttpUrl, jira: JiraConnection): Request {
+        val credentials = Credentials.basic(jira.username, jira.token)
         return Request.Builder()
             .url(url)
             .header("Authorization", credentials)

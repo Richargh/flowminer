@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.jira
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import de.richargh.teamcharta.importer.jira.app.JiraIssueService
+import de.richargh.teamcharta.importer.jira.app.api.JiraConnection
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
@@ -36,9 +37,12 @@ class JiraImporter : Callable<Int> {
     lateinit var output: String
 
     override fun call(): Int {
-        val issues = JiraIssueService().fetchIssues(username, token, baseUrl, projectKey)
+        val jira = JiraConnection(username = username, token = token, baseUrl = baseUrl)
+
+        val issues = JiraIssueService().fetchIssues(username, jira)
         val mapper = jacksonObjectMapper()
         File(output).writeText(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(issues))
+
         println("Extracted " + issues.size + " issues to $output")
         return 0
     }

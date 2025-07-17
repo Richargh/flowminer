@@ -1,5 +1,6 @@
 package de.richargh.teamcharta.importer.jira.app
 
+import de.richargh.teamcharta.importer.jira.app.api.JiraConnection
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -58,10 +59,12 @@ class JiraIssueServiceTest {
         // when
         val service = JiraIssueService()
         val issues = service.fetchIssues(
-            username = "user",
-            token = "token",
-            baseUrl = baseUrl,
-            projectKey = "PROJ"
+            projectKey = "PROJ",
+            JiraConnection(
+                username = "user",
+                token = "token",
+                baseUrl = baseUrl,
+            )
         )
         // then
         issues.size shouldBe 1
