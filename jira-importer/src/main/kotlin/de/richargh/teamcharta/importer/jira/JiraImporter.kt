@@ -39,7 +39,7 @@ class JiraImporter : Callable<Int> {
     override fun call(): Int {
         val jira = JiraConnection(username = username, token = token, baseUrl = baseUrl)
 
-        val issues = JiraIssueService().fetchIssues(username, jira)
+        val issues = JiraIssueService().fetchIssues(projectKey, jira)
         val mapper = jacksonObjectMapper()
         File(output).writeText(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(issues))
 
