@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.jira.app
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import de.richargh.teamcharta.importer.jira.app.api.JiraIssue
 import okhttp3.Credentials
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -11,15 +12,6 @@ import java.time.OffsetDateTime
 
 
 class JiraIssueService {
-    data class IssueInfo(
-        val key: String,
-        val name: String?,
-        val type: String?,
-        val state: String?,
-        val started: String?,
-        val finished: String?,
-        val stateDuration: Long?
-    )
 
     private val client = OkHttpClient()
     private val mapper = jacksonObjectMapper()
@@ -29,7 +21,7 @@ class JiraIssueService {
         token: String,
         baseUrl: String,
         projectKey: String
-    ): List<IssueInfo> {
+    ): List<JiraIssue> {
         val url = buildQuery(baseUrl, projectKey)
         val request = buildRequest(url, username, token)
         val responseBody = executeRequest(request)
@@ -62,7 +54,7 @@ class JiraIssueService {
         }
     }
 
-    private fun parseIssues(responseBody: String): List<IssueInfo> {
+    private fun parseIssues(responseBody: String): List<JiraIssue> {
         val root: JsonNode = mapper.readTree(responseBody)
         val issues: JsonNode? = root.get("issues")
         val now = System.currentTimeMillis()
@@ -72,7 +64,7 @@ class JiraIssueService {
         }.toList()
     }
 
-    private fun extractIssueInfo(issue: JsonNode, now: Long): IssueInfo {
+    private fun extractIssueInfo(issue: JsonNode, now: Long): JiraIssue {
         val key = issue.get("key")?.asText() ?: ""
         val fields = issue.get("fields")
         val name = fields?.get("summary")?.asText()
@@ -122,6 +114,6 @@ class JiraIssueService {
                 stateDuration = (now - lastStateChange) / 1000 // seconds
             }
         }
-        return IssueInfo(key, name, type, state, started, finished, stateDuration)
+        return JiraIssue(key, name, type, state, started, finished, stateDuration)
     }
 }
