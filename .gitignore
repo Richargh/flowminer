@@ -30,6 +30,9 @@ $RECYCLE.BIN/
 *.ipr
 out/
 
+# IntelliJ Http
+*.private.env.json
+
 # Gradle
 .gradle/
 build/

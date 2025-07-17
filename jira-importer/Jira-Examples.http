@@ -1,0 +1,9 @@
+// All Issues of Project, calls https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-search-jql-get
+https://{{domain}}.atlassian.net/rest/api/3/search/jql?jql=project%3D{{projectId}}
+Authorization: Basic {{username}} {{api-token}}
+
+###
+
+// All Projects, calls https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-projects/#api-rest-api-3-project-search-get
+https://{{domain}}.atlassian.net//rest/api/3/project/search
+Authorization: Basic {{username}} {{api-token}}

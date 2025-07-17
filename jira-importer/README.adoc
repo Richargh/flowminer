@@ -1,0 +1,48 @@
+= Jira Importer
+
+== Prerequisite: API Token
+
+First you need to create an API token
+
+. Log in to Atlassian
+. Avatar -> Account settings -> Security -> "Create and managed API tokens"
+. "Create API Token" with a name, e.g. "jira-importer"
+. Copy the token
+. Store it in a secure place of your choice, e.g. a password manager
+
+Store it in an environment variable so you can pass it to the script:
+
+.On MacOs
+[source,bash]
+----
+read -s JIRA_API_TOKEN
+----
+
+== Testing the API with Http Client
+
+IntelliJ has a built-in Http client.
+You can use that optionally to test if your Api token actually works.
+First create an link:http-client.private.env.json[Environment file for the Http client].
+It should have the same variables that the link:Jira-Examples.http[] uses.
+
+.An example file
+[source,json]
+----
+{
+  "dowsing": {
+    "domain": "your-domain",
+    "projectId": "a-project-id",
+    "username": "an@email.ftw",
+    "api-token": "The API token you stored"
+  }
+}
+----
+
+== Usage
+
+. Run the tests with `./gradlew build`
+. Fetch issues for project: +
+[source,bash]
+----
+./gradlew :jira-importer:run --args="--username an@email.ftw --token $JIRA_API_TOKEN --base-url https://your-domain.atlassian.net --project a-project-id --output output.json"
+----
