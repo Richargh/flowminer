@@ -19,7 +19,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("JiraExtractorKt")
+    mainClass.set("de.richargh.teamcharta.importer.jira.JiraImporterKt")
 }
 
 java {
@@ -27,10 +27,6 @@ java {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
         vendor.set(org.gradle.jvm.toolchain.JvmVendorSpec.ADOPTIUM)
     }
-}
-
-application {
-    mainClass.set("JiraExtractorKt")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
