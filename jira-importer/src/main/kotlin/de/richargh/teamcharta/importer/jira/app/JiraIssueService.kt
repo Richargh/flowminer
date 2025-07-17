@@ -1,11 +1,11 @@
 package de.richargh.teamcharta.importer.jira.app
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import de.richargh.teamcharta.importer.jira.app.api.JiraConnection
 import de.richargh.teamcharta.importer.jira.app.api.StateTransition
 import de.richargh.teamcharta.importer.jira.app.api.WorkItem
+import de.richargh.teamcharta.importer.jira.app.internal.JiraApiIssueDto
+import de.richargh.teamcharta.importer.jira.app.internal.JiraSearchResponseDto
 import okhttp3.Credentials
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -18,7 +18,7 @@ class JiraIssueService {
 
     private val client = OkHttpClient()
     private val moshi = Moshi.Builder().build()
-    private val responseAdapter = moshi.adapter(JiraSearchResponse::class.java)
+    private val responseAdapter = moshi.adapter(JiraSearchResponseDto::class.java)
     private val jiraDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
     fun fetchIssues(
@@ -63,7 +63,7 @@ class JiraIssueService {
         return searchResponse?.issues?.map { extractIssueInfo(it, now) } ?: emptyList()
     }
 
-    private fun extractIssueInfo(issue: JiraApiIssue, now: Long): WorkItem {
+    private fun extractIssueInfo(issue: JiraApiIssueDto, now: Long): WorkItem {
         var started: OffsetDateTime? = null
         var finished: OffsetDateTime? = null
 
@@ -98,49 +98,3 @@ class JiraIssueService {
     }
 }
 
-@JsonClass(generateAdapter = true)
-data class JiraSearchResponse(
-    val issues: List<JiraApiIssue>?
-)
-
-@JsonClass(generateAdapter = true)
-data class JiraApiIssue(
-    val key: String?,
-    val fields: JiraApiFields?,
-    val changelog: JiraApiChangelog?
-)
-
-@JsonClass(generateAdapter = true)
-data class JiraApiFields(
-    val summary: String?,
-    val issuetype: JiraApiIssueType?,
-    val status: JiraApiStatus?
-)
-
-@JsonClass(generateAdapter = true)
-data class JiraApiIssueType(
-    val name: String?
-)
-
-@JsonClass(generateAdapter = true)
-data class JiraApiStatus(
-    val name: String?
-)
-
-@JsonClass(generateAdapter = true)
-data class JiraApiChangelog(
-    val histories: List<JiraApiHistory>?
-)
-
-@JsonClass(generateAdapter = true)
-data class JiraApiHistory(
-    val created: String?,
-    val items: List<JiraApiHistoryItem>?
-)
-
-@JsonClass(generateAdapter = true)
-data class JiraApiHistoryItem(
-    val field: String?,
-    @Json(name = "fromString") val fromStringValue: String?,
-    @Json(name = "toString") val toStringValue: String?
-)
