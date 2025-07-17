@@ -11,6 +11,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 class JiraIssueService {
 
@@ -66,8 +67,8 @@ class JiraIssueService {
         val type = issue.fields?.issuetype?.name
         val state = issue.fields?.status?.name
         val changelog = issue.changelog
-        var started: String? = null
-        var finished: String? = null
+        var started: OffsetDateTime? = null
+        var finished: OffsetDateTime? = null
         var stateDuration: Long? = null
         if (changelog != null && changelog.histories != null) {
             var lastStateChange: Long? = null
@@ -76,18 +77,19 @@ class JiraIssueService {
                     if (item.field == "status") {
                         val toString = item.toStringValue
                         val created = history.created
-                        val createdMillis = try {
+                        val createdOffset = try {
                             created?.let {
-                                OffsetDateTime.parse(it).toInstant().toEpochMilli()
+                                OffsetDateTime.parse(it).withOffsetSameInstant(ZoneOffset.UTC)
                             }
                         } catch (e: Exception) {
                             null
                         }
+                        val createdMillis = createdOffset?.toInstant()?.toEpochMilli()
                         if (toString == "In Progress" && started == null) {
-                            started = created
+                            started = createdOffset
                         }
                         if ((toString == "Done" || toString == "Closed") && finished == null) {
-                            finished = created
+                            finished = createdOffset
                         }
                         if (toString == state) {
                             lastStateChange = createdMillis
@@ -105,7 +107,7 @@ class JiraIssueService {
 
 @JsonClass(generateAdapter = true)
 data class JiraSearchResponse(
-    val issues: List<JiraApiIssue>
+    val issues: List<JiraApiIssue>?
 )
 
 @JsonClass(generateAdapter = true)
