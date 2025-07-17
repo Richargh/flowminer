@@ -4,7 +4,8 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import de.richargh.teamcharta.importer.jira.app.api.JiraConnection
-import de.richargh.teamcharta.importer.jira.app.api.JiraIssue
+import de.richargh.teamcharta.importer.jira.app.api.WorkItem
+import de.richargh.teamcharta.importer.jira.app.api.StateTransition
 import okhttp3.Credentials
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -22,7 +23,7 @@ class JiraIssueService {
     fun fetchIssues(
         projectKey: String,
         jiraConnection: JiraConnection
-    ): List<JiraIssue> {
+    ): List<WorkItem> {
         val url = buildQuery(projectKey, jiraConnection)
         val request = buildRequest(url, jiraConnection)
         val responseBody = executeRequest(request)
@@ -55,13 +56,13 @@ class JiraIssueService {
         }
     }
 
-    private fun parseIssues(responseBody: String): List<JiraIssue> {
+    private fun parseIssues(responseBody: String): List<WorkItem> {
         val searchResponse = responseAdapter.fromJson(responseBody)
         val now = System.currentTimeMillis()
         return searchResponse?.issues?.map { extractIssueInfo(it, now) } ?: emptyList()
     }
 
-    private fun extractIssueInfo(issue: JiraApiIssue, now: Long): JiraIssue {
+    private fun extractIssueInfo(issue: JiraApiIssue, now: Long): WorkItem {
         val key = issue.key ?: ""
         val name = issue.fields?.summary
         val type = issue.fields?.issuetype?.name
@@ -70,20 +71,23 @@ class JiraIssueService {
         var started: OffsetDateTime? = null
         var finished: OffsetDateTime? = null
         var stateDuration: Long? = null
+        val transitions = mutableListOf<StateTransition>()
         if (changelog != null && changelog.histories != null) {
             var lastStateChange: Long? = null
             for (history in changelog.histories) {
+                val created = history.created
+                val createdOffset = try {
+                    created?.let {
+                        OffsetDateTime.parse(it).withOffsetSameInstant(ZoneOffset.UTC)
+                    }
+                } catch (e: Exception) {
+                    null
+                }
                 for (item in history.items ?: emptyList()) {
                     if (item.field == "status") {
+                        val fromString = item.fromStringValue
                         val toString = item.toStringValue
-                        val created = history.created
-                        val createdOffset = try {
-                            created?.let {
-                                OffsetDateTime.parse(it).withOffsetSameInstant(ZoneOffset.UTC)
-                            }
-                        } catch (e: Exception) {
-                            null
-                        }
+                        transitions.add(StateTransition(fromString, toString, createdOffset))
                         val createdMillis = createdOffset?.toInstant()?.toEpochMilli()
                         if (toString == "In Progress" && started == null) {
                             started = createdOffset
@@ -91,17 +95,11 @@ class JiraIssueService {
                         if ((toString == "Done" || toString == "Closed") && finished == null) {
                             finished = createdOffset
                         }
-                        if (toString == state) {
-                            lastStateChange = createdMillis
-                        }
                     }
                 }
             }
-            if (lastStateChange != null) {
-                stateDuration = (now - lastStateChange) / 1000 // seconds
-            }
         }
-        return JiraIssue(key, name, type, state, started, finished, stateDuration)
+        return WorkItem(key, name, type, state, started, finished, transitions)
     }
 }
 
@@ -148,5 +146,6 @@ data class JiraApiHistory(
 @JsonClass(generateAdapter = true)
 data class JiraApiHistoryItem(
     val field: String?,
+    @Json(name = "fromString") val fromStringValue: String?,
     @Json(name = "toString") val toStringValue: String?
 )
