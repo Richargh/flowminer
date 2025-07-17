@@ -37,7 +37,7 @@ class JiraIssueService {
     }
 
     private fun buildQuery(baseUrl: String, projectKey: String): HttpUrl {
-        val urlBuilder = "$baseUrl/rest/api/3/search".toHttpUrl().newBuilder()
+        val urlBuilder = "$baseUrl/rest/api/3/search/jql".toHttpUrl().newBuilder()
         urlBuilder.addQueryParameter("jql", "project=$projectKey ORDER BY created DESC")
         urlBuilder.addQueryParameter("expand", "changelog")
         urlBuilder.addQueryParameter("maxResults", "1000")
@@ -45,10 +45,10 @@ class JiraIssueService {
     }
 
     private fun buildRequest(url: HttpUrl, username: String, token: String): Request {
-        val credential = Credentials.basic(username, token)
+        val credentials = Credentials.basic(username, token)
         return Request.Builder()
             .url(url)
-            .header("Authorization", credential)
+            .header("Authorization", credentials)
             .header("Accept", "application/json")
             .build()
     }
