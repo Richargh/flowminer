@@ -1,5 +1,11 @@
 // All Issues of Project, calls https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-search-jql-get
-https://{{domain}}.atlassian.net/rest/api/3/search/jql?jql=project%3D{{projectId}}&expand=changelog
+https://{{domain}}.atlassian.net/rest/api/3/search/jql?jql=project%3D{{projectId}}&expand=changelog&fields=*all
+Authorization: Basic {{username}} {{api-token}}
+
+###
+
+// One Issues of Project, calls https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-search-jql-get
+https://{{domain}}.atlassian.net/rest/api/3/search/jql?jql=id%3D{{issueId}}&expand=changelog&fields=*navigable
 Authorization: Basic {{username}} {{api-token}}
 
 ###
