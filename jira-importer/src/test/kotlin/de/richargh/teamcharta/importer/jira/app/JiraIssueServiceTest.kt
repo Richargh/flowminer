@@ -1,6 +1,16 @@
 package de.richargh.teamcharta.importer.jira.app
 
+import com.squareup.moshi.Moshi
 import de.richargh.teamcharta.importer.jira.app.api.JiraConnection
+import de.richargh.teamcharta.importer.jira.app.internal.JiraSearchResponseDto
+import de.richargh.teamcharta.importer.jira.app.internal.jiraApiChangelogDto
+import de.richargh.teamcharta.importer.jira.app.internal.jiraApiFieldsDto
+import de.richargh.teamcharta.importer.jira.app.internal.jiraApiHistoryDto
+import de.richargh.teamcharta.importer.jira.app.internal.jiraApiHistoryItemDto
+import de.richargh.teamcharta.importer.jira.app.internal.jiraApiIssueDto
+import de.richargh.teamcharta.importer.jira.app.internal.jiraApiIssueTypeDto
+import de.richargh.teamcharta.importer.jira.app.internal.jiraApiStatusDto
+import de.richargh.teamcharta.importer.jira.app.internal.jiraSearchResponseDto
 import io.kotest.matchers.shouldBe
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -29,30 +39,35 @@ class JiraIssueServiceTest {
     @Test
     fun `fetchIssues parses issues from mocked jira server`() {
         // given
-        val mockResponse = """
-        {
-          "issues": [
-            {
-              "key": "PROJ-1",
-              "fields": {
-                "summary": "Test Issue",
-                "issuetype": { "name": "Bug" },
-                "status": { "name": "In Progress" }
-              },
-              "changelog": {
-                "histories": [
-                  {
-                    "created": "2024-06-01T10:00:00.000+0000",
-                    "items": [
-                      { "field": "status", "toString": "In Progress" }
-                    ]
-                  }
-                ]
-              }
-            }
-          ]
+        val moshi = Moshi.Builder().build()
+        val adapter = moshi.adapter(JiraSearchResponseDto::class.java)
+        val mockResponseObj = jiraSearchResponseDto {
+            issues(
+                jiraApiIssueDto {
+                    key("PROJ-1")
+                    fields(jiraApiFieldsDto {
+                        summary("Test Issue")
+                        issuetype(jiraApiIssueTypeDto { name("Bug") })
+                        status(jiraApiStatusDto { name("In Progress") })
+                    })
+                    changelog(jiraApiChangelogDto {
+                        histories(
+                            jiraApiHistoryDto {
+                                created("2024-06-01T10:00:00.000+0000")
+                                items(
+                                    jiraApiHistoryItemDto {
+                                        field("status")
+                                        fromStringValue("To Do")
+                                        toStringValue("In Progress")
+                                    }
+                                )
+                            }
+                        )
+                    })
+                }
+            )
         }
-        """.trimIndent()
+        val mockResponse = adapter.toJson(mockResponseObj)
         server.enqueue(MockResponse().setBody(mockResponse).setHeader("Content-Type", "application/json"))
 
         val baseUrl = server.url("/").toString().removeSuffix("/")
