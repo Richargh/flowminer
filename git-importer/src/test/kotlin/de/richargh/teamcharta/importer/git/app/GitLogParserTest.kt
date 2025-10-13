@@ -1,17 +1,17 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api.*
+import de.richargh.teamcharta.importer.git.app.api.BranchCreated
+import de.richargh.teamcharta.importer.git.app.api.BranchMerged
+import de.richargh.teamcharta.importer.git.app.api.CommitMade
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import java.nio.file.Path
 
 class GitLogParserTest {
 
     @Test
-    fun `should parse simple commit events from git log`(@TempDir tempDir: Path) {
+    fun `should parse simple commit events from git log`() {
         // Given
         val gitLogContent = """
             abc123||John Doe|2024-01-15T10:00:00Z|HEAD -> main, origin/main|Initial commit
@@ -40,7 +40,6 @@ class GitLogParserTest {
         secondEvent.shouldBeInstanceOf<CommitMade>()
         secondEvent.commitHash shouldBe "def456"
         secondEvent.author shouldBe "Jane Smith"
-        secondEvent.filesChanged shouldBe 1
     }
 
     @Test
@@ -98,7 +97,7 @@ class GitLogParserTest {
     }
 
     @Test
-    fun `should handle multiple branches and their lifecycle`(@TempDir tempDir: Path) {
+    fun `should handle multiple branches and their lifecycle`() {
         // Given
         val gitLogContent = """
             merge789|ghi012 jkl345|John Doe|2024-01-25T16:00:00Z|HEAD -> main|Merge branch 'feature-y' into main
@@ -135,7 +134,7 @@ class GitLogParserTest {
     }
 
     @Test
-    fun `should sort events by timestamp`(@TempDir tempDir: Path) {
+    fun `should sort events by timestamp`() {
         // Given
         val gitLogContent = """
             def456|abc123|Jane Smith|2024-01-18T12:00:00Z|feature-x|Add feature x

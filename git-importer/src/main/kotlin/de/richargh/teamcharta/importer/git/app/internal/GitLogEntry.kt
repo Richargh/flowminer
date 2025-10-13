@@ -12,6 +12,5 @@ data class GitLogEntry(
     val author: String,
     val timestamp: Instant,
     val refs: List<String>,
-    val message: String,
-    val filesChanged: Int = 0
+    val message: String
 )

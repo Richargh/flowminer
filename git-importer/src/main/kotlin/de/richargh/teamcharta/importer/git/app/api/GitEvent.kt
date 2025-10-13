@@ -32,8 +32,7 @@ data class CommitMade(
     override val commitHash: String,
     override val branchName: String,
     val author: String,
-    val message: String,
-    val filesChanged: Int = 0
+    val message: String
 ) : GitEvent
 
 /**

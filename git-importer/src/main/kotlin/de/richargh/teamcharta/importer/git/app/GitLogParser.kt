@@ -17,53 +17,55 @@ class GitLogParser {
     }
 
     private fun parseGitLogOutput(output: String): List<GitLogEntry> {
-        val entries = mutableListOf<GitLogEntry>()
-        val lines = output.lines()
-        var i = 0
-
-        while (i < lines.size) {
-            val line = lines[i].trim()
-            if (line.isEmpty()) {
-                i++
-                continue
-            }
-
-            // Parse commit line
-            val parts = line.split("|")
-            if (parts.size >= 6) {
-                val hash = parts[0]
-                val parents = parts[1].split(" ").filter { it.isNotEmpty() }
-                val author = parts[2]
-                val timestamp = Instant.parse(parts[3])
-                val refs = parts[4].split(",").map { it.trim() }.filter { it.isNotEmpty() }
-                val message = parts[5]
-
-                // Count changed files from numstat (next lines until empty line or next commit)
-                i++
-                var filesChanged = 0
-                while (i < lines.size && lines[i].isNotEmpty() && !lines[i].contains("|")) {
-                    filesChanged++
-                    i++
-                }
-
-                entries.add(
-                    GitLogEntry(
-                        hash = hash,
-                        parents = parents,
-                        author = author,
-                        timestamp = timestamp,
-                        refs = refs,
-                        message = message,
-                        filesChanged = filesChanged
-                    )
-                )
-            } else {
-                i++
-            }
-        }
-
-        return entries
+        return output.lines().mapNotNull { tryParseLine(it) }
     }
+
+    private fun tryParseLine(line: String): GitLogEntry? {
+        if (line.isEmpty()) {
+            return null
+        }
+        val commitData = tryParseCommitLine(line)
+            ?: return null
+
+        return GitLogEntry(
+            hash = commitData.hash,
+            parents = commitData.parents,
+            author = commitData.author,
+            timestamp = commitData.timestamp,
+            refs = commitData.refs,
+            message = commitData.message,
+        )
+    }
+
+    private fun tryParseCommitLine(commitLine: String): CommitData? {
+        val parts = commitLine.split("|")
+        if (parts.size < 6) return null
+
+        return CommitData(
+            hash = parts[0],
+            parents = parseParents(parts[1]),
+            author = parts[2],
+            timestamp = Instant.parse(parts[3]),
+            refs = parseRefs(parts[4]),
+            message = parts[5]
+        )
+    }
+
+    private fun parseParents(parentString: String): List<String> =
+        parentString.split(" ").filter { it.isNotEmpty() }
+
+    private fun parseRefs(refString: String): List<String> =
+        refString.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+
+
+    private data class CommitData(
+        val hash: String,
+        val parents: List<String>,
+        val author: String,
+        val timestamp: Instant,
+        val refs: List<String>,
+        val message: String
+    )
 
     private fun extractEvents(logEntries: List<GitLogEntry>, defaultBranch: String): List<GitEvent> {
         val events = mutableListOf<GitEvent>()
@@ -113,7 +115,6 @@ class GitLogParser {
                     branchName = branchName,
                     author = entry.author,
                     message = entry.message,
-                    filesChanged = entry.filesChanged
                 )
             )
 
