@@ -1,5 +1,7 @@
 plugins {
-    // No plugins at root
+    // Apply Kotlin plugin to all subprojects without applying it to the root project
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.kapt) apply false
 }
 
 allprojects {
