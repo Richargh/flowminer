@@ -21,8 +21,11 @@ This is a repo containing two distinct but interconnected parts:
   * Research, that describe the state the app is currently in before implementing the spec, with the suffix `.research.md`. Location @docs/research.
   * Plans, that describe how to implement a spec given the state described in the research, with the suffix `.plan.md`. Location @docs/plans.
   * Process, that describe general processes to follow and are read on demand, with the suffix `.process.md`. Location @docs/processes.
+    * See this folder when needing to take an action like: "Write an ADR" or "Make a commit".
+  * Architecture Decision Records (ADRs), that describe key architecture decisions that were made. Location @docs/adrs.
 * Keep plans simple and concise - avoid over-elaboration, detailed sections, or comprehensive documentation style
 * Plans should be brief, actionable outlines rather than detailed specifications
+* ALWAYS suggest to write an ADR when we make an architecturally significant decision.
 * NEVER generate additional `.md` files
 
 ## CORE DEVELOPMENT PRINCIPLES
