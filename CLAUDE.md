@@ -1,75 +1,69 @@
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 **ALWAYS** add the STARTER_CHARACTER followed by space at the start of your reply.
-The starter character will change for each process file that is in progress.
+The starter character will change for each `*.research.md`, `*.plan.md` or `*.process.md` file that is in progress.
 
 Default STARTER_CHARACTER = 🏃
 
+## Repository Overview
+
+This is a repo containing two distinct but interconnected parts:
+
+* Analysis of data: @git-importer, @jira-importer
+  * When working in the analysis ALWAYS read the @analysis/CLAUDE.md
+* Visualization of data
+  * When working in the visualization ALWAYS read the @visualization/CLAUDE.md
+
+## AI Guides
+
+* Generate `.md` files ALWAYS inside @docs for:
+  * Specs, that describe a new feature that we want to build, with the suffix `.spec.md`. Location @docs/specs.
+  * Research, that describe the state the app is currently in before implementing the spec, with the suffix `.research.md`. Location @docs/research.
+  * Plans, that describe how to implement a spec given the state described in the research, with the suffix `.plan.md`. Location @docs/plans.
+  * Process, that describe general processes to follow and are read on demand, with the suffix `.process.md`. Location @docs/processes.
+* Keep plans simple and concise - avoid over-elaboration, detailed sections, or comprehensive documentation style
+* Plans should be brief, actionable outlines rather than detailed specifications
+* NEVER generate additional `.md` files
+
 ## CORE DEVELOPMENT PRINCIPLES
 
-- Always follow the TDD cycle: Red → Green → Refactor
-- Write the simplest failing test first
-- Implement the minimum code needed to make tests pass
-- Refactor only after tests are passing
-- Maintain high code quality throughout development
-
-## TDD METHODOLOGY GUIDANCE
-
-- Start by writing a failing test that defines a small increment of functionality
-- Make test failures clear and informative
-- Write just enough code to make the test pass - no more
-- Once tests pass, consider if refactoring is needed
-- Repeat the cycle for new functionality
-- Structure all unit tests following the Arrange-Act-Assert pattern and introduce each block with a comment
+* Always follow the TDD cycle: Red → Green → Refactor
+* Write the simplest failing test first
+* Implement the minimum code needed to make tests pass
+* Refactor only after tests are passing
+* Maintain high code quality throughout development
 
 ## TIDY FIRST APPROACH
 
-- Separate all changes into two distinct types:
+* Separate all changes into two distinct types:
     1. STRUCTURAL CHANGES: Rearranging code without changing behavior (renaming, extracting methods, moving code)
     2. BEHAVIORAL CHANGES: Adding or modifying actual functionality
-- Never mix structural and behavioral changes in the same commit
-- Always make structural changes first when both are needed
-- Validate structural changes do not alter behavior by running tests before and after
-
-## COMMIT NOTATION (ARLO BELSHEE)
-
-Use the following prefixes for all commits to clearly categorize changes:
-
-- **R:** - Refactoring (structural changes, no behavior change)
-- **F:** - Feature (new behavioral changes)
-- **B:** - Bug fix (fixing incorrect behavior)
-- **t:** - Test-only changes
-- **d:** - Documentation
-- **c:** - Comments
-- **e:** - Environment/configuration
-
-Examples:
-- `R: extract validation logic to separate function`
-- `F: implement user login validation`
-- `B: fix null pointer in data processing`
-- `t: add test for edge case in sorting`
-
-Key principle: Never mix R: commits with F: or B: commits. This enforces the separation of structural and behavioral changes.
+* Never mix structural and behavioral changes in the same commit
+* Always make structural changes first when both are needed
+* Validate structural changes do not alter behavior by running tests before and after
 
 ## CODE QUALITY STANDARDS
 
-- Eliminate duplication ruthlessly
-- Express intent clearly through naming and structure
-- Make dependencies explicit
-- Keep methods small and focused on a single responsibility
-- Minimize state and side effects
-- Use the simplest solution that could possibly work
+* Eliminate duplication ruthlessly
+* Express intent clearly through naming and structure
+* Make dependencies explicit
+* Keep methods small and focused on a single responsibility
+* Minimize state and side effects
+* Use the simplest solution that could possibly work
 
 ## REFACTORING GUIDELINES
 
-- Refactor only when tests are passing (in the "Green" phase)
-- Use established refactoring patterns with their proper names
-- Make one refactoring change at a time
-- Run tests after each refactoring step
-- Prioritize refactorings that remove duplication or improve clarity
+* Refactor only when tests are passing (in the "Green" phase)
+* Use established refactoring patterns with their proper names
+* Make one refactoring change at a time
+* Run tests after each refactoring step
+* Prioritize refactorings that remove duplication or improve clarity
 
 ## EXAMPLE WORKFLOW
 
-When approaching a new feature:
-1. Write a simple failing test for a small part of the feature
+When approaching a plan:
+
+1. Write a simple failing test for a small part of the plan
 2. Implement the bare minimum to make it pass
 3. Run tests to confirm they pass (Green)
 4. Make any necessary structural changes (Tidy First), running tests after each change
