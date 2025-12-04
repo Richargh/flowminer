@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.application)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.pitest)
 }
 
 repositories {
@@ -26,7 +25,7 @@ application {
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
-        vendor.set(org.gradle.jvm.toolchain.JvmVendorSpec.ADOPTIUM)
+        vendor.set(JvmVendorSpec.ADOPTIUM)
     }
 }
 

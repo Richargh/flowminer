@@ -1,3 +1,3 @@
 rootProject.name = "teamcharta"
-include("jira-importer")
-include("git-importer") 
+include("analysis:jira-importer")
+include("analysis:git-importer")
