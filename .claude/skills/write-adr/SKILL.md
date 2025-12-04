@@ -1,5 +1,9 @@
+---
+name: write-adr
+description: This skill describes how to document an architecture decision record (ADR).
+---
 The file name of an Architecture Decision Records (ADRs), is `ADR-###-<name-of-problem-in-kebab-case>.md` where `###` is the number of the ADR, starting at `001`. Location @docs/adrs.
-  
+
 
 Structure of an ADR document with YAML frontmatter followed by content:
 ```markdown

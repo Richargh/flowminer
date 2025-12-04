@@ -1,3 +1,8 @@
+---
+name: risk-aware-commit
+description: This skill describes how to make a make a commit with the risk-aware-commit notation.
+---
+
 # Risk-Aware Commit Notation
 STARTER_CHARACTER = 🔒
 
@@ -57,3 +62,4 @@ The general format for commit messages is:
 
 ALWAYS add the 2 character prefix to commit messages.
 IMPORTANT: Never mix `R` commits with `F` or `B` commits. This enforces the separation of structural and behavioral changes.
+

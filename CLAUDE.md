@@ -1,7 +1,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 **ALWAYS** add the STARTER_CHARACTER followed by space at the start of your reply.
-The starter character will change for each `*.research.md`, `*.plan.md` or `*.process.md` file that is in progress.
+The starter character will change for each `*.research.md`, `*.plan.md` or SKILL file that is in progress.
 
 Default STARTER_CHARACTER = 🏃
 
@@ -20,8 +20,6 @@ This is a repo containing two distinct but interconnected parts:
   * Specs, that describe a new feature that we want to build, with the suffix `.spec.md`. Location @docs/specs.
   * Research, that describe the state the app is currently in before implementing the spec, with the suffix `.research.md`. Location @docs/research.
   * Plans, that describe how to implement a spec given the state described in the research, with the suffix `.plan.md`. Location @docs/plans.
-  * Process, that describe general processes to follow and are read on demand, with the suffix `.process.md`. Location @docs/processes.
-    * See this folder when needing to take an action like: "Write an ADR" or "Make a commit".
   * Architecture Decision Records (ADRs), that describe key architecture decisions that were made. Location @docs/adrs.
 * Keep plans simple and concise - avoid over-elaboration, detailed sections, or comprehensive documentation style
 * Plans should be brief, actionable outlines rather than detailed specifications
