@@ -22,7 +22,9 @@ data class Commit(
     val message: String,
     val parents: List<String>,
     val refs: List<String>,
-    val fileChanges: List<FileChange>
+    val fileChanges: List<FileChange>,
+    val trailers: List<Pair<String, String>> = emptyList(),
+    val coAuthors: List<Author> = emptyList()
 )
 
 data class GitMiningResult(

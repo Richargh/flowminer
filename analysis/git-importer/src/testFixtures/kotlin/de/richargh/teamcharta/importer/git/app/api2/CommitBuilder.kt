@@ -10,6 +10,8 @@ class CommitBuilder {
     private var parents: List<String> = emptyList()
     private var refs: List<String> = emptyList()
     private var fileChanges: List<FileChange> = emptyList()
+    private var trailers: List<Pair<String, String>> = emptyList()
+    private var coAuthors: List<Author> = emptyList()
 
     fun hash(hash: String) = apply { this.hash = hash }
     fun author(name: String, email: String) = apply { this.author = Author(name, email) }
@@ -19,6 +21,8 @@ class CommitBuilder {
     fun parents(vararg parents: String) = apply { this.parents = parents.toList() }
     fun refs(vararg refs: String) = apply { this.refs = refs.toList() }
     fun fileChanges(vararg fileChanges: FileChange) = apply { this.fileChanges = fileChanges.toList() }
+    fun trailers(vararg trailers: Pair<String, String>) = apply { this.trailers = trailers.toList() }
+    fun coAuthors(vararg coAuthors: Author) = apply { this.coAuthors = coAuthors.toList() }
 
     fun build(): Commit = Commit(
         hash = hash,
@@ -27,7 +31,9 @@ class CommitBuilder {
         message = message,
         parents = parents,
         refs = refs,
-        fileChanges = fileChanges
+        fileChanges = fileChanges,
+        trailers = trailers,
+        coAuthors = coAuthors
     )
 }
 

@@ -26,6 +26,8 @@ class GitRepositoryParser(
             "refs==>> %D",
             "-----BODY_START-----",
             "%b",
+            "-----TRAILERS_START-----",
+            "%(trailers)",
             "-----FILES_START-----"
         ).joinToString("%n")
 

@@ -30,6 +30,9 @@ class GitLogParser2 {
             .filter { it.isNotEmpty() }
             .mapNotNull { parseNumstatLine(it) }
 
+        val trailers = parseTrailers(raw.trailers)
+        val coAuthors = extractCoAuthors(trailers)
+
         return Commit(
             hash = hash,
             author = Author(authorName, authorEmail),
@@ -37,7 +40,34 @@ class GitLogParser2 {
             message = message,
             parents = parents,
             refs = refs,
-            fileChanges = fileChanges
+            fileChanges = fileChanges,
+            trailers = trailers,
+            coAuthors = coAuthors
+        )
+    }
+
+    private fun parseTrailers(trailersStr: String): List<Pair<String, String>> {
+        if (trailersStr.isBlank()) return emptyList()
+        return trailersStr.lines()
+            .filter { it.contains(":") }
+            .map { line ->
+                val key = line.substringBefore(":").trim()
+                val value = line.substringAfter(":").trim()
+                key to value
+            }
+    }
+
+    private fun extractCoAuthors(trailers: List<Pair<String, String>>): List<Author> {
+        return trailers
+            .filter { it.first.equals("Co-authored-by", ignoreCase = true) }
+            .mapNotNull { parseAuthorValue(it.second) }
+    }
+
+    private fun parseAuthorValue(value: String): Author? {
+        val match = authorPattern.matchEntire(value) ?: return null
+        return Author(
+            name = match.groupValues[1].trim(),
+            email = match.groupValues[2].trim()
         )
     }
 
@@ -55,4 +85,7 @@ class GitLogParser2 {
             deletions = deletions
         )
     }
+
+    private val authorPattern = Regex("""(.+?)\s*<([^>]+)>""")
+
 }

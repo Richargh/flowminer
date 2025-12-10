@@ -42,4 +42,93 @@ class GitLogParser2Test {
                 FileChange("src/Main.kt", additions = 5, deletions = 2))
         })
     }
+
+    @Test
+    fun `should extract trailers section`() {
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            hash==>> abc789
+            author==>> Jane Smith
+            authorMail==>> jane@example.com
+            authorDate==>> 2024-01-17T09:00:00+01:00
+            subject==>> Reviewed commit
+            parents==>> def456
+            refs==>>
+            -----BODY_START-----
+            Some changes.
+            -----TRAILERS_START-----
+            Co-authored-by: John Doe <john@example.com>
+            Signed-off-by: Alice Wonder <alice@example.com>
+            Reviewed-by: Bob Builder <bob@example.com>
+            -----FILES_START-----
+            3	1	src/File.kt
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits shouldContainExactly listOf(aCommit {
+            hash("abc789")
+            author("Jane Smith", "jane@example.com")
+            date(ZonedDateTime.parse("2024-01-17T09:00:00+01:00"))
+            message("Reviewed commit")
+            parents("def456")
+            fileChanges(FileChange("src/File.kt", additions = 3, deletions = 1))
+            trailers(
+                "Co-authored-by" to "John Doe <john@example.com>",
+                "Signed-off-by" to "Alice Wonder <alice@example.com>",
+                "Reviewed-by" to "Bob Builder <bob@example.com>"
+            )
+            coAuthors(Author("John Doe", "john@example.com"))
+        })
+    }
+
+    @Test
+    fun `should extract co-authors from trailers section`() {
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            hash==>> def456
+            author==>> Jane Smith
+            authorMail==>> jane@example.com
+            authorDate==>> 2024-01-16T14:30:00+01:00
+            subject==>> Pair programming commit
+            parents==>> abc123
+            refs==>>
+            -----BODY_START-----
+            Added new feature together.
+            -----TRAILERS_START-----
+            Co-authored-by: John Doe <john@example.com>
+            Co-authored-by: Alice Wonder <alice@example.com>
+            -----FILES_START-----
+            10	5	src/Feature.kt
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits shouldContainExactly listOf(aCommit {
+            hash("def456")
+            author("Jane Smith", "jane@example.com")
+            date(ZonedDateTime.parse("2024-01-16T14:30:00+01:00"))
+            message("Pair programming commit")
+            parents("abc123")
+            fileChanges(FileChange("src/Feature.kt", additions = 10, deletions = 5))
+            trailers(
+                "Co-authored-by" to "John Doe <john@example.com>",
+                "Co-authored-by" to "Alice Wonder <alice@example.com>"
+            )
+            coAuthors(
+                Author("John Doe", "john@example.com"),
+                Author("Alice Wonder", "alice@example.com")
+            )
+        })
+    }
 }
