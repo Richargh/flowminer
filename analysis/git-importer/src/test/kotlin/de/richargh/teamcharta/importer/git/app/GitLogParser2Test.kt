@@ -214,6 +214,76 @@ class GitLogParser2Test {
         result.commits[0].commitTypes shouldContainExactly listOf(CommitType.FEATURE)
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "fix: add login",
+        "bug: add login",
+        "bugfix: add login",
+        "hotfix: add login",
+        "b: add login",
+        "B: add login",
+        "fix(scope): add login",
+        "fix[scope]: add login",
+        "bug(scope): add login",
+        "bug[scope]: add login",
+        "bugfix(scope): add login",
+        "bugfix[scope]: add login",
+        "hotfix(scope): add login",
+        "hotfix[scope]: add login",
+
+        "b: add login",
+        "B: add login",
+        "b(scope): add login",
+        "b[scope]: add login",
+        "B(scope): add login",
+        "B[scope]: add login",
+        ". b: add login",
+        "^ b: add login",
+        "@ b: add login",
+        ". b(scope): add login",
+        "^ b(scope): add login",
+        "@ b(scope): add login",
+        ". b[scope]: add login",
+        "^ b[scope]: add login",
+        "@ b[scope]: add login",
+
+        "fix     : add login",
+        "bug   [scope]  : add login",
+        "bugfix   (scope)   : add login",
+        "B   [scope]  : add login",
+        "@ b     : add login",
+        "^ b  (scope)  : add login",
+        "^ b   [scope]   : add login",
+        "B  : add login",
+        "b    add login",
+        "   B  (scope): add login",
+        "@ b[scope]   add login",
+    ])
+    fun `should detect FIX commit type from message`(subject: String) {
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            hash==>> abc123
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00:00+01:00
+            subject==>> $subject
+            parents==>> parent1
+            refs==>>
+            -----BODY_START-----
+            -----FILES_START-----
+            5	2	src/Login.kt
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0].commitTypes shouldContainExactly listOf(CommitType.FIX)
+    }
+
     @Test
     fun `should deduplicate co-authors with different trailer key variations`() {
         // Given

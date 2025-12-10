@@ -94,10 +94,14 @@ class GitLogParser2 {
         if (featurePattern.containsMatchIn(message)) {
             types.add(CommitType.FEATURE)
         }
+        if (fixPattern.containsMatchIn(message)) {
+            types.add(CommitType.FIX)
+        }
         return types
     }
 
     private val authorPattern = Regex("""(.+?)\s*<([^>]+)>""")
     private val featurePattern = Regex("""^\s*([.^@!]\s+)?(feat|feature|f)\s*(\(.+\)|\[.+\])?\s*:?\s""", RegexOption.IGNORE_CASE)
+    private val fixPattern = Regex("""^\s*([.^@!]\s+)?(fix|bug|bugfix|hotfix|b)\s*(\(.+\)|\[.+\])?\s*:?\s""", RegexOption.IGNORE_CASE)
 
 }
