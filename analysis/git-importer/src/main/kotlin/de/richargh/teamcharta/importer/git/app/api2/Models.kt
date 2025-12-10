@@ -24,7 +24,7 @@ data class Commit(
     val refs: List<String>,
     val fileChanges: List<FileChange>,
     val trailers: List<Pair<String, String>> = emptyList(),
-    val coAuthors: List<Author> = emptyList()
+    val coAuthors: Set<Author> = emptySet()
 )
 
 data class GitMiningResult(

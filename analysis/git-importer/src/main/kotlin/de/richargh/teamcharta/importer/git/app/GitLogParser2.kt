@@ -57,10 +57,11 @@ class GitLogParser2 {
             }
     }
 
-    private fun extractCoAuthors(trailers: List<Pair<String, String>>): List<Author> {
+    private fun extractCoAuthors(trailers: List<Pair<String, String>>): Set<Author> {
         return trailers
             .filter { it.first.equals("Co-authored-by", ignoreCase = true) }
             .mapNotNull { parseAuthorValue(it.second) }
+            .toSet()
     }
 
     private fun parseAuthorValue(value: String): Author? {
