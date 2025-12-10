@@ -284,6 +284,70 @@ class GitLogParser2Test {
         result.commits[0].commitTypes shouldContainExactly listOf(CommitType.FIX)
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "refactor: add login",
+        "refactoring: add login",
+        "r: add login",
+        "R: add login",
+        "refactor(scope): add login",
+        "refactor[scope]: add login",
+        "refactoring(scope): add login",
+        "refactoring[scope]: add login",
+
+        "r: add login",
+        "R: add login",
+        "r(scope): add login",
+        "r[scope]: add login",
+        "R(scope): add login",
+        "R[scope]: add login",
+        ". r: add login",
+        "^ r: add login",
+        "@ r: add login",
+        ". r(scope): add login",
+        "^ r(scope): add login",
+        "@ r(scope): add login",
+        ". r[scope]: add login",
+        "^ r[scope]: add login",
+        "@ r[scope]: add login",
+
+        "refactor     : add login",
+        "refactoring   [scope]  : add login",
+        "refactor   (scope)   : add login",
+        "R   [scope]  : add login",
+        "@ r     : add login",
+        "^ r  (scope)  : add login",
+        "^ r   [scope]   : add login",
+        "R  : add login",
+        "r    add login",
+        "   R  (scope): add login",
+        "@ r[scope]   add login",
+    ])
+    fun `should detect REFACTOR commit type from message`(subject: String) {
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            hash==>> abc123
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00:00+01:00
+            subject==>> $subject
+            parents==>> parent1
+            refs==>>
+            -----BODY_START-----
+            -----FILES_START-----
+            5	2	src/Login.kt
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0].commitTypes shouldContainExactly listOf(CommitType.REFACTOR)
+    }
+
     @Test
     fun `should deduplicate co-authors with different trailer key variations`() {
         // Given
