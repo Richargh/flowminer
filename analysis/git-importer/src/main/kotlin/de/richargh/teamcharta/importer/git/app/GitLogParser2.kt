@@ -32,6 +32,7 @@ class GitLogParser2 {
 
         val trailers = parseTrailers(raw.trailers)
         val coAuthors = extractCoAuthors(trailers)
+        val commitTypes = detectCommitTypes(message)
 
         return Commit(
             hash = hash,
@@ -42,7 +43,8 @@ class GitLogParser2 {
             refs = refs,
             fileChanges = fileChanges,
             trailers = trailers,
-            coAuthors = coAuthors
+            coAuthors = coAuthors,
+            commitTypes = commitTypes
         )
     }
 
@@ -87,6 +89,15 @@ class GitLogParser2 {
         )
     }
 
+    private fun detectCommitTypes(message: String): List<CommitType> {
+        val types = mutableListOf<CommitType>()
+        if (featurePattern.containsMatchIn(message)) {
+            types.add(CommitType.FEATURE)
+        }
+        return types
+    }
+
     private val authorPattern = Regex("""(.+?)\s*<([^>]+)>""")
+    private val featurePattern = Regex("""^\s*([.^@!]\s+)?(feat|feature|f)\s*(\(.+\)|\[.+\])?\s*:?\s""", RegexOption.IGNORE_CASE)
 
 }

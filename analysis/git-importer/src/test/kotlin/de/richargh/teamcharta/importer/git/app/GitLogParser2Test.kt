@@ -1,8 +1,14 @@
 package de.richargh.teamcharta.importer.git.app
 
 import de.richargh.teamcharta.importer.git.app.api2.*
+import de.richargh.teamcharta.importer.git.app.api2.CommitType
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.should
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.time.ZonedDateTime
 
 class GitLogParser2Test {
@@ -113,6 +119,99 @@ class GitLogParser2Test {
             Author("John Doe", "john@example.com"),
             Author("Alice Wonder", "alice@example.com")
         )
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "add login",
+    ])
+    fun `should not detect commit type from message when none is there`(subject: String) {
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            hash==>> abc123
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00:00+01:00
+            subject==>> $subject
+            parents==>> parent1
+            refs==>>
+            -----BODY_START-----
+            -----FILES_START-----
+            5	2	src/Login.kt
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0].commitTypes.shouldBeEmpty()
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "feat: add login",
+        "feature: add login",
+        "f: add login",
+        "F: add login",
+        "feat(scope): add login",
+        "feat[scope]: add login",
+        "feature(scope): add login",
+        "feature[scope]: add login",
+
+        "f: add login",
+        "F: add login",
+        "f(scope): add login",
+        "f[scope]: add login",
+        "F(scope): add login",
+        "F[scope]: add login",
+        ". f: add login",
+        "^ f: add login",
+        "@ f: add login",
+        ". f(scope): add login",
+        "^ f(scope): add login",
+        "@ f(scope): add login",
+        ". f[scope]: add login",
+        "^ f[scope]: add login",
+        "@ f[scope]: add login",
+
+        "feature     : add login",
+        "feat   [scope]  : add login",
+        "feature   (scope)   : add login",
+        "F   [scope]  : add login",
+        "@ f     : add login",
+        "^ f  (scope)  : add login",
+        "^ f   [scope]   : add login",
+        "F  : add login",
+        "f    add login",
+        "   F  (scope): add login",
+        "@ f[scope]   add login",
+    ])
+    fun `should detect FEATURE commit type from message`(subject: String) {
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            hash==>> abc123
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00:00+01:00
+            subject==>> $subject
+            parents==>> parent1
+            refs==>>
+            -----BODY_START-----
+            -----FILES_START-----
+            5	2	src/Login.kt
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0].commitTypes shouldContainExactly listOf(CommitType.FEATURE)
     }
 
     @Test

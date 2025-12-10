@@ -2,6 +2,16 @@ package de.richargh.teamcharta.importer.git.app.api2
 
 import java.time.ZonedDateTime
 
+enum class CommitType {
+    FEATURE,
+    FIX,
+    REFACTOR,
+    TEST,
+    DOCS,
+    ENVIRONMENT,
+    UNKNOWN
+}
+
 data class Author(
     val name: String,
     val email: String
@@ -24,7 +34,8 @@ data class Commit(
     val refs: List<String>,
     val fileChanges: List<FileChange>,
     val trailers: List<Pair<String, String>> = emptyList(),
-    val coAuthors: Set<Author> = emptySet()
+    val coAuthors: Set<Author> = emptySet(),
+    val commitTypes: List<CommitType> = emptyList()
 )
 
 data class GitMiningResult(
