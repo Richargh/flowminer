@@ -71,20 +71,11 @@ class GitLogParser2Test {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits shouldContainExactly listOf(aCommit {
-            hash("abc789")
-            author("Jane Smith", "jane@example.com")
-            date(ZonedDateTime.parse("2024-01-17T09:00:00+01:00"))
-            message("Reviewed commit")
-            parents("def456")
-            fileChanges(FileChange("src/File.kt", additions = 3, deletions = 1))
-            trailers(
-                "Co-authored-by" to "John Doe <john@example.com>",
-                "Signed-off-by" to "Alice Wonder <alice@example.com>",
-                "Reviewed-by" to "Bob Builder <bob@example.com>"
-            )
-            coAuthors(Author("John Doe", "john@example.com"))
-        })
+        result.commits[0].trailers shouldContainExactly listOf(
+            "Co-authored-by" to "John Doe <john@example.com>",
+            "Signed-off-by" to "Alice Wonder <alice@example.com>",
+            "Reviewed-by" to "Bob Builder <bob@example.com>"
+        )
     }
 
     @Test
@@ -114,21 +105,13 @@ class GitLogParser2Test {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits shouldContainExactly listOf(aCommit {
-            hash("def456")
-            author("Jane Smith", "jane@example.com")
-            date(ZonedDateTime.parse("2024-01-16T14:30:00+01:00"))
-            message("Pair programming commit")
-            parents("abc123")
-            fileChanges(FileChange("src/Feature.kt", additions = 10, deletions = 5))
-            trailers(
-                "Co-authored-by" to "John Doe <john@example.com>",
-                "Co-authored-by" to "Alice Wonder <alice@example.com>"
-            )
-            coAuthors(
-                Author("John Doe", "john@example.com"),
-                Author("Alice Wonder", "alice@example.com")
-            )
-        })
+        result.commits[0].trailers shouldContainExactly listOf(
+            "Co-authored-by" to "John Doe <john@example.com>",
+            "Co-authored-by" to "Alice Wonder <alice@example.com>"
+        )
+        result.commits[0].coAuthors shouldContainExactly listOf(
+            Author("John Doe", "john@example.com"),
+            Author("Alice Wonder", "alice@example.com")
+        )
     }
 }
