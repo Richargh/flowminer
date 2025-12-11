@@ -11,6 +11,10 @@ class CommitTypeDetectionTest {
     @ParameterizedTest
     @ValueSource(strings = [
         "add login",
+        // feat/bugfix/etc. are only keywords when they start the commit
+        "this feature is amazing",
+        "this might cause a bug",
+        "I think this was the fix"
     ])
     fun `should not detect commit type from message when none is there`(subject: String) {
         // Given
