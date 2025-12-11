@@ -298,4 +298,74 @@ class CommitTypeDetectionTest {
         // Then
         result.commits[0].commitTypes shouldContainExactly listOf(CommitType.TEST)
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "build: add login",
+        "chore: add login",
+        "ci: add login",
+        "ops: add login",
+        "E: add login",
+        "e: add login",
+        "build(scope): add login",
+        "build[scope]: add login",
+        "chore(scope): add login",
+        "chore[scope]: add login",
+        "ci(scope): add login",
+        "ci[scope]: add login",
+        "ops(scope): add login",
+        "ops[scope]: add login",
+
+        "e: add login",
+        "E: add login",
+        "e(scope): add login",
+        "e[scope]: add login",
+        "E(scope): add login",
+        "E[scope]: add login",
+        ". e: add login",
+        "^ e: add login",
+        "@ e: add login",
+        ". e(scope): add login",
+        "^ e(scope): add login",
+        "@ e(scope): add login",
+        ". e[scope]: add login",
+        "^ e[scope]: add login",
+        "@ e[scope]: add login",
+
+        "build     : add login",
+        "chore   [scope]  : add login",
+        "ci   (scope)   : add login",
+        "E   [scope]  : add login",
+        "@ e     : add login",
+        "^ e  (scope)  : add login",
+        "^ e   [scope]   : add login",
+        "E  : add login",
+        "e    add login",
+        "   E  (scope): add login",
+        "@ e[scope]   add login",
+    ])
+    fun `should detect ENVIRONMENT commit type from message`(subject: String) {
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            hash==>> abc123
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00:00+01:00
+            subject==>> $subject
+            parents==>> parent1
+            refs==>>
+            -----BODY_START-----
+            -----FILES_START-----
+            5	2	src/Login.kt
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0].commitTypes shouldContainExactly listOf(CommitType.ENVIRONMENT)
+    }
 }

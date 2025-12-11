@@ -103,6 +103,9 @@ class GitLogParser2 {
         if (testPattern.containsMatchIn(message)) {
             types.add(CommitType.TEST)
         }
+        if (environmentPattern.containsMatchIn(message)) {
+            types.add(CommitType.ENVIRONMENT)
+        }
         return types
     }
 
@@ -111,5 +114,6 @@ class GitLogParser2 {
     private val fixPattern = Regex("""^\s*([.^@!]\s+)?(fix|bug|bugfix|hotfix|b)\s*(\(.+\)|\[.+\])?\s*:?\s""", RegexOption.IGNORE_CASE)
     private val refactorPattern = Regex("""^\s*([.^@!]\s+)?(refactor|refactoring|r)\s*(\(.+\)|\[.+\])?\s*:?\s""", RegexOption.IGNORE_CASE)
     private val testPattern = Regex("""^\s*([.^@!]\s+)?(test|testing|t)\s*(\(.+\)|\[.+\])?\s*:?\s""", RegexOption.IGNORE_CASE)
+    private val environmentPattern = Regex("""^\s*([.^@!]\s+)?(build|chore|ci|ops|e)\s*(\(.+\)|\[.+\])?\s*:?\s""", RegexOption.IGNORE_CASE)
 
 }
