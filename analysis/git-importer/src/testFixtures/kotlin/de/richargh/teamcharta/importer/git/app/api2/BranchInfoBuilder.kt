@@ -4,21 +4,21 @@ import java.time.ZonedDateTime
 
 class BranchInfoBuilder {
     private var name: String = "feature-branch"
-    private var firstCommitHash: String = "abc123"
+    private var firstCommitHash: CommitHash = CommitHash("abc123")
     private var firstCommitDate: ZonedDateTime = ZonedDateTime.parse("2024-01-10T10:00:00+01:00")
-    private var mergeCommitHash: String? = null
+    private var mergeCommitHash: CommitHash? = null
     private var mergeDate: ZonedDateTime? = null
     private var targetBranch: String? = null
 
     fun name(name: String) = apply { this.name = name }
-    fun firstCommitHash(hash: String) = apply { this.firstCommitHash = hash }
+    fun firstCommitHash(hash: String) = apply { this.firstCommitHash = CommitHash(hash) }
     fun firstCommitDate(date: ZonedDateTime) = apply { this.firstCommitDate = date }
-    fun mergeCommitHash(hash: String) = apply { this.mergeCommitHash = hash }
+    fun mergeCommitHash(hash: String) = apply { this.mergeCommitHash = CommitHash(hash) }
     fun mergeDate(date: ZonedDateTime) = apply { this.mergeDate = date }
     fun targetBranch(branch: String) = apply { this.targetBranch = branch }
 
     fun mergedInto(targetBranch: String, mergeDate: ZonedDateTime, mergeCommitHash: String) = apply {
-        this.mergeCommitHash = mergeCommitHash
+        this.mergeCommitHash = CommitHash(mergeCommitHash)
         this.mergeDate = mergeDate
         this.targetBranch = targetBranch
     }

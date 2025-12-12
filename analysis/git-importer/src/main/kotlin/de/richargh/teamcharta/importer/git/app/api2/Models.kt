@@ -13,6 +13,7 @@ enum class CommitType {
 }
 
 data class WorkKey(val key: String)
+data class CommitHash(val rawValue: String)
 
 data class Author(
     val name: String,
@@ -28,11 +29,11 @@ data class FileChange(
 )
 
 data class Commit(
-    val hash: String,
+    val hash: CommitHash,
     val author: Author,
     val date: ZonedDateTime,
     val message: String,
-    val parents: List<String>,
+    val parents: List<CommitHash>,
     val refs: List<String>,
     val fileChanges: List<FileChange>,
     val trailers: List<Pair<String, String>>,
@@ -43,16 +44,16 @@ data class Commit(
 
 data class BranchInfo(
     val name: String,
-    val firstCommitHash: String,
+    val firstCommitHash: CommitHash,
     val firstCommitDate: ZonedDateTime,
-    val mergeCommitHash: String?,
+    val mergeCommitHash: CommitHash?,
     val mergeDate: ZonedDateTime?,
     val targetBranch: String?
 ) {
     companion object {
         fun unmerged(
             name: String,
-            firstCommitHash: String,
+            firstCommitHash: CommitHash,
             firstCommitDate: ZonedDateTime): BranchInfo {
             return BranchInfo(
                 name,
@@ -65,9 +66,9 @@ data class BranchInfo(
 
         fun merged(
             name: String,
-            firstCommitHash: String,
+            firstCommitHash: CommitHash,
             firstCommitDate: ZonedDateTime,
-            mergeCommitHash: String,
+            mergeCommitHash: CommitHash,
             mergeDate: ZonedDateTime,
             targetBranch: String): BranchInfo {
             return BranchInfo(

@@ -16,16 +16,17 @@ class GitLogParser2 {
     }
 
     private fun parseCommit(raw: RawCommit): Commit {
-        val hash = raw.headerFields["hash"] ?: ""
+        val hash = raw.headerFields["hash"]?.let(::CommitHash)
+            ?: throw IllegalArgumentException("Commit has no hash")
         val authorName = raw.headerFields["author"] ?: ""
         val authorEmail = raw.headerFields["authorMail"] ?: ""
         val rawDate = raw.headerFields["authorDate"] ?: ""
         val message = raw.headerFields["subject"] ?: ""
-        val parentsStr = raw.headerFields["parents"] ?: ""
+        val rawParents = raw.headerFields["parents"] ?: ""
         val refsStr = raw.headerFields["refs"] ?: ""
 
         val date = ZonedDateTime.parse(rawDate)
-        val parents = parentsStr.split(" ").filter { it.isNotEmpty() }
+        val parents = rawParents.split(" ").filter { it.isNotEmpty() }.map(::CommitHash)
         val refs = if (refsStr.isEmpty()) emptyList() else listOf(refsStr)
 
         val fileChanges = raw.files.lines()
