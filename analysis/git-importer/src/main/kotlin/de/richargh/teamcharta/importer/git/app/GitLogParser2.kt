@@ -23,11 +23,11 @@ class GitLogParser2 {
         val rawDate = raw.headerFields["authorDate"] ?: ""
         val message = raw.headerFields["subject"] ?: ""
         val rawParents = raw.headerFields["parents"] ?: ""
-        val refsStr = raw.headerFields["refs"] ?: ""
+        val rawRefs = raw.headerFields["refs"] ?: ""
 
         val date = ZonedDateTime.parse(rawDate)
         val parents = rawParents.split(" ").filter { it.isNotEmpty() }.map(::CommitHash)
-        val refs = if (refsStr.isEmpty()) emptyList() else listOf(refsStr)
+        val refs = parseRefs(rawRefs)
 
         val fileChanges = raw.files.lines()
             .filter { it.isNotEmpty() }
@@ -113,6 +113,20 @@ class GitLogParser2 {
         }
 
         return workKeys
+    }
+
+    private fun parseRefs(rawRefs: String): List<Ref> {
+        if (rawRefs.isEmpty()) return emptyList()
+        return rawRefs.split(",").map { it.trim() }.mapNotNull { parseRef(it) }
+    }
+
+    private fun parseRef(rawRef: String): Ref? {
+        return when {
+            rawRef.startsWith("HEAD -> ") -> Ref.Head(rawRef.removePrefix("HEAD -> "))
+            rawRef.startsWith("tag: ") -> Ref.Tag(rawRef.removePrefix("tag: "))
+            rawRef.isNotEmpty() -> Ref.Branch(rawRef)
+            else -> null
+        }
     }
 
     private val authorPattern = Regex("""(?<name>.+?)\s*<(?<email>[^>]+)>""")

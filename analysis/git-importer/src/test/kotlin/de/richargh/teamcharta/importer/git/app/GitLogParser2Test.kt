@@ -37,7 +37,7 @@ class GitLogParser2Test {
             date(ZonedDateTime.parse("2024-01-15T10:00:00+01:00"))
             message("Initial commit")
             parents("parent1")
-            refs("HEAD -> main")
+            headRef("main")
             fileChanges(
                 FileChange("src/Main.kt", additions = 5, deletions = 2))
         })

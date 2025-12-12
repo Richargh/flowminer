@@ -15,6 +15,12 @@ enum class CommitType {
 data class WorkKey(val key: String)
 data class CommitHash(val rawValue: String)
 
+sealed interface Ref {
+    data class Head(val branchName: String) : Ref
+    data class Branch(val name: String) : Ref
+    data class Tag(val name: String) : Ref
+}
+
 data class Author(
     val name: String,
     val email: String
@@ -34,7 +40,7 @@ data class Commit(
     val date: ZonedDateTime,
     val message: String,
     val parents: List<CommitHash>,
-    val refs: List<String>,
+    val refs: List<Ref>,
     val fileChanges: List<FileChange>,
     val trailers: List<Pair<String, String>>,
     val coAuthors: Set<Author>,
@@ -43,16 +49,16 @@ data class Commit(
 )
 
 data class BranchInfo(
-    val name: String,
+    val name: Ref.Branch,
     val firstCommitHash: CommitHash,
     val firstCommitDate: ZonedDateTime,
     val mergeCommitHash: CommitHash?,
     val mergeDate: ZonedDateTime?,
-    val targetBranch: String?
+    val targetBranch: Ref.Branch?
 ) {
     companion object {
         fun unmerged(
-            name: String,
+            name: Ref.Branch,
             firstCommitHash: CommitHash,
             firstCommitDate: ZonedDateTime): BranchInfo {
             return BranchInfo(
@@ -65,12 +71,12 @@ data class BranchInfo(
         }
 
         fun merged(
-            name: String,
+            name: Ref.Branch,
             firstCommitHash: CommitHash,
             firstCommitDate: ZonedDateTime,
             mergeCommitHash: CommitHash,
             mergeDate: ZonedDateTime,
-            targetBranch: String): BranchInfo {
+            targetBranch: Ref.Branch): BranchInfo {
             return BranchInfo(
                 name,
                 firstCommitHash,
@@ -83,7 +89,7 @@ data class BranchInfo(
 }
 
 class BranchInfos(branches: List<BranchInfo>) {
-    private val branchFor: Map<String, BranchInfo> = branches.associateBy { it.name }
+    private val branchFor: Map<String, BranchInfo> = branches.associateBy { it.name.name }
 
     operator fun get(name: String): BranchInfo? = branchFor[name]
 
