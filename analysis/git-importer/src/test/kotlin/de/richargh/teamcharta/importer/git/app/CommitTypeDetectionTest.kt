@@ -3,6 +3,8 @@ package de.richargh.teamcharta.importer.git.app
 import de.richargh.teamcharta.importer.git.app.api2.CommitType
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -38,7 +40,7 @@ class CommitTypeDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0].commitTypes.shouldBeEmpty()
+        result.commits[0].commitType.shouldBeNull()
     }
 
     @ParameterizedTest
@@ -108,7 +110,7 @@ class CommitTypeDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0].commitTypes shouldContainExactly listOf(CommitType.FEATURE)
+        result.commits[0].commitType shouldBe CommitType.FEATURE
     }
 
     @ParameterizedTest
@@ -184,7 +186,7 @@ class CommitTypeDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0].commitTypes shouldContainExactly listOf(CommitType.FIX)
+        result.commits[0].commitType shouldBe CommitType.FIX
     }
 
     @ParameterizedTest
@@ -255,7 +257,7 @@ class CommitTypeDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0].commitTypes shouldContainExactly listOf(CommitType.REFACTOR)
+        result.commits[0].commitType shouldBe CommitType.REFACTOR
     }
 
     @ParameterizedTest
@@ -326,7 +328,7 @@ class CommitTypeDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0].commitTypes shouldContainExactly listOf(CommitType.TEST)
+        result.commits[0].commitType shouldBe CommitType.TEST
     }
 
     @ParameterizedTest
@@ -402,6 +404,6 @@ class CommitTypeDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0].commitTypes shouldContainExactly listOf(CommitType.ENVIRONMENT)
+        result.commits[0].commitType shouldBe CommitType.ENVIRONMENT
     }
 }
