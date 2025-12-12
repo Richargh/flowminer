@@ -15,31 +15,7 @@ class GitRepositoryParser(
     }
 
     private fun startGitLog(repoPath: File, since: String): Process {
-        val format = listOf(
-            "-----COMMIT_START-----",
-            "hash==>> %H",
-            "author==>> %an",
-            "authorMail==>> %ae",
-            "authorDate==>> %aI",
-            "subject==>> %s",
-            "parents==>> %P",
-            "refs==>> %D",
-            "-----BODY_START-----",
-            "%b",
-            "-----TRAILERS_START-----",
-            "%(trailers)",
-            "-----FILES_START-----"
-        ).joinToString("%n")
-
-        val command = listOf(
-            "git", "log",
-            "--all",
-            "--numstat",
-            "--topo-order",
-            "--reverse",
-            "--since=$since",
-            "--pretty=format:$format"
-        )
+        val command = gitLogCommand(since)
 
         return ProcessBuilder(command)
             .directory(repoPath)
@@ -47,3 +23,35 @@ class GitRepositoryParser(
             .start()
     }
 }
+
+private fun gitLogCommand(since: String): List<String>{
+    val format = listOf(
+        "-----COMMIT_START-----",
+        "hash==>> %H",
+        "author==>> %an",
+        "authorMail==>> %ae",
+        "authorDate==>> %aI",
+        "subject==>> %s",
+        "parents==>> %P",
+        "refs==>> %D",
+        "-----BODY_START-----",
+        "%b",
+        "-----TRAILERS_START-----",
+        "%(trailers)",
+        "-----FILES_START-----"
+    ).joinToString("%n")
+
+    return listOf(
+        "git", "log",
+        "--all",
+        "--numstat",
+        "--topo-order",
+        "--reverse",
+        "--since=$since",
+        "--pretty=format:$format"
+    )
+}
+
+//fun main(){
+//    println(gitLogCommand("3 months ago").joinToString(" "))
+//}
