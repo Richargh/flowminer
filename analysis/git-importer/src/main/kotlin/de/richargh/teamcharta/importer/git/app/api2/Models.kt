@@ -12,6 +12,8 @@ enum class CommitType {
     UNKNOWN
 }
 
+data class WorkKey(val key: String)
+
 data class Author(
     val name: String,
     val email: String
@@ -35,7 +37,8 @@ data class Commit(
     val fileChanges: List<FileChange>,
     val trailers: List<Pair<String, String>>,
     val coAuthors: Set<Author>,
-    val commitType: CommitType
+    val commitType: CommitType,
+    val workKeys: List<WorkKey>
 )
 
 data class GitMiningResult(

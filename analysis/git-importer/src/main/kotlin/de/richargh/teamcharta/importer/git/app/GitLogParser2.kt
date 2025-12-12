@@ -33,6 +33,7 @@ class GitLogParser2 {
         val trailers = parseTrailers(raw.trailers)
         val coAuthors = extractCoAuthors(trailers)
         val commitType = detectCommitTypes(message)
+        val workKeys = detectWorkKeys(message)
 
         return Commit(
             hash = hash,
@@ -44,7 +45,8 @@ class GitLogParser2 {
             fileChanges = fileChanges,
             trailers = trailers,
             coAuthors = coAuthors,
-            commitType = commitType
+            commitType = commitType,
+            workKeys = workKeys
         )
     }
 
@@ -96,8 +98,24 @@ class GitLogParser2 {
         return commitTypes[firstWord] ?: CommitType.UNKNOWN
     }
 
+    private fun detectWorkKeys(message: String): List<WorkKey> {
+        val workKeys = mutableListOf<WorkKey>()
+
+        gitHubWorkKeyPattern.findAll(message).forEach { match ->
+            workKeys.add(WorkKey(match.value))
+        }
+
+        jiraWorkKeyPattern.findAll(message).forEach { match ->
+            workKeys.add(WorkKey(match.value))
+        }
+
+        return workKeys
+    }
+
     private val authorPattern = Regex("""(?<name>.+?)\s*<(?<email>[^>]+)>""")
     private val firstWordPattern = Regex("""^\W*(?<firstWord>\w+)""")
+    private val gitHubWorkKeyPattern = Regex("""#\d+""")
+    private val jiraWorkKeyPattern = Regex("""\b[A-Z]{2,10}-\d+\b""")
 
     private val commitTypes = mapOf(
         "feat" to CommitType.FEATURE,

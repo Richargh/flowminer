@@ -13,6 +13,7 @@ class CommitBuilder {
     private var trailers: List<Pair<String, String>> = emptyList()
     private var coAuthors: Set<Author> = emptySet()
     private var commitType: CommitType = CommitType.UNKNOWN
+    private var workKeys: List<WorkKey> = emptyList()
 
     fun hash(hash: String) = apply { this.hash = hash }
     fun author(name: String, email: String) = apply { this.author = Author(name, email) }
@@ -24,6 +25,7 @@ class CommitBuilder {
     fun fileChanges(vararg fileChanges: FileChange) = apply { this.fileChanges = fileChanges.toList() }
     fun trailers(vararg trailers: Pair<String, String>) = apply { this.trailers = trailers.toList() }
     fun coAuthors(vararg coAuthors: Author) = apply { this.coAuthors = coAuthors.toSet() }
+    fun workKeys(vararg workKeys: WorkKey) = apply { this.workKeys = workKeys.toList() }
 
     fun build(): Commit = Commit(
         hash = hash,
@@ -35,7 +37,8 @@ class CommitBuilder {
         fileChanges = fileChanges,
         trailers = trailers,
         coAuthors = coAuthors,
-        commitType
+        commitType = commitType,
+        workKeys = workKeys
     )
 }
 
