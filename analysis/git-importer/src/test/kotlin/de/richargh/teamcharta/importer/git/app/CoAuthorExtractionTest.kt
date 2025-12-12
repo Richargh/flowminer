@@ -10,7 +10,7 @@ class CoAuthorExtractionTest {
     fun `should extract co-authors`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry {
+            anEntry("main") {
                 trailers(
                     "Co-authored-by" to "John Doe <john@example.com>",
                     "Co-authored-by" to "Alice Wonder <alice@example.com>"
@@ -38,7 +38,7 @@ class CoAuthorExtractionTest {
     fun `should deduplicate co-authors with different trailer key variations`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry {
+            anEntry("main") {
                 trailers(
                     "Co-authored-by" to "John Doe <john@example.com>",
                     "co-authored-by" to "John Doe <john@example.com>",

@@ -1,48 +1,57 @@
 package de.richargh.teamcharta.importer.git.app
 
+import de.richargh.teamcharta.importer.git.app.api2.CommitHash
+import de.richargh.teamcharta.importer.git.app.api2.hash
 import java.time.ZonedDateTime
 
 class GitLogEntryBuilder {
-    private var hash: String = "abc123"
+    private var hash: CommitHash = CommitHash("abc123")
     private var author: String = "John Doe"
     private var authorMail: String = "john@example.com"
     private var authorDate: ZonedDateTime = ZonedDateTime.parse("2024-01-15T10:00:00+01:00")
     private var subject: String = "Initial commit"
-    private var parents: List<String> = emptyList()
+    private var parents: MutableList<CommitHash> = mutableListOf()
     private var refs: List<String> = emptyList()
     private var body: String = ""
     private var trailers: List<Pair<String, String>> = emptyList()
     private var fileChanges: List<FileChangeEntry> = emptyList()
 
-    fun hash(hash: String) = apply { this.hash = hash }
+    fun hash(hash: CommitHash) = apply { this.hash = hash }
+    fun hash() = hash
     fun author(name: String) = apply { this.author = name }
     fun authorMail(email: String) = apply { this.authorMail = email }
     fun author(name: String, email: String) = apply {
         this.author = name
         this.authorMail = email
     }
+
     fun authorDate(date: ZonedDateTime) = apply { this.authorDate = date }
     fun subject(subject: String) = apply { this.subject = subject }
-    fun parents(vararg parents: String) = apply { this.parents = parents.toList() }
+    fun parents(vararg parents: CommitHash) = apply { this.parents = parents.toMutableList() }
+    fun parents() = parents
+    operator fun plus(parent: CommitHash) {
+        this.parents.add(parent)
+    }
+
     fun refs(vararg refs: String) = apply { this.refs = refs.toList() }
-    fun headRef(branchName: String) = apply { this.refs = this.refs + "HEAD -> $branchName" }
-    fun branch(name: String) = apply { this.refs = this.refs + name }
-    fun tag(name: String) = apply { this.refs = this.refs + "tag: $name" }
+    fun refHead(branch: String) = apply { this.refs += "HEAD -> $branch" }
+    fun refBranch(branch: String) = apply { this.refs += branch }
+    fun refTag(name: String) = apply { this.refs += "tag: $name" }
     fun body(body: String) = apply { this.body = body }
     fun trailers(vararg trailers: Pair<String, String>) = apply { this.trailers = trailers.toList() }
     fun fileChanges(vararg changes: FileChangeEntry) = apply { this.fileChanges = changes.toList() }
     fun file(path: String, additions: Int = 0, deletions: Int = 0) = apply {
-        this.fileChanges = this.fileChanges + FileChangeEntry(path, additions, deletions)
+        this.fileChanges += FileChangeEntry(path, additions, deletions)
     }
 
     fun build(): String = buildString {
         appendLine("-----COMMIT_START-----")
-        appendLine("hash==>> $hash")
+        appendLine("hash==>> ${hash.rawValue}")
         appendLine("author==>> $author")
         appendLine("authorMail==>> $authorMail")
         appendLine("authorDate==>> $authorDate")
         appendLine("subject==>> $subject")
-        appendLine("parents==>> ${parents.joinToString(" ")}")
+        appendLine("parents==>> ${parents.joinToString(" ") { it.rawValue }}")
         appendLine("refs==>> ${refs.joinToString(", ")}")
         appendLine("-----BODY_START-----")
         if (body.isNotEmpty()) {
@@ -69,16 +78,77 @@ data class FileChangeEntry(
 
 class GitLogBuilder {
     private val entries = mutableListOf<GitLogEntryBuilder>()
+    private val branchForEntry = mutableMapOf<CommitHash, String>()
+    private val entriesForBranch = mutableMapOf<String, MutableList<GitLogEntryBuilder>>()
 
-    fun anEntry(block: GitLogEntryBuilder.() -> Unit = {}) = apply {
-        entries.add(GitLogEntryBuilder().apply(block))
+    fun anEntry(branch: String, parentBranchName: String? = null, block: GitLogEntryBuilder.() -> Unit = {}): CommitHash {
+        val builder = GitLogEntryBuilder()
+        builder.hash(entries.size.toString().hash())
+        builder.apply(block)
+
+        if(parentBranchName != null) {
+            val parentCommit = findLatestInBranch(parentBranchName)
+            builder.parents(parentCommit)
+        }
+        addCommitToBranch(builder, branch)
+        entries.add(builder)
+
+        return builder.hash()
     }
 
-    fun build(): String = entries.joinToString("\n") { it.build() }
+    private fun addCommitToBranch(builder: GitLogEntryBuilder, branch: String) {
+        branchForEntry[builder.hash()] = branch
+        entriesForBranch.getOrPut(branch) { mutableListOf() }.add(builder)
+    }
+
+    fun build(): String = joinEntries()
+
+    private fun joinEntries(): String {
+        val result = StringBuilder()
+        for ((i, e) in entries.withIndex()) {
+            val (branch, before, entry, after) = findBeforeAfterInBranch(e.hash())
+            if (before != null)
+                entry + before.hash()
+            if (after == null)
+                entry.refBranch(branch)
+            result.append(entry.build())
+
+            if (i < entries.size) {
+                result.append("\n")
+            }
+        }
+        return result.toString()
+    }
+
+    private fun findLatestInBranch(
+        branch: String
+    ): CommitHash {
+        val allInBranch = entriesForBranch[branch]
+        return allInBranch!!.last().hash()
+    }
+
+    private fun findBeforeAfterInBranch(
+        hash: CommitHash,
+    ): FindGitLogResult {
+        val branch = branchForEntry[hash]!!
+        val allInBranch = entriesForBranch[branch]
+        val indexInBranch = allInBranch?.indexOfFirst { it.hash() == hash }!!
+        return FindGitLogResult(
+            branch,
+            allInBranch.getOrNull(indexInBranch - 1),
+            allInBranch.getOrNull(indexInBranch)!!,
+            allInBranch.getOrNull(indexInBranch + 1)
+        )
+    }
+
+    private data class FindGitLogResult(
+        val branch: String,
+        val before: GitLogEntryBuilder?,
+        val current: GitLogEntryBuilder,
+        val after: GitLogEntryBuilder?
+    )
 }
 
 fun aGitLog(block: GitLogBuilder.() -> Unit = {}): String =
     GitLogBuilder().apply(block).build()
 
-fun anEntry(block: GitLogEntryBuilder.() -> Unit = {}): String =
-    GitLogEntryBuilder().apply(block).build()

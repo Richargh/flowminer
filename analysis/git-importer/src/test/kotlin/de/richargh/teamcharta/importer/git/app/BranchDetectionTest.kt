@@ -1,21 +1,19 @@
 package de.richargh.teamcharta.importer.git.app
 
 import de.richargh.teamcharta.importer.git.app.api2.aBranch
+import de.richargh.teamcharta.importer.git.app.api2.hash
 import de.richargh.teamcharta.importer.git.app.internal.atStartOfYear
-import de.richargh.teamcharta.importer.git.app.internal.zoned
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
 class BranchDetectionTest {
 
     @Test
-    fun `should extract branch info`() {
+    fun `should extract branch info for initial commit`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry {
-                hash("mmm123")
+            anEntry("origin/main") {
                 authorDate(atStartOfYear(2024))
-                branch("origin/main")
             }
         }
 
@@ -26,10 +24,39 @@ class BranchDetectionTest {
 
         // Then
         result.branches.size() shouldBe 1
-        result.branches["main"] shouldBe aBranch {
-            name("main")
-            firstCommitHash("mmm123")
+        result.branches["origin/main"] shouldBe aBranch {
+            name("origin/main")
+            firstCommitHash("0".hash())
             firstCommitDate(atStartOfYear(2024))
+        }
+    }
+
+    @Test
+    fun `should extract branch info for multiple commits on branch`() {
+        // Given
+        val gitLogContent = aGitLog {
+            anEntry("origin/main") {
+                authorDate(atStartOfYear(2023))
+            }
+            anEntry("origin/main") {
+                authorDate(atStartOfYear(2024))
+            }
+            anEntry("origin/main") {
+                authorDate(atStartOfYear(2025))
+            }
+        }
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.branches.size() shouldBe 1
+        result.branches["origin/main"] shouldBe aBranch {
+            name("origin/main")
+            firstCommitHash("0".hash())
+            firstCommitDate(atStartOfYear(2023))
         }
     }
 
@@ -37,16 +64,14 @@ class BranchDetectionTest {
     fun `should extract branch info from merge commits`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry {
-                hash("fff123")
-                authorDate(atStartOfYear(2024))
-                branch("origin/feature-login")
+            anEntry("origin/main") {
+                authorDate(atStartOfYear(2023))
             }
-            anEntry {
-                hash("mmm123")
+            anEntry("origin/feature-login", "origin/main") {
+                authorDate(atStartOfYear(2024))
+            }
+            anEntry("origin/main", "origin/feature-login") {
                 authorDate(atStartOfYear(2025))
-                parents("mmm123", "fff123")
-                headRef("main")
             }
         }
 
@@ -57,11 +82,16 @@ class BranchDetectionTest {
 
         // Then
         result.branches.size() shouldBe 2
-        result.branches["feature-login"] shouldBe aBranch {
-            name("feature-login")
-            firstCommitHash("fff123")
+        result.branches["origin/main"] shouldBe aBranch {
+            name("origin/main")
+            firstCommitHash("0".hash())
+            firstCommitDate(atStartOfYear(2023))
+        }
+        result.branches["origin/feature-login"] shouldBe aBranch {
+            name("origin/feature-login")
+            firstCommitHash("1".hash())
             firstCommitDate(atStartOfYear(2024))
-            mergedInto("main", atStartOfYear(2025), "mmm123")
+            mergedInto("origin/main", atStartOfYear(2025), "2")
         }
     }
 
@@ -69,21 +99,17 @@ class BranchDetectionTest {
     fun `should extract branch info when one branch is unmerged`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry {
-                hash("fff123")
+            anEntry("origin/main") {
+                authorDate(atStartOfYear(2022))
+            }
+            anEntry("origin/feature-login", "origin/main") {
                 authorDate(atStartOfYear(2023))
-                branch("origin/feature-login")
             }
-            anEntry {
-                hash("fff456")
+            anEntry("origin/feature-user", "origin/main") {
                 authorDate(atStartOfYear(2024))
-                branch("origin/feature-user")
             }
-            anEntry {
-                hash("mmm456")
+            anEntry("origin/main", "origin/feature-login") {
                 authorDate(atStartOfYear(2025))
-                parents("mmm123", "fff123")
-                headRef("main")
             }
         }
 
@@ -94,11 +120,21 @@ class BranchDetectionTest {
 
         // Then
         result.branches.size() shouldBe 3
-        result.branches["feature-login"] shouldBe aBranch {
-            name("feature-login")
-            firstCommitHash("fff123")
+        result.branches["origin/main"] shouldBe aBranch {
+            name("origin/main")
+            firstCommitHash("0".hash())
+            firstCommitDate(atStartOfYear(2022))
+        }
+        result.branches["origin/feature-login"] shouldBe aBranch {
+            name("origin/feature-login")
+            firstCommitHash("1".hash())
             firstCommitDate(atStartOfYear(2023))
-            mergedInto("main", atStartOfYear(2025), "mmm456")
+            mergedInto("origin/main", atStartOfYear(2025), "3")
+        }
+        result.branches["origin/feature-user"] shouldBe aBranch {
+            name("origin/feature-user")
+            firstCommitHash("2".hash())
+            firstCommitDate(atStartOfYear(2024))
         }
     }
 }

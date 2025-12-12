@@ -11,9 +11,9 @@ class BranchInfoBuilder {
     private var targetBranch: Ref.Branch? = null
 
     fun name(name: String) = apply { this.name = Ref.Branch(name) }
-    fun firstCommitHash(hash: String) = apply { this.firstCommitHash = CommitHash(hash) }
+    fun firstCommitHash(hash: CommitHash) = apply { this.firstCommitHash = hash }
     fun firstCommitDate(date: ZonedDateTime) = apply { this.firstCommitDate = date }
-    fun mergeCommitHash(hash: String) = apply { this.mergeCommitHash = CommitHash(hash) }
+    fun mergeCommitHash(hash: CommitHash) = apply { this.mergeCommitHash = hash }
     fun mergeDate(date: ZonedDateTime) = apply { this.mergeDate = date }
     fun targetBranch(branch: String) = apply { this.targetBranch = Ref.Branch(branch) }
 

@@ -20,7 +20,7 @@ class WorkKeyDetectionTest {
     fun `should return empty list when no work key in message`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -43,7 +43,7 @@ class WorkKeyDetectionTest {
     fun `should detect single GitHub style work key`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -66,7 +66,7 @@ class WorkKeyDetectionTest {
     fun `should detect single Jira style work key`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -89,7 +89,7 @@ class WorkKeyDetectionTest {
         // Given
         val expectedKeys = expectedKeysStr.split("|").map { WorkKey(it) }
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -110,7 +110,7 @@ class WorkKeyDetectionTest {
     fun `should detect Jira keys with project codes 2-10 chars`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -130,7 +130,7 @@ class WorkKeyDetectionTest {
     fun `should not detect Jira keys with invalid project code length`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()

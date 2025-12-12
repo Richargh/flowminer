@@ -9,7 +9,7 @@ class GitTrailerExtractionTest {
     fun `should extract trailers section`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry {
+            anEntry("main") {
                 trailers(
                     "Co-authored-by" to "John Doe <john@example.com>",
                     "Signed-off-by" to "Alice Wonder <alice@example.com>",

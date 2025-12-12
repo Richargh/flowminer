@@ -2,7 +2,6 @@ package de.richargh.teamcharta.importer.git.app.internal
 
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 

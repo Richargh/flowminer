@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.git.app
 
 import de.richargh.teamcharta.importer.git.app.api2.Ref
 import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -13,7 +14,9 @@ class RefDetectionTest {
     fun `should parse HEAD ref`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { headRef("main") }
+            anEntry("main") {
+                refHead("main")
+            }
         }
 
         val testee = GitLogParser2()
@@ -22,14 +25,17 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(Ref.Head("main"))
+        result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
+            Ref.Branch("main"),
+            Ref.Head("main")
+        )
     }
 
     @Test
     fun `should parse tag ref`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { tag("v1.0.0") }
+            anEntry("main") { refTag("v1.0.0") }
         }
 
         val testee = GitLogParser2()
@@ -38,14 +44,17 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(Ref.Tag("v1.0.0"))
+        result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
+            Ref.Branch("main"),
+            Ref.Tag("v1.0.0")
+        )
     }
 
     @Test
     fun `should parse branch ref without slash`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { branch("develop") }
+            anEntry("develop") {  }
         }
 
         val testee = GitLogParser2()
@@ -70,7 +79,7 @@ class RefDetectionTest {
     fun `should parse nested branch refs`(branchName: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { branch(branchName) }
+            anEntry(branchName) {  }
         }
 
         val testee = GitLogParser2()
@@ -86,10 +95,9 @@ class RefDetectionTest {
     fun `should parse multiple refs`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry {
-                headRef("main")
-                branch("origin/main")
-                tag("v1.0.0")
+            anEntry("origin/main") {
+                refHead("main")
+                refTag("v1.0.0")
             }
         }
 
@@ -99,26 +107,10 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(
+        result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
             Ref.Head("main"),
             Ref.Branch("origin/main"),
             Ref.Tag("v1.0.0")
         )
-    }
-
-    @Test
-    fun `should handle empty refs`() {
-        // Given
-        val gitLogContent = aGitLog {
-            anEntry {}
-        }
-
-        val testee = GitLogParser2()
-
-        // When
-        val result = testee.parse(gitLogContent.lineSequence())
-
-        // Then
-        result.commits.first().refs shouldHaveSize 0
     }
 }

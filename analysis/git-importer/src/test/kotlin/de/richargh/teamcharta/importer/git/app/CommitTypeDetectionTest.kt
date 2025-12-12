@@ -17,7 +17,7 @@ class CommitTypeDetectionTest {
     fun `should not detect commit type from message when none is there`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -77,7 +77,7 @@ class CommitTypeDetectionTest {
     fun `should detect FEATURE commit type from message`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -143,7 +143,7 @@ class CommitTypeDetectionTest {
     fun `should detect FIX commit type from message`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -203,7 +203,7 @@ class CommitTypeDetectionTest {
     fun `should detect REFACTOR commit type from message`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -263,7 +263,7 @@ class CommitTypeDetectionTest {
     fun `should detect TEST commit type from message`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -329,7 +329,7 @@ class CommitTypeDetectionTest {
     fun `should detect ENVIRONMENT commit type from message`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
@@ -396,7 +396,7 @@ class CommitTypeDetectionTest {
     fun `should detect DOCS commit type from message`(subject: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry { subject(subject) }
+            anEntry("main") { subject(subject) }
         }
 
         val testee = GitLogParser2()
