@@ -17,7 +17,7 @@ class BranchInfoBuilder {
     fun mergeDate(date: ZonedDateTime) = apply { this.mergeDate = date }
     fun targetBranch(branch: String) = apply { this.targetBranch = branch }
 
-    fun merged(mergeCommitHash: String, mergeDate: ZonedDateTime, targetBranch: String) = apply {
+    fun mergedInto(targetBranch: String, mergeDate: ZonedDateTime, mergeCommitHash: String) = apply {
         this.mergeCommitHash = mergeCommitHash
         this.mergeDate = mergeDate
         this.targetBranch = targetBranch

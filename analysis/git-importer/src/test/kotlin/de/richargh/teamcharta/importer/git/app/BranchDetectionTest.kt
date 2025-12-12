@@ -1,11 +1,9 @@
-package de.richargh.teamcharta.importer.git.app.internal
+package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.GitLogParser2
 import de.richargh.teamcharta.importer.git.app.api2.aBranch
-import io.kotest.matchers.collections.shouldHaveSize
+import de.richargh.teamcharta.importer.git.app.internal.zoned
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import java.time.ZonedDateTime
 
 class BranchDetectionTest {
 
@@ -37,7 +35,7 @@ class BranchDetectionTest {
         result.branches["main"] shouldBe aBranch {
             name("main")
             firstCommitHash("abc123")
-            firstCommitDate(ZonedDateTime.parse("2024-01-10T10:00:00+01:00"))
+            firstCommitDate("2024-01-10T10:00:00+01:00".zoned())
         }
     }
 
@@ -79,8 +77,8 @@ class BranchDetectionTest {
         result.branches["feature-login"] shouldBe aBranch {
             name("feature-login")
             firstCommitHash("feat1")
-            firstCommitDate(ZonedDateTime.parse("2024-01-10T10:00:00+01:00"))
-            merged("main1", ZonedDateTime.parse("2024-01-12T10:00:00+01:00"), "main")
+            firstCommitDate("2024-01-10T10:00:00+01:00".zoned())
+            mergedInto("main", "2024-01-12T10:00:00+01:00".zoned(), "main1")
         }
     }
 
@@ -133,8 +131,8 @@ class BranchDetectionTest {
         result.branches["feature-login"] shouldBe aBranch {
             name("feature-login")
             firstCommitHash("feat1")
-            firstCommitDate(ZonedDateTime.parse("2024-01-10T10:00:00+01:00"))
-            merged("main1", ZonedDateTime.parse("2024-01-12T10:00:00+01:00"), "main")
+            firstCommitDate("2024-01-10T10:00:00+01:00".zoned())
+            mergedInto("main", "2024-01-12T10:00:00+01:00".zoned(), "main1")
         }
     }
 }
