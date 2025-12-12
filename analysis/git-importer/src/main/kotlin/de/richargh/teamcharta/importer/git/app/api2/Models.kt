@@ -41,6 +41,47 @@ data class Commit(
     val workKeys: List<WorkKey>
 )
 
+data class BranchInfo(
+    val name: String,
+    val firstCommitHash: String,
+    val firstCommitDate: ZonedDateTime,
+    val mergeCommitHash: String?,
+    val mergeDate: ZonedDateTime?,
+    val targetBranch: String?
+) {
+    companion object {
+        fun unmerged(
+            name: String,
+            firstCommitHash: String,
+            firstCommitDate: ZonedDateTime): BranchInfo {
+            return BranchInfo(
+                name,
+                firstCommitHash,
+                firstCommitDate,
+                null,
+                null,
+                null)
+        }
+
+        fun merged(
+            name: String,
+            firstCommitHash: String,
+            firstCommitDate: ZonedDateTime,
+            mergeCommitHash: String,
+            mergeDate: ZonedDateTime,
+            targetBranch: String): BranchInfo {
+            return BranchInfo(
+                name,
+                firstCommitHash,
+                firstCommitDate,
+                mergeCommitHash,
+                mergeDate,
+                targetBranch)
+        }
+    }
+}
+
 data class GitMiningResult(
-    val commits: List<Commit>
+    val commits: List<Commit>,
+    val branches: List<BranchInfo> = emptyList()
 )
