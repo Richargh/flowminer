@@ -19,19 +19,9 @@ class WorkKeyDetectionTest {
     ])
     fun `should return empty list when no work key in message`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -52,19 +42,9 @@ class WorkKeyDetectionTest {
     ])
     fun `should detect single GitHub style work key`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -85,19 +65,9 @@ class WorkKeyDetectionTest {
     ])
     fun `should detect single Jira style work key`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -118,19 +88,9 @@ class WorkKeyDetectionTest {
     fun `should detect multiple work keys from same message`(subject: String, expectedKeysStr: String) {
         // Given
         val expectedKeys = expectedKeysStr.split("|").map { WorkKey(it) }
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -149,19 +109,9 @@ class WorkKeyDetectionTest {
     ])
     fun `should detect Jira keys with project codes 2-10 chars`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -179,19 +129,9 @@ class WorkKeyDetectionTest {
     ])
     fun `should not detect Jira keys with invalid project code length`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 

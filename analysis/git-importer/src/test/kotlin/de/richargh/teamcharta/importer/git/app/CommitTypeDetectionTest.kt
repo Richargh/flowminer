@@ -1,9 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
 import de.richargh.teamcharta.importer.git.app.api2.CommitType
-import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -13,26 +10,15 @@ class CommitTypeDetectionTest {
     @ParameterizedTest
     @ValueSource(strings = [
         "add login",
-        // feat/bugfix/etc. are only keywords when they start the commit
         "this feature is amazing",
         "this might cause a bug",
         "I think this was the fix"
     ])
     fun `should not detect commit type from message when none is there`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -90,19 +76,9 @@ class CommitTypeDetectionTest {
     ])
     fun `should detect FEATURE commit type from message`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -166,19 +142,9 @@ class CommitTypeDetectionTest {
     ])
     fun `should detect FIX commit type from message`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -199,7 +165,6 @@ class CommitTypeDetectionTest {
         "refactor[scope]: add login",
         "refactoring(scope): add login",
         "refactoring[scope]: add login",
-        // breaking refactorings should not happen, but maybe someone commits them anyway...
         "refactor!: add login",
         "refactor(scope)!: add login",
         "refactor!(scope): add login",
@@ -237,19 +202,9 @@ class CommitTypeDetectionTest {
     ])
     fun `should detect REFACTOR commit type from message`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -270,7 +225,6 @@ class CommitTypeDetectionTest {
         "test[scope]: add login",
         "testing(scope): add login",
         "testing[scope]: add login",
-        // breaking tests should not happen, but maybe someone commits them anyway...
         "test!: add login",
         "test(scope)!: add login",
         "test!(scope): add login",
@@ -308,19 +262,9 @@ class CommitTypeDetectionTest {
     ])
     fun `should detect TEST commit type from message`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -384,19 +328,9 @@ class CommitTypeDetectionTest {
     ])
     fun `should detect ENVIRONMENT commit type from message`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 
@@ -461,19 +395,9 @@ class CommitTypeDetectionTest {
     ])
     fun `should detect DOCS commit type from message`(subject: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> $subject
-            parents==>> parent1
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-            5	2	src/Login.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { subject(subject) }
+        }
 
         val testee = GitLogParser2()
 

@@ -8,24 +8,15 @@ class GitTrailerExtractionTest {
     @Test
     fun `should extract trailers section`() {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc789
-            author==>> Jane Smith
-            authorMail==>> jane@example.com
-            authorDate==>> 2024-01-17T09:00:00+01:00
-            subject==>> Reviewed commit
-            parents==>> def456
-            refs==>>
-            -----BODY_START-----
-            Some changes.
-            -----TRAILERS_START-----
-            Co-authored-by: John Doe <john@example.com>
-            Signed-off-by: Alice Wonder <alice@example.com>
-            Reviewed-by: Bob Builder <bob@example.com>
-            -----FILES_START-----
-            3	1	src/File.kt
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry {
+                trailers(
+                    "Co-authored-by" to "John Doe <john@example.com>",
+                    "Signed-off-by" to "Alice Wonder <alice@example.com>",
+                    "Reviewed-by" to "Bob Builder <bob@example.com>"
+                )
+            }
+        }
 
         val testee = GitLogParser2()
 
@@ -39,5 +30,4 @@ class GitTrailerExtractionTest {
             "Reviewed-by" to "Bob Builder <bob@example.com>"
         )
     }
-
 }

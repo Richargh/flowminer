@@ -12,18 +12,9 @@ class RefDetectionTest {
     @Test
     fun `should parse HEAD ref`() {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-10T10:00:00+01:00
-            subject==>> Initial commit
-            parents==>>
-            refs==>> HEAD -> main
-            -----BODY_START-----
-            -----FILES_START-----
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { headRef("main") }
+        }
 
         val testee = GitLogParser2()
 
@@ -31,26 +22,15 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(
-            Ref.Head("main")
-        )
+        result.commits.first().refs shouldContainExactly listOf(Ref.Head("main"))
     }
 
     @Test
     fun `should parse tag ref`() {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-10T10:00:00+01:00
-            subject==>> Release v1.0.0
-            parents==>>
-            refs==>> tag: v1.0.0
-            -----BODY_START-----
-            -----FILES_START-----
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { tag("v1.0.0") }
+        }
 
         val testee = GitLogParser2()
 
@@ -58,26 +38,15 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(
-            Ref.Tag("v1.0.0")
-        )
+        result.commits.first().refs shouldContainExactly listOf(Ref.Tag("v1.0.0"))
     }
 
     @Test
     fun `should parse branch ref without slash`() {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-10T10:00:00+01:00
-            subject==>> Initial commit
-            parents==>>
-            refs==>> develop
-            -----BODY_START-----
-            -----FILES_START-----
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { branch("develop") }
+        }
 
         val testee = GitLogParser2()
 
@@ -85,9 +54,7 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(
-            Ref.Branch("develop")
-        )
+        result.commits.first().refs shouldContainExactly listOf(Ref.Branch("develop"))
     }
 
     @ParameterizedTest(name = "should parse nested branch ref: {0}")
@@ -102,18 +69,9 @@ class RefDetectionTest {
     )
     fun `should parse nested branch refs`(branchName: String) {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-10T10:00:00+01:00
-            subject==>> Initial commit
-            parents==>>
-            refs==>> $branchName
-            -----BODY_START-----
-            -----FILES_START-----
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry { branch(branchName) }
+        }
 
         val testee = GitLogParser2()
 
@@ -121,26 +79,19 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(
-            Ref.Branch(branchName)
-        )
+        result.commits.first().refs shouldContainExactly listOf(Ref.Branch(branchName))
     }
 
     @Test
     fun `should parse multiple refs`() {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-10T10:00:00+01:00
-            subject==>> Release v1.0.0
-            parents==>>
-            refs==>> HEAD -> main, origin/main, tag: v1.0.0
-            -----BODY_START-----
-            -----FILES_START-----
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry {
+                headRef("main")
+                branch("origin/main")
+                tag("v1.0.0")
+            }
+        }
 
         val testee = GitLogParser2()
 
@@ -158,18 +109,9 @@ class RefDetectionTest {
     @Test
     fun `should handle empty refs`() {
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-10T10:00:00+01:00
-            subject==>> Initial commit
-            parents==>>
-            refs==>>
-            -----BODY_START-----
-            -----FILES_START-----
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry {}
+        }
 
         val testee = GitLogParser2()
 
