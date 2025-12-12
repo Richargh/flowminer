@@ -1,9 +1,9 @@
 package de.richargh.teamcharta.importer.git.app
 
+import de.richargh.teamcharta.importer.git.app.api2.BranchName
 import de.richargh.teamcharta.importer.git.app.api2.Ref
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.collections.shouldHaveSize
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -26,7 +26,7 @@ class RefDetectionTest {
 
         // Then
         result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
-            Ref.Branch("main"),
+            Ref.BranchTip("main"),
             Ref.Head("main")
         )
     }
@@ -45,7 +45,7 @@ class RefDetectionTest {
 
         // Then
         result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
-            Ref.Branch("main"),
+            Ref.BranchTip("main"),
             Ref.Tag("v1.0.0")
         )
     }
@@ -63,7 +63,7 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(Ref.Branch("develop"))
+        result.commits.first().refs shouldContainExactly listOf(Ref.BranchTip("develop"))
     }
 
     @ParameterizedTest(name = "should parse nested branch ref: {0}")
@@ -88,7 +88,7 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(Ref.Branch(branchName))
+        result.commits.first().refs shouldContainExactly listOf(Ref.BranchTip(branchName))
     }
 
     @Test
@@ -109,7 +109,7 @@ class RefDetectionTest {
         // Then
         result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
             Ref.Head("main"),
-            Ref.Branch("origin/main"),
+            Ref.BranchTip("origin/main"),
             Ref.Tag("v1.0.0")
         )
     }

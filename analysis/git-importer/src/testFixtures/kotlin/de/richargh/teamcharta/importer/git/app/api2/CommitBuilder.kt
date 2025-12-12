@@ -22,8 +22,8 @@ class CommitBuilder {
     fun message(message: String) = apply { this.message = message }
     fun parents(vararg parents: String) = apply { this.parents = parents.toList().map(::CommitHash) }
     fun refs(vararg refs: Ref) = apply { this.refs = refs.toList() }
-    fun headRef(branchName: String) = apply { this.refs += Ref.Head(branchName) }
-    fun branch(name: String) = apply { this.refs += Ref.Branch(name) }
+    fun headRef(branchName: String) = apply { this.refs += Ref.Head(BranchName(branchName)) }
+    fun branch(name: String) = apply { this.refs += Ref.BranchTip(BranchName(name)) }
     fun tag(name: String) = apply { this.refs += Ref.Tag(name) }
     fun fileChanges(vararg fileChanges: FileChange) = apply { this.fileChanges = fileChanges.toList() }
     fun trailers(vararg trailers: Pair<String, String>) = apply { this.trailers = trailers.toList() }

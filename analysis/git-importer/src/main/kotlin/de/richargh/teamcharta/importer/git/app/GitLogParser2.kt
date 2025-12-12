@@ -122,9 +122,9 @@ class GitLogParser2 {
 
     private fun parseRef(rawRef: String): Ref? {
         return when {
-            rawRef.startsWith("HEAD -> ") -> Ref.Head(rawRef.removePrefix("HEAD -> "))
+            rawRef.startsWith("HEAD -> ") -> Ref.Head(BranchName(rawRef.removePrefix("HEAD -> ")))
             rawRef.startsWith("tag: ") -> Ref.Tag(rawRef.removePrefix("tag: "))
-            rawRef.isNotEmpty() -> Ref.Branch(rawRef)
+            rawRef.isNotEmpty() -> Ref.BranchTip(rawRef)
             else -> null
         }
     }

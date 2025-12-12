@@ -14,10 +14,15 @@ enum class CommitType {
 
 data class WorkKey(val key: String)
 data class CommitHash(val rawValue: String)
+data class BranchName(val value: String)
 
 sealed interface Ref {
-    data class Head(val branchName: String) : Ref
-    data class Branch(val name: String) : Ref
+    data class Head(val branch: BranchName) : Ref {
+        constructor(name: String): this(BranchName(name))
+    }
+    data class BranchTip(val name: BranchName) : Ref {
+        constructor(name: String): this(BranchName(name))
+    }
     data class Tag(val name: String) : Ref
 }
 
@@ -49,49 +54,19 @@ data class Commit(
 )
 
 data class BranchInfo(
-    val name: Ref.Branch,
+    val name: BranchName,
     val firstCommitHash: CommitHash,
     val firstCommitDate: ZonedDateTime,
     val mergeCommitHash: CommitHash?,
     val mergeDate: ZonedDateTime?,
-    val targetBranch: Ref.Branch?
-) {
-    companion object {
-        fun unmerged(
-            name: Ref.Branch,
-            firstCommitHash: CommitHash,
-            firstCommitDate: ZonedDateTime): BranchInfo {
-            return BranchInfo(
-                name,
-                firstCommitHash,
-                firstCommitDate,
-                null,
-                null,
-                null)
-        }
-
-        fun merged(
-            name: Ref.Branch,
-            firstCommitHash: CommitHash,
-            firstCommitDate: ZonedDateTime,
-            mergeCommitHash: CommitHash,
-            mergeDate: ZonedDateTime,
-            targetBranch: Ref.Branch): BranchInfo {
-            return BranchInfo(
-                name,
-                firstCommitHash,
-                firstCommitDate,
-                mergeCommitHash,
-                mergeDate,
-                targetBranch)
-        }
-    }
-}
+    val targetBranch: BranchName?
+)
 
 class BranchInfos(branches: List<BranchInfo>) {
-    private val branchFor: Map<String, BranchInfo> = branches.associateBy { it.name.name }
+    private val branchFor: Map<BranchName, BranchInfo> = branches.associateBy { it.name }
 
-    operator fun get(name: String): BranchInfo? = branchFor[name]
+    operator fun get(name: BranchName): BranchInfo? = branchFor[name]
+    operator fun get(name: String): BranchInfo? = branchFor[BranchName(name)]
 
     fun all() = branchFor.values
     fun size() = branchFor.size

@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.git.app.internal
 
 import de.richargh.teamcharta.importer.git.app.api2.BranchInfo
 import de.richargh.teamcharta.importer.git.app.api2.BranchInfos
+import de.richargh.teamcharta.importer.git.app.api2.BranchName
 import de.richargh.teamcharta.importer.git.app.api2.Commit
 import de.richargh.teamcharta.importer.git.app.api2.Ref
 
@@ -11,23 +12,23 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     val commitByHash = commits.associateBy { it.hash.rawValue }
 
     // Find all tip commits (commits with branch refs)
-    val branchTips = mutableMapOf<String, Commit>()
+    val branchTips = mutableMapOf<BranchName, Commit>()
     for (commit in commits) {
         for (ref in commit.refs) {
-            val branchRef = extractBranchRef(ref) ?: continue
-            branchTips[branchRef.name] = commit
+            val branch = extractBranchName(ref) ?: continue
+            branchTips[branch] = commit
         }
     }
 
     // For each branch, walk backwards through parents to find all commits on that branch
     // Stop when we hit a commit already claimed by another branch
     // Process main/master branches first so they claim their commits before feature branches
-    val branchCommits = mutableMapOf<String, MutableList<Commit>>()
-    val commitToBranch = mutableMapOf<String, String>()
+    val branchCommits = mutableMapOf<BranchName, MutableList<Commit>>()
+    val commitToBranch = mutableMapOf<String, BranchName>()
 
     val sortedBranches = branchTips.entries.sortedBy { (name, _) ->
         when {
-            name.contains("main") || name.contains("master") -> 0
+            name.value.contains("main") || name.value.contains("master") -> 0
             else -> 1
         }
     }
@@ -67,15 +68,15 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     }
 
     // Find merge commits and associate them with branches
-    val mergeInfo = mutableMapOf<String, Pair<Commit, Ref.Branch>>() // branchName -> (mergeCommit, targetBranch)
+    val mergeInfo = mutableMapOf<BranchName, Pair<Commit, BranchName>>() // branchName -> (mergeCommit, targetBranch)
 
     for (commit in commits) {
         if (commit.parents.size > 1) { // Merge commit
             // First parent (index 0) is the branch being merged
             val firstParentHash = commit.parents.firstOrNull()?.rawValue ?: continue
             val mergedBranchName = commitToBranch[firstParentHash] ?: continue
-            val targetBranch = commit.refs.firstNotNullOfOrNull { extractBranchRef(it) }
-            if (targetBranch != null && mergedBranchName != targetBranch.name) {
+            val targetBranch = commit.refs.firstNotNullOfOrNull { extractBranchName(it) }
+            if (targetBranch != null && mergedBranchName != targetBranch) {
                 mergeInfo[mergedBranchName] = commit to targetBranch
             }
         }
@@ -93,7 +94,7 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
         val merge = mergeInfo[branchName]
 
         result.add(BranchInfo(
-            name = Ref.Branch(branchName),
+            name = branchName,
             firstCommitHash = firstCommit.hash,
             firstCommitDate = firstCommit.date,
             mergeCommitHash = merge?.first?.hash,
@@ -105,10 +106,10 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     return BranchInfos(result)
 }
 
-private fun extractBranchRef(ref: Ref): Ref.Branch? {
+private fun extractBranchName(ref: Ref): BranchName? {
     return when (ref) {
-        is Ref.Head -> Ref.Branch(ref.branchName)
-        is Ref.Branch -> Ref.Branch(ref.name)
+        is Ref.Head -> ref.branch
+        is Ref.BranchTip -> ref.name
         is Ref.Tag -> null
     }
 }

@@ -1,5 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
+import de.richargh.teamcharta.importer.git.app.api2.BranchName
 import de.richargh.teamcharta.importer.git.app.api2.CommitHash
 import de.richargh.teamcharta.importer.git.app.api2.hash
 import java.time.ZonedDateTime
@@ -35,7 +36,7 @@ class GitLogEntryBuilder {
 
     fun refs(vararg refs: String) = apply { this.refs = refs.toList() }
     fun refHead(branch: String) = apply { this.refs += "HEAD -> $branch" }
-    fun refBranch(branch: String) = apply { this.refs += branch }
+    fun refBranchTip(branch: BranchName) = apply { this.refs += branch.value }
     fun refTag(name: String) = apply { this.refs += "tag: $name" }
     fun body(body: String) = apply { this.body = body }
     fun trailers(vararg trailers: Pair<String, String>) = apply { this.trailers = trailers.toList() }
@@ -78,8 +79,8 @@ data class FileChangeEntry(
 
 class GitLogBuilder {
     private val entries = mutableListOf<GitLogEntryBuilder>()
-    private val branchForEntry = mutableMapOf<CommitHash, String>()
-    private val entriesForBranch = mutableMapOf<String, MutableList<GitLogEntryBuilder>>()
+    private val branchForEntry = mutableMapOf<CommitHash, BranchName>()
+    private val entriesForBranch = mutableMapOf<BranchName, MutableList<GitLogEntryBuilder>>()
 
     fun anEntry(branch: String, parentBranchName: String? = null, block: GitLogEntryBuilder.() -> Unit = {}): CommitHash {
         val builder = GitLogEntryBuilder()
@@ -87,16 +88,16 @@ class GitLogBuilder {
         builder.apply(block)
 
         if(parentBranchName != null) {
-            val parentCommit = findLatestInBranch(parentBranchName)
+            val parentCommit = findLatestInBranch(BranchName(parentBranchName))
             builder.parents(parentCommit)
         }
-        addCommitToBranch(builder, branch)
+        addCommitToBranch(builder, BranchName(branch))
         entries.add(builder)
 
         return builder.hash()
     }
 
-    private fun addCommitToBranch(builder: GitLogEntryBuilder, branch: String) {
+    private fun addCommitToBranch(builder: GitLogEntryBuilder, branch: BranchName) {
         branchForEntry[builder.hash()] = branch
         entriesForBranch.getOrPut(branch) { mutableListOf() }.add(builder)
     }
@@ -110,7 +111,7 @@ class GitLogBuilder {
             if (before != null)
                 entry + before.hash()
             if (after == null)
-                entry.refBranch(branch)
+                entry.refBranchTip(branch)
             result.append(entry.build())
 
             if (i < entries.size) {
@@ -121,7 +122,7 @@ class GitLogBuilder {
     }
 
     private fun findLatestInBranch(
-        branch: String
+        branch: BranchName
     ): CommitHash {
         val allInBranch = entriesForBranch[branch]
         return allInBranch!!.last().hash()
@@ -142,7 +143,7 @@ class GitLogBuilder {
     }
 
     private data class FindGitLogResult(
-        val branch: String,
+        val branch: BranchName,
         val before: GitLogEntryBuilder?,
         val current: GitLogEntryBuilder,
         val after: GitLogEntryBuilder?
