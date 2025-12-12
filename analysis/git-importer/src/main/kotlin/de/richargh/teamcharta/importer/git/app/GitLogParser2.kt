@@ -90,30 +90,39 @@ class GitLogParser2 {
     }
 
     private fun detectCommitTypes(message: String): List<CommitType> {
-        val types = mutableListOf<CommitType>()
-        if (featurePattern.containsMatchIn(message)) {
-            types.add(CommitType.FEATURE)
-        }
-        if (fixPattern.containsMatchIn(message)) {
-            types.add(CommitType.FIX)
-        }
-        if (refactorPattern.containsMatchIn(message)) {
-            types.add(CommitType.REFACTOR)
-        }
-        if (testPattern.containsMatchIn(message)) {
-            types.add(CommitType.TEST)
-        }
-        if (environmentPattern.containsMatchIn(message)) {
-            types.add(CommitType.ENVIRONMENT)
-        }
-        return types
+        val firstWord = firstWordPattern.find(message)?.groupValues?.get(1)?.lowercase() ?: return emptyList()
+
+        return commitTypes[firstWord]?.let { listOf(it) }
+            ?: emptyList()
     }
 
     private val authorPattern = Regex("""(.+?)\s*<([^>]+)>""")
-    private val featurePattern = Regex("""^\s*([.^@!]\s+)?(feat|feature|f)\s*!?\s*(\(.+\)|\[.+\])?\s*!?\s*:?\s""", RegexOption.IGNORE_CASE)
-    private val fixPattern = Regex("""^\s*([.^@!]\s+)?(fix|bug|bugfix|hotfix|b)\s*!?\s*(\(.+\)|\[.+\])?\s*!?\s*:?\s""", RegexOption.IGNORE_CASE)
-    private val refactorPattern = Regex("""^\s*([.^@!]\s+)?(refactor|refactoring|r)\s*!?\s*(\(.+\)|\[.+\])?\s*!?\s*:?\s""", RegexOption.IGNORE_CASE)
-    private val testPattern = Regex("""^\s*([.^@!]\s+)?(test|testing|t)\s*!?\s*(\(.+\)|\[.+\])?\s*!?\s*:?\s""", RegexOption.IGNORE_CASE)
-    private val environmentPattern = Regex("""^\s*([.^@!]\s+)?(build|chore|ci|ops|e)\s*!?\s*(\(.+\)|\[.+\])?\s*!?\s*:?\s""", RegexOption.IGNORE_CASE)
+    private val firstWordPattern = Regex("""^\W*(\w+)""")
+
+    private val commitTypes = mapOf(
+        "feat" to CommitType.FEATURE,
+        "feature" to CommitType.FEATURE,
+        "f" to CommitType.FEATURE,
+
+        "fix" to CommitType.FIX,
+        "bug" to CommitType.FIX,
+        "bugfix" to CommitType.FIX,
+        "hotfix" to CommitType.FIX,
+        "b" to CommitType.FIX,
+
+        "refactor" to CommitType.REFACTOR,
+        "refactoring" to CommitType.REFACTOR,
+        "r" to CommitType.REFACTOR,
+
+        "test" to CommitType.TEST,
+        "testing" to CommitType.TEST,
+        "t" to CommitType.TEST,
+
+        "build" to CommitType.ENVIRONMENT,
+        "chore" to CommitType.ENVIRONMENT,
+        "ci" to CommitType.ENVIRONMENT,
+        "ops" to CommitType.ENVIRONMENT,
+        "e" to CommitType.ENVIRONMENT
+    )
 
 }
