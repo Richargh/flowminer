@@ -1,6 +1,7 @@
 package de.richargh.teamcharta.importer.git.app
 
 import de.richargh.teamcharta.importer.git.app.api2.aBranch
+import de.richargh.teamcharta.importer.git.app.internal.atStartOfYear
 import de.richargh.teamcharta.importer.git.app.internal.zoned
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
@@ -12,8 +13,8 @@ class BranchDetectionTest {
         // Given
         val gitLogContent = aGitLog {
             anEntry {
-                hash("abc123")
-                authorDate("2024-01-10T10:00:00+01:00")
+                hash("mmm123")
+                authorDate(atStartOfYear(2024))
                 branch("origin/main")
             }
         }
@@ -27,8 +28,8 @@ class BranchDetectionTest {
         result.branches.size() shouldBe 1
         result.branches["main"] shouldBe aBranch {
             name("main")
-            firstCommitHash("abc123")
-            firstCommitDate("2024-01-10T10:00:00+01:00".zoned())
+            firstCommitHash("mmm123")
+            firstCommitDate(atStartOfYear(2024))
         }
     }
 
@@ -37,14 +38,14 @@ class BranchDetectionTest {
         // Given
         val gitLogContent = aGitLog {
             anEntry {
-                hash("feat1")
-                authorDate("2024-01-10T10:00:00+01:00")
+                hash("fff123")
+                authorDate(atStartOfYear(2024))
                 branch("origin/feature-login")
             }
             anEntry {
-                hash("main1")
-                authorDate("2024-01-12T10:00:00+01:00")
-                parents("main1", "feat1")
+                hash("mmm123")
+                authorDate(atStartOfYear(2025))
+                parents("mmm123", "fff123")
                 headRef("main")
             }
         }
@@ -58,9 +59,9 @@ class BranchDetectionTest {
         result.branches.size() shouldBe 2
         result.branches["feature-login"] shouldBe aBranch {
             name("feature-login")
-            firstCommitHash("feat1")
-            firstCommitDate("2024-01-10T10:00:00+01:00".zoned())
-            mergedInto("main", "2024-01-12T10:00:00+01:00".zoned(), "main1")
+            firstCommitHash("fff123")
+            firstCommitDate(atStartOfYear(2024))
+            mergedInto("main", atStartOfYear(2025), "mmm123")
         }
     }
 
@@ -69,19 +70,19 @@ class BranchDetectionTest {
         // Given
         val gitLogContent = aGitLog {
             anEntry {
-                hash("feat1")
-                authorDate("2024-01-10T10:00:00+01:00")
+                hash("fff123")
+                authorDate(atStartOfYear(2023))
                 branch("origin/feature-login")
             }
             anEntry {
-                hash("feat2")
-                authorDate("2024-01-10T10:00:00+01:00")
+                hash("fff456")
+                authorDate(atStartOfYear(2024))
                 branch("origin/feature-user")
             }
             anEntry {
-                hash("main1")
-                authorDate("2024-01-12T10:00:00+01:00")
-                parents("main1", "feat1")
+                hash("mmm456")
+                authorDate(atStartOfYear(2025))
+                parents("mmm123", "fff123")
                 headRef("main")
             }
         }
@@ -95,9 +96,9 @@ class BranchDetectionTest {
         result.branches.size() shouldBe 3
         result.branches["feature-login"] shouldBe aBranch {
             name("feature-login")
-            firstCommitHash("feat1")
-            firstCommitDate("2024-01-10T10:00:00+01:00".zoned())
-            mergedInto("main", "2024-01-12T10:00:00+01:00".zoned(), "main1")
+            firstCommitHash("fff123")
+            firstCommitDate(atStartOfYear(2023))
+            mergedInto("main", atStartOfYear(2025), "mmm456")
         }
     }
 }

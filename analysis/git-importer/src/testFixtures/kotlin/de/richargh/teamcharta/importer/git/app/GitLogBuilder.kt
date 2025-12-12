@@ -1,10 +1,12 @@
 package de.richargh.teamcharta.importer.git.app
 
+import java.time.ZonedDateTime
+
 class GitLogEntryBuilder {
     private var hash: String = "abc123"
     private var author: String = "John Doe"
     private var authorMail: String = "john@example.com"
-    private var authorDate: String = "2024-01-15T10:00:00+01:00"
+    private var authorDate: ZonedDateTime = ZonedDateTime.parse("2024-01-15T10:00:00+01:00")
     private var subject: String = "Initial commit"
     private var parents: List<String> = emptyList()
     private var refs: List<String> = emptyList()
@@ -19,7 +21,7 @@ class GitLogEntryBuilder {
         this.author = name
         this.authorMail = email
     }
-    fun authorDate(date: String) = apply { this.authorDate = date }
+    fun authorDate(date: ZonedDateTime) = apply { this.authorDate = date }
     fun subject(subject: String) = apply { this.subject = subject }
     fun parents(vararg parents: String) = apply { this.parents = parents.toList() }
     fun refs(vararg refs: String) = apply { this.refs = refs.toList() }
