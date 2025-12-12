@@ -44,7 +44,6 @@ class BranchDetectionTest {
             anEntry {
                 hash("main1")
                 authorDate("2024-01-12T10:00:00+01:00")
-                subject("Merge branch 'feature-login' into main")
                 parents("main1", "feat1")
                 headRef("main")
             }
@@ -82,7 +81,6 @@ class BranchDetectionTest {
             anEntry {
                 hash("main1")
                 authorDate("2024-01-12T10:00:00+01:00")
-                subject("Merge branch 'feature-login' into main")
                 parents("main1", "feat1")
                 headRef("main")
             }

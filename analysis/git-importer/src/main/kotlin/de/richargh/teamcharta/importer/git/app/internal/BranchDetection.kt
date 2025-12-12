@@ -20,15 +20,8 @@ fun extractBranchRef(ref: Ref): Ref.Branch? {
     }
 }
 
-private val mergePattern = Regex("Merge branch '([^']+)'")
-
-fun extractMergedBranchFromMessage(message: String): Ref.Branch? {
-    val match = mergePattern.find(message) ?: return null
-    return match.groupValues.getOrNull(1)?.let { Ref.Branch(it) }
-}
-
 fun extractBranchInfo(commits: List<Commit>): BranchInfos {
-    // Find all branches referenced in commits, keyed by full ref name
+    // Find all branches referenced in commits, keyed by branch name
     val branchCommits = mutableMapOf<String, MutableList<Commit>>()
 
     for (commit in commits) {
@@ -38,15 +31,24 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
         }
     }
 
+    // Build commit hash -> branch name lookup
+    val commitToBranch = mutableMapOf<String, String>()
+    for ((branchName, branchCommitsList) in branchCommits) {
+        for (commit in branchCommitsList) {
+            commitToBranch[commit.hash.rawValue] = branchName
+        }
+    }
+
     // Find merge commits and associate them with branches
     val mergeInfo = mutableMapOf<String, Pair<Commit, Ref.Branch>>() // branchName -> (mergeCommit, targetBranch)
 
     for (commit in commits) {
         if (commit.parents.size > 1) { // Merge commit
-            val mergedBranch = extractMergedBranchFromMessage(commit.message) ?: continue
+            val secondParentHash = commit.parents.getOrNull(1)?.rawValue ?: continue
+            val mergedBranchName = commitToBranch[secondParentHash] ?: continue
             val targetBranch = commit.refs.firstNotNullOfOrNull { extractBranchRef(it) }
             if (targetBranch != null) {
-                mergeInfo[mergedBranch.name] = commit to targetBranch
+                mergeInfo[mergedBranchName] = commit to targetBranch
             }
         }
     }
@@ -67,22 +69,6 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
             mergeDate = merge?.first?.date,
             targetBranch = merge?.second
         ))
-    }
-
-    // Also add branches that are only known from merge commits
-    for ((branchName, mergeData) in mergeInfo) {
-        if (!branchCommits.containsKey(branchName)) {
-            // We don't have refs pointing to this branch, but we know it was merged
-            // Need to find the first commit for this branch - for now, use merge info
-            result.add(BranchInfo.merged(
-                name = Ref.Branch(branchName),
-                firstCommitHash = mergeData.first.parents.getOrNull(1) ?: mergeData.first.hash,
-                firstCommitDate = mergeData.first.date, // Approximation - we don't know the actual first commit date
-                mergeCommitHash = mergeData.first.hash,
-                mergeDate = mergeData.first.date,
-                targetBranch = mergeData.second
-            ))
-        }
     }
 
     return BranchInfos(result)
