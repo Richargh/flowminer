@@ -81,17 +81,25 @@ class GitLogBuilder {
     private val entries = mutableListOf<GitLogEntryBuilder>()
     private val branchForEntry = mutableMapOf<CommitHash, BranchName>()
     private val entriesForBranch = mutableMapOf<BranchName, MutableList<GitLogEntryBuilder>>()
+    private val originOfBranch = mutableMapOf<BranchName, BranchName?>()
+    private val parentBranchForEntry = mutableMapOf<CommitHash, BranchName?>()
 
     fun anEntry(branch: String, parentBranchName: String? = null, block: GitLogEntryBuilder.() -> Unit = {}): CommitHash {
         val builder = GitLogEntryBuilder()
         builder.hash(entries.size.toString().hash())
         builder.apply(block)
 
+        val branchName = BranchName(branch)
+        if (branchName !in originOfBranch) {
+            originOfBranch[branchName] = parentBranchName?.let { BranchName(it) }
+        }
+        parentBranchForEntry[builder.hash()] = parentBranchName?.let { BranchName(it) }
+
         if(parentBranchName != null) {
             val parentCommit = findLatestInBranch(BranchName(parentBranchName))
             builder.parents(parentCommit)
         }
-        addCommitToBranch(builder, BranchName(branch))
+        addCommitToBranch(builder, branchName)
         entries.add(builder)
 
         return builder.hash()
@@ -108,8 +116,13 @@ class GitLogBuilder {
         val result = StringBuilder()
         for ((i, e) in entries.withIndex()) {
             val (branch, before, entry, after) = findBeforeAfterInBranch(e.hash())
-            if (before != null)
-                entry + before.hash()
+            val parentBranch = parentBranchForEntry[e.hash()]
+            val shouldAddBefore = before != null && (
+                parentBranch == null ||
+                originOfBranch[parentBranch] == branch
+            )
+            if (shouldAddBefore)
+                entry + before!!.hash()
             if (after == null)
                 entry.refBranchTip(branch)
             result.append(entry.build())

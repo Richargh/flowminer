@@ -292,6 +292,67 @@ class GitLogBuilderTest {
     }
 
     @Test
+    fun `should allow merging back then adding a new commit`(){
+        // when
+        val result = aGitLog {
+            anEntry("main"){ }
+            anEntry("feature-1", "main"){
+                subject("Feature commit 1")
+            }
+            anEntry("main", "feature-1"){
+                subject("Merge commit")
+            }
+            anEntry("feature-1", "main"){
+                subject("Feature commit 2")
+            }
+        }
+        // then
+        result shouldBe """
+            -----COMMIT_START-----
+            hash==>> 0
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00+01:00
+            subject==>> Initial commit
+            parents==>> 
+            refs==>> 
+            -----BODY_START-----
+            -----FILES_START-----
+            -----COMMIT_START-----
+            hash==>> 1
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00+01:00
+            subject==>> Feature commit 1
+            parents==>> 0
+            refs==>> 
+            -----BODY_START-----
+            -----FILES_START-----
+            -----COMMIT_START-----
+            hash==>> 2
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00+01:00
+            subject==>> Merge commit
+            parents==>> 1 0
+            refs==>> main
+            -----BODY_START-----
+            -----FILES_START-----
+            -----COMMIT_START-----
+            hash==>> 3
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00+01:00
+            subject==>> Feature commit 2
+            parents==>> 2
+            refs==>> feature-1
+            -----BODY_START-----
+            -----FILES_START-----
+            
+        """.trimIndent()
+    }
+
+    @Test
     fun `should allow setting head`(){
         // when
         val result = aGitLog {
