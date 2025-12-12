@@ -33,8 +33,8 @@ data class Commit(
     val parents: List<String>,
     val refs: List<String>,
     val fileChanges: List<FileChange>,
-    val trailers: List<Pair<String, String>> = emptyList(),
-    val coAuthors: Set<Author> = emptySet(),
+    val trailers: List<Pair<String, String>>,
+    val coAuthors: Set<Author>,
     val commitType: CommitType
 )
 
