@@ -89,10 +89,11 @@ class GitLogParser2 {
         )
     }
 
-    private fun detectCommitTypes(message: String): CommitType? {
-        val firstWord = firstWordPattern.find(message)?.groups?.get("firstWord")?.value?.lowercase() ?: return null
+    private fun detectCommitTypes(message: String): CommitType {
+        val firstWord = firstWordPattern.find(message)?.groups?.get("firstWord")?.value?.lowercase()
+            ?: return CommitType.UNKNOWN
 
-        return commitTypes[firstWord]
+        return commitTypes[firstWord] ?: CommitType.UNKNOWN
     }
 
     private val authorPattern = Regex("""(?<name>.+?)\s*<(?<email>[^>]+)>""")

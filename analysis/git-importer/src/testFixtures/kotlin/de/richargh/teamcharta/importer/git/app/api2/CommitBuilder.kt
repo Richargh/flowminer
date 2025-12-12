@@ -12,6 +12,7 @@ class CommitBuilder {
     private var fileChanges: List<FileChange> = emptyList()
     private var trailers: List<Pair<String, String>> = emptyList()
     private var coAuthors: Set<Author> = emptySet()
+    private var commitType: CommitType = CommitType.UNKNOWN
 
     fun hash(hash: String) = apply { this.hash = hash }
     fun author(name: String, email: String) = apply { this.author = Author(name, email) }
@@ -33,7 +34,8 @@ class CommitBuilder {
         refs = refs,
         fileChanges = fileChanges,
         trailers = trailers,
-        coAuthors = coAuthors
+        coAuthors = coAuthors,
+        commitType
     )
 }
 

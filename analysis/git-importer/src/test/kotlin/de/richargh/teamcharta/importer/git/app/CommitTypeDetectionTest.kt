@@ -40,7 +40,7 @@ class CommitTypeDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0].commitType.shouldBeNull()
+        result.commits[0].commitType shouldBe CommitType.UNKNOWN
     }
 
     @ParameterizedTest

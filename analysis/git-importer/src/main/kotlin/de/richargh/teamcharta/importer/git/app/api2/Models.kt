@@ -35,7 +35,7 @@ data class Commit(
     val fileChanges: List<FileChange>,
     val trailers: List<Pair<String, String>> = emptyList(),
     val coAuthors: Set<Author> = emptySet(),
-    val commitType: CommitType? = null
+    val commitType: CommitType
 )
 
 data class GitMiningResult(
