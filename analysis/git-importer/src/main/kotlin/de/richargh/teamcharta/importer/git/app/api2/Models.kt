@@ -81,7 +81,16 @@ data class BranchInfo(
     }
 }
 
+class BranchInfos(branches: List<BranchInfo>) {
+    private val branchFor: Map<String, BranchInfo> = branches.associateBy { it.name }
+
+    operator fun get(name: String): BranchInfo? = branchFor[name]
+
+    fun all() = branchFor.values
+    fun size() = branchFor.size
+}
+
 data class GitMiningResult(
     val commits: List<Commit>,
-    val branches: List<BranchInfo> = emptyList()
+    val branches: BranchInfos = BranchInfos(emptyList())
 )

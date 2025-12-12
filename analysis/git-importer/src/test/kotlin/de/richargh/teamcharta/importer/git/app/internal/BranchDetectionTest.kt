@@ -32,10 +32,9 @@ class BranchDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.branches shouldHaveSize 1
+        result.branches.size() shouldBe 1
 
-        val featureBranch = result.branches.find { it.name == "main" }
-        featureBranch shouldBe aBranch {
+        result.branches["main"] shouldBe aBranch {
             name("main")
             firstCommitHash("abc123")
             firstCommitDate(ZonedDateTime.parse("2024-01-10T10:00:00+01:00"))
@@ -75,17 +74,13 @@ class BranchDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.branches shouldHaveSize 2
+        result.branches.size() shouldBe 2
 
-        val featureBranch = result.branches.find { it.name == "feature-login" }
-        featureBranch shouldBe aBranch {
+        result.branches["feature-login"] shouldBe aBranch {
             name("feature-login")
             firstCommitHash("feat1")
             firstCommitDate(ZonedDateTime.parse("2024-01-10T10:00:00+01:00"))
-
-            mergeCommitHash("main1")
-            mergeDate(ZonedDateTime.parse("2024-01-12T10:00:00+01:00"))
-            targetBranch("main")
+            merged("main1", ZonedDateTime.parse("2024-01-12T10:00:00+01:00"), "main")
         }
     }
 
@@ -133,10 +128,9 @@ class BranchDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.branches shouldHaveSize 3
+        result.branches.size() shouldBe 3
 
-        val featureBranch = result.branches.find { it.name == "feature-login" }
-        featureBranch shouldBe aBranch {
+        result.branches["feature-login"] shouldBe aBranch {
             name("feature-login")
             firstCommitHash("feat1")
             firstCommitDate(ZonedDateTime.parse("2024-01-10T10:00:00+01:00"))

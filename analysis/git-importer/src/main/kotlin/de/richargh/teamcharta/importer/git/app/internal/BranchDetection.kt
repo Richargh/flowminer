@@ -1,6 +1,7 @@
 package de.richargh.teamcharta.importer.git.app.internal
 
 import de.richargh.teamcharta.importer.git.app.api2.BranchInfo
+import de.richargh.teamcharta.importer.git.app.api2.BranchInfos
 import de.richargh.teamcharta.importer.git.app.api2.Commit
 import kotlin.collections.iterator
 
@@ -20,7 +21,7 @@ fun extractMergedBranchFromMessage(message: String): String? {
     return match.groupValues.getOrNull(1)
 }
 
-fun extractBranchInfo(commits: List<Commit>): List<BranchInfo> {
+fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     // Find all branches referenced in commits
     val branchCommits = mutableMapOf<String, MutableList<Commit>>()
 
@@ -78,5 +79,5 @@ fun extractBranchInfo(commits: List<Commit>): List<BranchInfo> {
         }
     }
 
-    return result
+    return BranchInfos(result)
 }

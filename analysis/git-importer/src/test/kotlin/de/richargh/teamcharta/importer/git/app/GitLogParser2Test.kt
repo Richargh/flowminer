@@ -67,7 +67,7 @@ class GitLogParser2Test {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.branches shouldContainExactly listOf(aBranch {
+        result.branches.all() shouldContainExactly listOf(aBranch {
             name("main")
             firstCommitHash("abc123")
             firstCommitDate(ZonedDateTime.parse("2024-01-15T10:00:00+01:00"))
