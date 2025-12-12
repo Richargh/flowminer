@@ -122,7 +122,12 @@ class GitLogParser2 {
         "chore" to CommitType.ENVIRONMENT,
         "ci" to CommitType.ENVIRONMENT,
         "ops" to CommitType.ENVIRONMENT,
-        "e" to CommitType.ENVIRONMENT
+        "e" to CommitType.ENVIRONMENT,
+
+        "doc" to CommitType.DOCS,
+        "docs" to CommitType.DOCS,
+        "documentation" to CommitType.DOCS,
+        "d" to CommitType.DOCS,
     )
 
 }

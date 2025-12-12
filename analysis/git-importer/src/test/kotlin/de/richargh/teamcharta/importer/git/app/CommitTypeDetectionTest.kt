@@ -406,4 +406,81 @@ class CommitTypeDetectionTest {
         // Then
         result.commits[0].commitType shouldBe CommitType.ENVIRONMENT
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "doc: add login",
+        "docs: add login",
+        "documentation: add login",
+        "d: add login",
+        "D: add login",
+        "doc(scope): add login",
+        "doc[scope]: add login",
+        "docs(scope): add login",
+        "docs[scope]: add login",
+        "documentation(scope): add login",
+        "documentation[scope]: add login",
+        "d(scope): add login",
+        "d[scope]: add login",
+        "D(scope): add login",
+        "D[scope]: add login",
+        "doc!: add login",
+        "doc(scope)!: add login",
+        "doc!(scope): add login",
+        "docs!: add login",
+        "docs(scope)!: add login",
+        "docs!(scope): add login",
+
+        "d: add login",
+        "D: add login",
+        "d(scope): add login",
+        "d[scope]: add login",
+        "D(scope): add login",
+        "D[scope]: add login",
+        ". d: add login",
+        "^ d: add login",
+        "@ d: add login",
+        ". d(scope): add login",
+        "^ d(scope): add login",
+        "@ d(scope): add login",
+        ". d[scope]: add login",
+        "^ d[scope]: add login",
+        "@ d[scope]: add login",
+
+        "doc     : add login",
+        "docs   [scope]  : add login",
+        "documentation   (scope)   : add login",
+        "D   [scope]  : add login",
+        "@ d     : add login",
+        "^ d  (scope)  : add login",
+        "^ d   [scope]   : add login",
+        "D  : add login",
+        "d   add login",
+        "   D  (scope): add login",
+        "@ d[scope]   add login",
+    ])
+    fun `should detect DOCS commit type from message`(subject: String) {
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            hash==>> abc123
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2024-01-15T10:00:00+01:00
+            subject==>> $subject
+            parents==>> parent1
+            refs==>>
+            -----BODY_START-----
+            -----FILES_START-----
+            5	2	src/Login.kt
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0].commitType shouldBe CommitType.DOCS
+    }
 }
