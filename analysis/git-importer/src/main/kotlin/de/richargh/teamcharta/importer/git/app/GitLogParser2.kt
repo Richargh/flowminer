@@ -116,7 +116,9 @@ class GitLogParser2 {
 
     private val authorPattern = Regex("""(?<name>.+?)\s*<(?<email>[^>]+)>""")
     private val firstWordPattern = Regex("""^\W*(?<firstWord>\w+)""")
+    // also used by GitLab, Azure DevOps
     private val gitHubWorkKeyPattern = Regex("""#\d+""")
+    // allegedly also used by TFS, YouTrack, Shortcut
     private val jiraWorkKeyPattern = Regex("""\b[A-Z]{2,10}-\d+\b""")
 
     private val commitTypes = mapOf(
