@@ -28,7 +28,7 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
 
     val sortedBranches = branchTips.entries.sortedBy { (name, _) ->
         when {
-            name.value.contains("main") || name.value.contains("master") -> 0
+            name.value.contains("main") || name.value.contains("master") || name.value.contains("trunk") -> 0
             else -> 1
         }
     }
@@ -53,13 +53,9 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
             commitsOnBranch.add(current)
             commitToBranch[hash] = branchName
 
-            // For merge commits, follow second parent (index 1) to stay on same branch
-            // For regular commits, follow first parent (index 0)
-            val nextParentHash = if (current.parents.size > 1) {
-                current.parents.getOrNull(1)?.rawValue
-            } else {
-                current.parents.firstOrNull()?.rawValue
-            }
+            // Always follow first parent to stay on the same branch
+            // In git, first parent is the branch you were on when merging
+            val nextParentHash = current.parents.firstOrNull()?.rawValue
 
             current = nextParentHash?.let { commitByHash[it] }
         }
@@ -72,9 +68,9 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
 
     for (commit in commits) {
         if (commit.parents.size > 1) { // Merge commit
-            // First parent (index 0) is the branch being merged
-            val firstParentHash = commit.parents.firstOrNull()?.rawValue ?: continue
-            val mergedBranchName = commitToBranch[firstParentHash] ?: continue
+            // Second parent (index 1) is the branch being merged (git convention)
+            val secondParentHash = commit.parents.getOrNull(1)?.rawValue ?: continue
+            val mergedBranchName = commitToBranch[secondParentHash] ?: continue
             val targetBranch = commit.refs.firstNotNullOfOrNull { extractBranchName(it) }
             if (targetBranch != null && mergedBranchName != targetBranch) {
                 mergeInfo[mergedBranchName] = commit to targetBranch

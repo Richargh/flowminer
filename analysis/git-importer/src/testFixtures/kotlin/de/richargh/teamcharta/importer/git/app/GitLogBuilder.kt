@@ -31,7 +31,7 @@ class GitLogEntryBuilder {
     fun parents(vararg parents: CommitHash) = apply { this.parents = parents.toMutableList() }
     fun parents() = parents
     operator fun plus(parent: CommitHash) {
-        this.parents.add(parent)
+        this.parents.add(0, parent)  // Prepend to match git convention (first parent = target branch)
     }
 
     fun refs(vararg refs: String) = apply { this.refs = refs.toList() }

@@ -231,7 +231,7 @@ class GitLogBuilderTest {
             authorMail==>> john@example.com
             authorDate==>> 2024-01-15T10:00+01:00
             subject==>> Latest commit
-            parents==>> 1 0
+            parents==>> 0 1
             refs==>> main
             -----BODY_START-----
             -----FILES_START-----
@@ -283,7 +283,7 @@ class GitLogBuilderTest {
             authorMail==>> john@example.com
             authorDate==>> 2024-01-15T10:00+01:00
             subject==>> Latest commit
-            parents==>> fff123 mmm123
+            parents==>> mmm123 fff123
             refs==>> main
             -----BODY_START-----
             -----FILES_START-----
@@ -334,7 +334,7 @@ class GitLogBuilderTest {
             authorMail==>> john@example.com
             authorDate==>> 2024-01-15T10:00+01:00
             subject==>> Merge commit
-            parents==>> 1 0
+            parents==>> 0 1
             refs==>> main
             -----BODY_START-----
             -----FILES_START-----
