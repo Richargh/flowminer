@@ -69,8 +69,8 @@ class GitLogParser2 {
     private fun parseAuthorValue(value: String): Author? {
         val match = authorPattern.matchEntire(value) ?: return null
         return Author(
-            name = match.groupValues[1].trim(),
-            email = match.groupValues[2].trim()
+            name = match.groups["name"]?.value?.trim() ?: return null,
+            email = match.groups["email"]?.value?.trim() ?: return null
         )
     }
 
@@ -95,7 +95,7 @@ class GitLogParser2 {
         return commitTypes[firstWord]
     }
 
-    private val authorPattern = Regex("""(.+?)\s*<([^>]+)>""")
+    private val authorPattern = Regex("""(?<name>.+?)\s*<(?<email>[^>]+)>""")
     private val firstWordPattern = Regex("""^\W*(?<firstWord>\w+)""")
 
     private val commitTypes = mapOf(
