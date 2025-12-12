@@ -90,13 +90,13 @@ class GitLogParser2 {
     }
 
     private fun detectCommitTypes(message: String): CommitType? {
-        val firstWord = firstWordPattern.find(message)?.groupValues?.get(1)?.lowercase() ?: return null
+        val firstWord = firstWordPattern.find(message)?.groups?.get("firstWord")?.value?.lowercase() ?: return null
 
         return commitTypes[firstWord]
     }
 
     private val authorPattern = Regex("""(.+?)\s*<([^>]+)>""")
-    private val firstWordPattern = Regex("""^\W*(\w+)""")
+    private val firstWordPattern = Regex("""^\W*(?<firstWord>\w+)""")
 
     private val commitTypes = mapOf(
         "feat" to CommitType.FEATURE,
