@@ -314,5 +314,127 @@ class BranchDetectionTest {
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
             }
         }
+
+        @Test
+        fun `should extract branch info when main is merged into feat before feat is merged back`() {
+            // Graph:
+            // trunk: 0───1───2───────────6 (trunk) [merge feat]
+            //         \       \         /
+            // feat:    \       \       /
+            //           3───4───5─────┘ (feat)
+            //                   ^
+            //                   merge trunk into feat (parents: 4, 2)
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            hash==>> 0
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2025-01-01T00:00:00+01:00
+            subject==>> initial commit
+            parents==>>
+            refs==>>
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk.md
+
+            -----COMMIT_START-----
+            hash==>> 1
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2025-01-01T01:00:00+01:00
+            subject==>> trunk commit 1
+            parents==>> 0
+            refs==>>
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk1.md
+
+            -----COMMIT_START-----
+            hash==>> 2
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2025-01-01T02:00:00+01:00
+            subject==>> trunk commit 2
+            parents==>> 1
+            refs==>>
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk2.md
+
+            -----COMMIT_START-----
+            hash==>> 3
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2025-01-01T03:00:00+01:00
+            subject==>> feat commit 1
+            parents==>> 0
+            refs==>>
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat1.md
+
+            -----COMMIT_START-----
+            hash==>> 4
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2025-01-01T04:00:00+01:00
+            subject==>> feat commit 2
+            parents==>> 3
+            refs==>>
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat2.md
+
+            -----COMMIT_START-----
+            hash==>> 5
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2025-01-01T05:00:00+01:00
+            subject==>> Merge branch 'trunk' into feat
+            parents==>> 4 2
+            refs==>> feat
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            hash==>> 6
+            author==>> John Doe
+            authorMail==>> john@example.com
+            authorDate==>> 2025-01-01T06:00:00+01:00
+            subject==>> Merge branch 'feat' into trunk
+            parents==>> 2 5
+            refs==>> HEAD -> trunk
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+        """.trimIndent()
+
+            val testee = GitLogParser2()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches.size() shouldBe 2
+            result.branches["trunk"] shouldBe aBranch {
+                name("trunk")
+                firstCommitHash("0".hash())
+                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            }
+            result.branches["feat"] shouldBe aBranch {
+                name("feat")
+                firstCommitHash("3".hash())
+                firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                mergedInto("trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
+            }
+        }
     }
 }

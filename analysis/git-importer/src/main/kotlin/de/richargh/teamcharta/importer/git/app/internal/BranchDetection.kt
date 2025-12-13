@@ -64,6 +64,7 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     }
 
     // Find merge commits and associate them with branches
+    // Only record merges INTO main/master/trunk branches (feature branches are "complete" when merged into main)
     val mergeInfo = mutableMapOf<BranchName, Pair<Commit, BranchName>>() // branchName -> (mergeCommit, targetBranch)
 
     for (commit in commits) {
@@ -73,7 +74,13 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
             val mergedBranchName = commitToBranch[secondParentHash] ?: continue
             val targetBranch = commit.refs.firstNotNullOfOrNull { extractBranchName(it) }
             if (targetBranch != null && mergedBranchName != targetBranch) {
-                mergeInfo[mergedBranchName] = commit to targetBranch
+                // Only record if target is a main branch (merging into main = branch complete)
+                val isTargetMainBranch = targetBranch.value.contains("main") ||
+                        targetBranch.value.contains("master") ||
+                        targetBranch.value.contains("trunk")
+                if (isTargetMainBranch) {
+                    mergeInfo[mergedBranchName] = commit to targetBranch
+                }
             }
         }
     }
