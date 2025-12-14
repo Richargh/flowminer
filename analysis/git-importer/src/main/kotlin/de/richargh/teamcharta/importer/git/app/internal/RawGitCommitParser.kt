@@ -1,7 +1,6 @@
 package de.richargh.teamcharta.importer.git.app.internal
 
-fun splitIntoRawCommits(lines: Sequence<String>): List<RawCommit> {
-    val rawCommits = mutableListOf<RawCommit>()
+fun splitIntoRawCommits(lines: Sequence<String>): Sequence<RawCommit> = sequence {
     val headerFields = mutableMapOf<String, String>()
     val body = StringBuilder()
     val trailers = StringBuilder()
@@ -11,9 +10,9 @@ fun splitIntoRawCommits(lines: Sequence<String>): List<RawCommit> {
     for (line in lines) {
         when {
             line == "-----COMMIT_START-----" -> {
-                // Save previous commit if exists
+                // Yield previous commit if exists
                 if (headerFields.isNotEmpty()) {
-                    rawCommits.add(RawCommit(
+                    yield(RawCommit(
                         headerFields.toMap(),
                         body.toString().trim(),
                         trailers.toString().trim(),
@@ -65,17 +64,15 @@ fun splitIntoRawCommits(lines: Sequence<String>): List<RawCommit> {
         }
     }
 
-    // Handle last commit
+    // Yield last commit
     if (headerFields.isNotEmpty()) {
-        rawCommits.add(RawCommit(
+        yield(RawCommit(
             headerFields.toMap(),
             body.toString().trim(),
             trailers.toString().trim(),
             files.toString().trim()
         ))
     }
-
-    return rawCommits
 }
 
 private enum class Section { HEADER, BODY, TRAILERS, FILES }

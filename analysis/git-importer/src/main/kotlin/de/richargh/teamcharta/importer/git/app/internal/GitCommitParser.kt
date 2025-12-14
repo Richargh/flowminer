@@ -2,8 +2,13 @@ package de.richargh.teamcharta.importer.git.app.internal
 
 import de.richargh.teamcharta.importer.git.app.api2.*
 import java.time.ZonedDateTime
+import kotlin.collections.map
 
-fun parseCommit(raw: RawCommit): Commit {
+fun parseCommits(rawCommits: Sequence<RawCommit>): Sequence<Commit> {
+    return rawCommits.map { parseCommit(it) }
+}
+
+private fun parseCommit(raw: RawCommit): Commit {
     val hash = raw.headerFields["hash"]?.let(::CommitHash)
         ?: throw IllegalArgumentException("Commit has no hash")
     val date = raw.headerFields["authorDate"]?.let(ZonedDateTime::parse)
