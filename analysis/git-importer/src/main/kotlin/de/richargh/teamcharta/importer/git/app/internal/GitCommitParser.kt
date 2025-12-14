@@ -1,32 +1,22 @@
 package de.richargh.teamcharta.importer.git.app.internal
 
-import de.richargh.teamcharta.importer.git.app.api2.Author
-import de.richargh.teamcharta.importer.git.app.api2.BranchName
-import de.richargh.teamcharta.importer.git.app.api2.Commit
-import de.richargh.teamcharta.importer.git.app.api2.CommitHash
-import de.richargh.teamcharta.importer.git.app.api2.CommitType
-import de.richargh.teamcharta.importer.git.app.api2.FileChange
-import de.richargh.teamcharta.importer.git.app.api2.Ref
-import de.richargh.teamcharta.importer.git.app.api2.WorkKey
+import de.richargh.teamcharta.importer.git.app.api2.*
 import java.time.ZonedDateTime
 
 fun parseCommit(raw: RawCommit): Commit {
     val hash = raw.headerFields["hash"]?.let(::CommitHash)
         ?: throw IllegalArgumentException("Commit has no hash")
-    val authorName = raw.headerFields["author"] ?: ""
-    val authorEmail = raw.headerFields["authorMail"] ?: ""
-    val rawDate = raw.headerFields["authorDate"] ?: ""
+    val date = raw.headerFields["authorDate"]?.let(ZonedDateTime::parse)
+        ?: throw IllegalArgumentException("Commit has no hash")
+    val author = Author(
+        name = raw.headerFields["author"] ?: "",
+        email = raw.headerFields["authorMail"] ?: ""
+    )
     val message = raw.headerFields["subject"] ?: ""
-    val rawParents = raw.headerFields["parents"] ?: ""
-    val rawRefs = raw.headerFields["refs"] ?: ""
+    val parents = parseParents(raw.headerFields["parents"] ?: "")
+    val refs = parseRefs(raw.headerFields["refs"] ?: "")
 
-    val date = ZonedDateTime.parse(rawDate)
-    val parents = rawParents.split(" ").filter { it.isNotEmpty() }.map(::CommitHash)
-    val refs = parseRefs(rawRefs)
-
-    val fileChanges = raw.files.lines()
-        .filter { it.isNotEmpty() }
-        .mapNotNull { parseNumstatLine(it) }
+    val fileChanges = parseFileChanges(raw.files.lines())
 
     val trailers = parseTrailers(raw.trailers)
     val coAuthors = extractCoAuthors(trailers)
@@ -35,7 +25,7 @@ fun parseCommit(raw: RawCommit): Commit {
 
     return Commit(
         hash = hash,
-        author = Author(authorName, authorEmail),
+        author = author,
         date = date,
         message = message,
         parents = parents,
@@ -48,31 +38,29 @@ fun parseCommit(raw: RawCommit): Commit {
     )
 }
 
-private fun parseTrailers(trailersStr: String): List<Pair<String, String>> {
-    if (trailersStr.isBlank()) return emptyList()
-    return trailersStr.lines()
-        .filter { it.contains(":") }
-        .map { line ->
-            val key = line.substringBefore(":").trim()
-            val value = line.substringAfter(":").trim()
-            key to value
-        }
+
+private fun parseParents(rawParents: String): List<CommitHash> =
+    rawParents.split(" ").filter { it.isNotEmpty() }.map(::CommitHash)
+
+
+private fun parseRefs(rawRefs: String): List<Ref> {
+    if (rawRefs.isEmpty()) return emptyList()
+    return rawRefs.split(",").map { it.trim() }.mapNotNull { parseRef(it) }
 }
 
-private fun extractCoAuthors(trailers: List<Pair<String, String>>): Set<Author> {
-    return trailers
-        .filter { it.first.equals("Co-authored-by", ignoreCase = true) }
-        .mapNotNull { parseAuthorValue(it.second) }
-        .toSet()
+private fun parseRef(rawRef: String): Ref? {
+    return when {
+        rawRef.startsWith("HEAD -> ") -> Ref.Head(BranchName(rawRef.removePrefix("HEAD -> ")))
+        rawRef.startsWith("tag: ") -> Ref.Tag(rawRef.removePrefix("tag: "))
+        rawRef.isNotEmpty() -> Ref.BranchTip(rawRef)
+        else -> null
+    }
 }
 
-private fun parseAuthorValue(value: String): Author? {
-    val match = authorPattern.matchEntire(value) ?: return null
-    return Author(
-        name = match.groups["name"]?.value?.trim() ?: return null,
-        email = match.groups["email"]?.value?.trim() ?: return null
-    )
-}
+
+private fun parseFileChanges(files: List<String>): List<FileChange> = files
+    .filter { it.isNotEmpty() }
+    .mapNotNull { parseNumstatLine(it) }
 
 private fun parseNumstatLine(line: String): FileChange? {
     val parts = line.split("\t")
@@ -86,6 +74,34 @@ private fun parseNumstatLine(line: String): FileChange? {
         path = path,
         additions = additions,
         deletions = deletions
+    )
+}
+
+
+private fun parseTrailers(trailersStr: String): List<Pair<String, String>> {
+    if (trailersStr.isBlank()) return emptyList()
+    return trailersStr.lines()
+        .filter { it.contains(":") }
+        .map { line ->
+            val key = line.substringBefore(":").trim()
+            val value = line.substringAfter(":").trim()
+            key to value
+        }
+}
+
+
+private fun extractCoAuthors(trailers: List<Pair<String, String>>): Set<Author> {
+    return trailers
+        .filter { it.first.equals("Co-authored-by", ignoreCase = true) }
+        .mapNotNull { parseAuthorValue(it.second) }
+        .toSet()
+}
+
+private fun parseAuthorValue(value: String): Author? {
+    val match = authorPattern.matchEntire(value) ?: return null
+    return Author(
+        name = match.groups["name"]?.value?.trim() ?: return null,
+        email = match.groups["email"]?.value?.trim() ?: return null
     )
 }
 
@@ -110,24 +126,12 @@ private fun detectWorkKeys(message: String): List<WorkKey> {
     return workKeys
 }
 
-private fun parseRefs(rawRefs: String): List<Ref> {
-    if (rawRefs.isEmpty()) return emptyList()
-    return rawRefs.split(",").map { it.trim() }.mapNotNull { parseRef(it) }
-}
-
-private fun parseRef(rawRef: String): Ref? {
-    return when {
-        rawRef.startsWith("HEAD -> ") -> Ref.Head(BranchName(rawRef.removePrefix("HEAD -> ")))
-        rawRef.startsWith("tag: ") -> Ref.Tag(rawRef.removePrefix("tag: "))
-        rawRef.isNotEmpty() -> Ref.BranchTip(rawRef)
-        else -> null
-    }
-}
-
 private val authorPattern = Regex("""(?<name>.+?)\s*<(?<email>[^>]+)>""")
 private val firstWordPattern = Regex("""^\W*(?<firstWord>\w+)""")
+
 // also used by GitLab, Azure DevOps
 private val gitHubWorkKeyPattern = Regex("""#\d+""")
+
 // allegedly also used by TFS, YouTrack, Shortcut
 private val jiraWorkKeyPattern = Regex("""\b[A-Z]{2,10}-\d+\b""")
 
