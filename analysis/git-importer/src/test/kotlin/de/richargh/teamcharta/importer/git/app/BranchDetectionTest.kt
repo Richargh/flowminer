@@ -148,65 +148,35 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T00:00:00+01:00
-            subject==>> initial commit
-            parents==>>
-            refs==>>
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       trunk.md
-            
+
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T01:00:00+01:00
-            subject==>> main commit
-            parents==>> 0
-            refs==>>
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       trunk2.md
 
             -----COMMIT_START-----
-            hash==>> 2
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T02:00:00+01:00
-            subject==>> feat 1 commit
-            parents==>> 0
-            refs==>>
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat.md
 
             -----COMMIT_START-----
-            hash==>> 3
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T03:00:00+01:00
-            subject==>> feat 2 commit
-            parents==>> 2
-            refs==>> feat
+            feat|3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat2.md
 
             -----COMMIT_START-----
-            hash==>> 4
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T04:00:00+01:00
-            subject==>> Merge branch 'feat' into trunk
-            parents==>> 1 3
-            refs==>> HEAD -> trunk
+            HEAD -> trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -237,65 +207,35 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T00:00:00+01:00
-            subject==>> initial commit
-            parents==>>
-            refs==>>
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       trunk.md
-            
+
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T00:01:00+01:00
-            subject==>> main commit
-            parents==>> 0
-            refs==>>
+            |1|0|2025-01-01T00:01:00+01:00|John Doe|john@example.com|main commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       trunk2.md
-            
+
             -----COMMIT_START-----
-            hash==>> 2
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T02:00:00+01:00
-            subject==>> feat 1 commit
-            parents==>> 0
-            refs==>>
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat.md
-            
+
             -----COMMIT_START-----
-            hash==>> 3
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T03:00:00+01:00
-            subject==>> feat 2 commit
-            parents==>> 2
-            refs==>>
+            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat2.md
-            
+
             -----COMMIT_START-----
-            hash==>> 4
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T04:00:00+01:00
-            subject==>> Merge branch 'feat' into trunk
-            parents==>> 1 3
-            refs==>> HEAD -> trunk
+            HEAD -> trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -328,90 +268,48 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T00:00:00+01:00
-            subject==>> initial commit
-            parents==>>
-            refs==>>
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       trunk.md
 
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T01:00:00+01:00
-            subject==>> trunk commit 1
-            parents==>> 0
-            refs==>>
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit 1
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       trunk1.md
 
             -----COMMIT_START-----
-            hash==>> 2
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T02:00:00+01:00
-            subject==>> trunk commit 2
-            parents==>> 1
-            refs==>>
+            |2|1|2025-01-01T02:00:00+01:00|John Doe|john@example.com|trunk commit 2
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       trunk2.md
 
             -----COMMIT_START-----
-            hash==>> 3
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T03:00:00+01:00
-            subject==>> feat commit 1
-            parents==>> 0
-            refs==>>
+            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat commit 1
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat1.md
 
             -----COMMIT_START-----
-            hash==>> 4
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T04:00:00+01:00
-            subject==>> feat commit 2
-            parents==>> 3
-            refs==>>
+            |4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat commit 2
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat2.md
 
             -----COMMIT_START-----
-            hash==>> 5
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T05:00:00+01:00
-            subject==>> Merge branch 'trunk' into feat
-            parents==>> 4 2
-            refs==>> feat
+            feat|5|4 2|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'trunk' into feat
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
 
             -----COMMIT_START-----
-            hash==>> 6
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2025-01-01T06:00:00+01:00
-            subject==>> Merge branch 'feat' into trunk
-            parents==>> 2 5
-            refs==>> HEAD -> trunk
+            HEAD -> trunk|6|2 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----

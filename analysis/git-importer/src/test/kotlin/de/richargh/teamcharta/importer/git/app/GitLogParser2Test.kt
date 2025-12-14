@@ -12,13 +12,7 @@ class GitLogParser2Test {
         // Given
         val gitLogContent = """
             -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> Initial commit
-            parents==>> parent1
-            refs==>> HEAD -> main
+            HEAD -> main|abc123|parent1|2024-01-15T10:00:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             This is the commit body.
             -----FILES_START-----
@@ -48,13 +42,7 @@ class GitLogParser2Test {
         // Given
         val gitLogContent = """
             -----COMMIT_START-----
-            hash==>> abc123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00:00+01:00
-            subject==>> Initial commit
-            parents==>> parent1
-            refs==>> HEAD -> main
+            HEAD -> main|abc123|parent1|2024-01-15T10:00:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             This is the commit body.
             -----FILES_START-----

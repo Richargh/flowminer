@@ -47,13 +47,10 @@ class GitLogEntryBuilder {
 
     fun build(): String = buildString {
         appendLine("-----COMMIT_START-----")
-        appendLine("hash==>> ${hash.rawValue}")
-        appendLine("author==>> $author")
-        appendLine("authorMail==>> $authorMail")
-        appendLine("authorDate==>> $authorDate")
-        appendLine("subject==>> $subject")
-        appendLine("parents==>> ${parents.joinToString(" ") { it.rawValue }}")
-        appendLine("refs==>> ${refs.joinToString(", ")}")
+        // Format: refs|hash|parents|authorDate|author|authorMail|subject
+        val parentsStr = parents.joinToString(" ") { it.rawValue }
+        val refsStr = refs.joinToString(", ")
+        appendLine("$refsStr|${hash.rawValue}|$parentsStr|$authorDate|$author|$authorMail|$subject")
         appendLine("-----BODY_START-----")
         if (body.isNotEmpty()) {
             appendLine(body)

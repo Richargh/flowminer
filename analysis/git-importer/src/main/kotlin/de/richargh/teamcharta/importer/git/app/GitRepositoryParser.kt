@@ -27,13 +27,7 @@ class GitRepositoryParser(
 private fun gitLogCommand(since: String): List<String>{
     val format = listOf(
         "-----COMMIT_START-----",
-        "hash==>> %H",
-        "author==>> %an",
-        "authorMail==>> %ae",
-        "authorDate==>> %aI",
-        "subject==>> %s",
-        "parents==>> %P",
-        "refs==>> %D",
+        "%D|%H|%P|%aI|%an|%ae|%s",
         "-----BODY_START-----",
         "%b",
         "-----TRAILERS_START-----",

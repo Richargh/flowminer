@@ -20,36 +20,18 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> main
+            main|0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> develop
+            develop|1||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 2
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> stage
+            stage|2||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
-            
+
         """.trimIndent()
     }
 
@@ -68,26 +50,14 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> 
+            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Min
-            authorMail==>> min@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Later commit
-            parents==>> 0
-            refs==>> main
+            main|1|0|2024-01-15T10:00+01:00|John Min|min@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
-            
+
         """.trimIndent()
     }
 
@@ -106,36 +76,18 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> 
+            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Feature commit
-            parents==>> 0
-            refs==>> feature-1
+            feature-1|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 2
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Latest commit
-            parents==>> 0
-            refs==>> main
+            main|2|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
-            
+
         """.trimIndent()
     }
 
@@ -158,36 +110,18 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            hash==>> mmm123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> 
+            |mmm123||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> fff123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Feature commit
-            parents==>> mmm123
-            refs==>> feature-1
+            feature-1|fff123|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> mmm456
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Latest commit
-            parents==>> mmm123
-            refs==>> main
+            main|mmm456|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
-            
+
         """.trimIndent()
     }
 
@@ -206,36 +140,18 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> 
+            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Feature commit
-            parents==>> 0
-            refs==>> feature-1
+            feature-1|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 2
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Latest commit
-            parents==>> 0 1
-            refs==>> main
+            main|2|0 1|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
-            
+
         """.trimIndent()
     }
 
@@ -258,36 +174,18 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            hash==>> mmm123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> 
+            |mmm123||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> fff123
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Feature commit
-            parents==>> mmm123
-            refs==>> feature-1
+            feature-1|fff123|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> mmm456
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Latest commit
-            parents==>> mmm123 fff123
-            refs==>> main
+            main|mmm456|mmm123 fff123|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
-            
+
         """.trimIndent()
     }
 
@@ -309,46 +207,22 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> 
+            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Feature commit 1
-            parents==>> 0
-            refs==>> 
+            |1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit 1
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 2
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Merge commit
-            parents==>> 0 1
-            refs==>> main
+            main|2|0 1|2024-01-15T10:00+01:00|John Doe|john@example.com|Merge commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 3
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Feature commit 2
-            parents==>> 2
-            refs==>> feature-1
+            feature-1|3|2|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit 2
             -----BODY_START-----
             -----FILES_START-----
-            
+
         """.trimIndent()
     }
 
@@ -365,26 +239,14 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> 
+            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Later commit
-            parents==>> 0
-            refs==>> HEAD -> main, main
+            HEAD -> main, main|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
-            
+
         """.trimIndent()
     }
 
@@ -401,26 +263,14 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            hash==>> 0
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Initial commit
-            parents==>> 
-            refs==>> 
+            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            hash==>> 1
-            author==>> John Doe
-            authorMail==>> john@example.com
-            authorDate==>> 2024-01-15T10:00+01:00
-            subject==>> Later commit
-            parents==>> 0
-            refs==>> tag: v1.1.0, main
+            tag: v1.1.0, main|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
-            
+
         """.trimIndent()
     }
 

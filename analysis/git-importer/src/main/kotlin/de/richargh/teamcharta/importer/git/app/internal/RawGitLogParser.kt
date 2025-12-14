@@ -35,9 +35,18 @@ fun splitIntoRawCommits(lines: Sequence<String>): List<RawCommit> {
             line == "-----FILES_START-----" -> {
                 section = Section.FILES
             }
-            section == Section.HEADER && line.contains("==>>") -> {
-                val (key, value) = line.split("==>>", limit = 2).map { it.trim() }
-                headerFields[key] = value
+            section == Section.HEADER && line.isNotEmpty() -> {
+                // Parse single-line header: refs|hash|parents|authorDate|author|authorMail|subject
+                val parts = line.split("|", limit = 7)
+                if (parts.size >= 7) {
+                    headerFields["refs"] = parts[0]
+                    headerFields["hash"] = parts[1]
+                    headerFields["parents"] = parts[2]
+                    headerFields["authorDate"] = parts[3]
+                    headerFields["author"] = parts[4]
+                    headerFields["authorMail"] = parts[5]
+                    headerFields["subject"] = parts[6]
+                }
             }
             section == Section.BODY -> {
                 if (body.isNotEmpty()) body.append("\n")
