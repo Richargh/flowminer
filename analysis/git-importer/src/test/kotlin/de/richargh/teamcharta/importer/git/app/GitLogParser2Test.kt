@@ -25,7 +25,7 @@ class GitLogParser2Test {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits shouldContainExactly listOf(aCommit {
+        result.commits.all() shouldContainExactly listOf(aCommit {
             hash("abc123")
             author("John Doe", "john@example.com")
             date(ZonedDateTime.parse("2024-01-15T10:00:00+01:00"))

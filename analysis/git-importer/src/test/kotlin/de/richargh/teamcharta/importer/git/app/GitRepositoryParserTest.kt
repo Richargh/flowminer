@@ -16,6 +16,6 @@ class GitRepositoryParserTest {
         val result = testee.parse(repoPath, since = "1 year ago")
 
         // Then
-        result.commits.shouldNotBeEmpty()
+        result.commits.all().shouldNotBeEmpty()
     }
 }

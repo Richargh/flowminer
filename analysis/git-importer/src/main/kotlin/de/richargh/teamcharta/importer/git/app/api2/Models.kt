@@ -62,6 +62,16 @@ data class BranchInfo(
     val targetBranch: BranchName?
 )
 
+class Commits(private val commits: List<Commit>) {
+    operator fun get(index: Int): Commit = commits[index]
+
+    fun all(): Collection<Commit> = commits
+    fun first(): Commit = commits.first()
+    fun size(): Int = commits.size
+    fun isEmpty(): Boolean = commits.isEmpty()
+    fun isNotEmpty(): Boolean = commits.isNotEmpty()
+}
+
 class BranchInfos(branches: List<BranchInfo>) {
     private val branchFor: Map<BranchName, BranchInfo> = branches.associateBy { it.name }
 
@@ -73,6 +83,6 @@ class BranchInfos(branches: List<BranchInfo>) {
 }
 
 data class GitMiningResult(
-    val commits: List<Commit>,
+    val commits: Commits,
     val branches: BranchInfos = BranchInfos(emptyList())
 )

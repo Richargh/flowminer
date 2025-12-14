@@ -12,7 +12,7 @@ class GitLogParser2 {
         val rawCommits = splitIntoRawCommits(lines)
         val commits = rawCommits.map { parseCommit(it) }
         val branches = extractBranchInfo(commits)
-        return GitMiningResult(commits = commits, branches = branches)
+        return GitMiningResult(commits = Commits(commits), branches = branches)
     }
 
     private fun parseCommit(raw: RawCommit): Commit {
