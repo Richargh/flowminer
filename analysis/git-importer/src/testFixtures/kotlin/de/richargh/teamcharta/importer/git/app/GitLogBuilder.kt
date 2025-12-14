@@ -111,7 +111,8 @@ class GitLogBuilder {
 
     private fun joinEntries(): String {
         val result = StringBuilder()
-        for ((i, e) in entries.withIndex()) {
+        val reversedEntries = entries.reversed()
+        for ((i, e) in reversedEntries.withIndex()) {
             val (branch, before, entry, after) = findBeforeAfterInBranch(e.hash())
             val parentBranch = parentBranchForEntry[e.hash()]
             val shouldAddBefore = before != null && (
@@ -124,7 +125,7 @@ class GitLogBuilder {
                 entry.refBranchTip(branch)
             result.append(entry.build())
 
-            if (i < entries.size) {
+            if (i < reversedEntries.size) {
                 result.append("\n")
             }
         }

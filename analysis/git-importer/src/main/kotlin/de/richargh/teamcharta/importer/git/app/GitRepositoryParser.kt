@@ -40,7 +40,6 @@ private fun gitLogCommand(since: String): List<String>{
         "--all",
         "--numstat",
         "--topo-order",
-        "--reverse",
         "--since=$since",
         "--pretty=format:$format"
     )

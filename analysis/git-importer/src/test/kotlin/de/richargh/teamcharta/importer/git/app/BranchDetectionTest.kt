@@ -148,25 +148,10 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            HEAD -> trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
-            0       0       trunk.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat.md
 
             -----COMMIT_START-----
             feat|3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
@@ -176,10 +161,25 @@ class BranchDetectionTest {
             0       0       feat2.md
 
             -----COMMIT_START-----
-            HEAD -> trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
+            0       0       feat.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk2.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk.md
         """.trimIndent()
 
             val testee = GitLogParser2()
@@ -207,25 +207,10 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            HEAD -> trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
-            0       0       trunk.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T00:01:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat.md
 
             -----COMMIT_START-----
             |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
@@ -235,10 +220,25 @@ class BranchDetectionTest {
             0       0       feat2.md
 
             -----COMMIT_START-----
-            HEAD -> trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
+            0       0       feat.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T00:01:00+01:00|John Doe|john@example.com|main commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk2.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk.md
         """.trimIndent()
 
             val testee = GitLogParser2()
@@ -268,32 +268,16 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            HEAD -> trunk|6|2 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
-            0       0       trunk.md
 
             -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit 1
+            feat|5|4 2|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'trunk' into feat
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
-            0       0       trunk1.md
-
-            -----COMMIT_START-----
-            |2|1|2025-01-01T02:00:00+01:00|John Doe|john@example.com|trunk commit 2
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat1.md
 
             -----COMMIT_START-----
             |4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat commit 2
@@ -303,16 +287,32 @@ class BranchDetectionTest {
             0       0       feat2.md
 
             -----COMMIT_START-----
-            feat|5|4 2|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'trunk' into feat
+            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat commit 1
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
+            0       0       feat1.md
 
             -----COMMIT_START-----
-            HEAD -> trunk|6|2 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
+            |2|1|2025-01-01T02:00:00+01:00|John Doe|john@example.com|trunk commit 2
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
+            0       0       trunk2.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk1.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk.md
         """.trimIndent()
 
             val testee = GitLogParser2()
