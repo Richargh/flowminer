@@ -102,6 +102,54 @@ class BranchAssignmentTest {
     }
 
     @Test
+    fun `should assign Certain to second parent from merge message, when branch tip still exists`() {
+        // Given - merge commit with deleted feature branch
+        val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> origin/main|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0	0	main.md
+
+            -----COMMIT_START-----
+            origin/feature|0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|feature commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0	0	feature.md
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            date("2025-01-01T02:00:00+01:00".zoned())
+            message("Merge branch 'origin/feature' into origin/main")
+        })
+        result.commits[1] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            date("2025-01-01T01:00:00+01:00".zoned())
+            message("main commit")
+        })
+        result.commits[2] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/feature")))
+            date("2025-01-01T00:00:00+01:00".zoned())
+            message("feature commit")
+        })
+    }
+
+    @Test
     fun `should assign Inferred to second parent from merge message, when feature branch has been deleted`() {
         // Given - merge commit with deleted feature branch
         val gitLogContent = """
