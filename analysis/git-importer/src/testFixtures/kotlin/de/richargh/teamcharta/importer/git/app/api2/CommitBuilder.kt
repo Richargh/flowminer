@@ -30,6 +30,7 @@ class CommitBuilder {
     fun trailers(vararg trailers: Pair<String, String>) = apply { this.trailers = trailers.toList() }
     fun coAuthors(vararg coAuthors: Author) = apply { this.coAuthors = coAuthors.toSet() }
     fun workKeys(vararg workKeys: WorkKey) = apply { this.workKeys = workKeys.toList() }
+    fun nobranch() = apply { this.branch = null }
     fun branch(branch: BranchAssignment?) = apply { this.branch = branch }
     fun certainBranch(name: String) = apply { this.branch = BranchAssignment.Certain(BranchName(name)) }
     fun inferredBranch(name: String) = apply { this.branch = BranchAssignment.Inferred(BranchName(name)) }

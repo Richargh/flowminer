@@ -214,7 +214,11 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then - feature branch deleted, message doesn't match pattern = null
-        result.commits[2].branch shouldBe null
+        result.commits[2] should haveSameBranchAs(aCommit {
+            nobranch()
+            date("2025-01-01T00:00:00+01:00".zoned())
+            message("feature commit")
+        })
     }
 
     @Nested
