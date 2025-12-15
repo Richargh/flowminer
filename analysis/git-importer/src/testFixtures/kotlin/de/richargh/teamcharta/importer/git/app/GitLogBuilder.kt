@@ -35,9 +35,11 @@ class GitLogEntryBuilder {
     }
 
     fun refs(vararg refs: String) = apply { this.refs = refs.toList() }
-    fun refHead(branch: String) = apply { this.refs += "HEAD -> $branch" }
+    fun refHead(localBranch: String) = apply { this.refs += "HEAD -> $localBranch" }
     fun refBranchTip(branch: BranchName) = apply { this.refs += branch.value }
+    fun refOriginHead() = apply { this.refs += "origin/HEAD" }
     fun refTag(name: String) = apply { this.refs += "tag: $name" }
+    fun hasHeadRef(): Boolean = refs.any { it.startsWith("HEAD -> ") }
     fun body(body: String) = apply { this.body = body }
     fun trailers(vararg trailers: Pair<String, String>) = apply { this.trailers = trailers.toList() }
     fun fileChanges(vararg changes: FileChangeEntry) = apply { this.fileChanges = changes.toList() }
@@ -121,8 +123,13 @@ class GitLogBuilder {
             )
             if (shouldAddBefore)
                 entry + before!!.hash()
-            if (after == null)
+            if (after == null) {
                 entry.refBranchTip(branch)
+                // Add origin/HEAD when this is the HEAD commit and branch is origin/*
+                if (entry.hasHeadRef() && branch.value.startsWith("origin/")) {
+                    entry.refOriginHead()
+                }
+            }
             result.append(entry.build())
 
             if (i < reversedEntries.size) {

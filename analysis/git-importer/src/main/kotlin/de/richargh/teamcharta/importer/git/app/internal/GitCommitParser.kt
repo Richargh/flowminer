@@ -59,8 +59,9 @@ private fun parseRefs(rawRefs: String): List<Ref> {
 
 private fun parseRef(rawRef: String): Ref? {
     return when {
-        rawRef.startsWith("HEAD -> ") -> Ref.Head(BranchName(rawRef.removePrefix("HEAD -> ")))
+        rawRef.startsWith("HEAD -> ") -> Ref.LocalHead(BranchName(rawRef.removePrefix("HEAD -> ")))
         rawRef.startsWith("tag: ") -> Ref.Tag(rawRef.removePrefix("tag: "))
+        rawRef.endsWith("/HEAD") -> null // Skip symbolic refs like origin/HEAD
         rawRef.isNotEmpty() -> Ref.BranchTip(rawRef)
         else -> null
     }

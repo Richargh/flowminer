@@ -233,13 +233,13 @@ class GitLogBuilderTest {
             anEntry("origin/main"){ }
             anEntry("origin/main"){
                 subject("Later commit")
-                refHead("origin/main")
+                refHead("main")
             }
         }
         // then
         result shouldBe """
             -----COMMIT_START-----
-            HEAD -> origin/main, origin/main|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
+            HEAD -> main, origin/main, origin/HEAD|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----

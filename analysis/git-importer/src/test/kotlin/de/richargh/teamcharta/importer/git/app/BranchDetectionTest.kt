@@ -148,7 +148,7 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
+            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -207,7 +207,7 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
+            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -268,7 +268,7 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/trunk|6|2 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
+            HEAD -> trunk, origin/trunk, origin/HEAD|6|2 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----

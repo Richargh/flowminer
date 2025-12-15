@@ -14,7 +14,7 @@ class BranchTracker {
         parents: List<CommitHash>,
         message: String
     ): BranchAssignment? {
-        val hasHead = refs.any { it is Ref.Head }
+        val hasHead = refs.any { it is Ref.LocalHead }
         if (hasHead) {
             headChain.add(hash)
         }
@@ -45,7 +45,7 @@ class BranchTracker {
 
     private fun byTipOrHead(hash: CommitHash, refs: List<Ref>): BranchAssignment? {
         val branchRef = refs.filterIsInstance<Ref.BranchTip>().firstOrNull()
-            ?: refs.filterIsInstance<Ref.Head>().firstOrNull()?.let { Ref.BranchTip(it.branch) }
+            ?: refs.filterIsInstance<Ref.LocalHead>().firstOrNull()?.let { Ref.BranchTip(it.branch) }
 
         if (branchRef != null) {
             val assignment = BranchAssignment.Certain(branchRef.name)

@@ -12,7 +12,7 @@ class GitLogParser2Test {
         // Given
         val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> main|abc123|parent1|2024-01-15T10:00:00+01:00|John Doe|john@example.com|Initial commit
+            HEAD -> main, origin/main, origin/HEAD|abc123|parent1|2024-01-15T10:00:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             This is the commit body.
             -----FILES_START-----
@@ -32,9 +32,10 @@ class GitLogParser2Test {
             message("Initial commit")
             parents("parent1")
             headRef("main")
+            branchTip("origin/main")
             fileChanges(
                 FileChange("src/Main.kt", additions = 5, deletions = 2))
-            certainBranch("main")
+            certainBranch("origin/main")
         })
     }
 
@@ -43,7 +44,7 @@ class GitLogParser2Test {
         // Given
         val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> main|abc123|parent1|2024-01-15T10:00:00+01:00|John Doe|john@example.com|Initial commit
+            HEAD -> main, origin/main, origin/HEAD|abc123|parent1|2024-01-15T10:00:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             This is the commit body.
             -----FILES_START-----
@@ -57,7 +58,7 @@ class GitLogParser2Test {
 
         // Then
         result.branches.all() shouldContainExactly listOf(aBranch {
-            name("main")
+            name("origin/main")
             firstCommitHash("abc123".hash())
             firstCommitDate(ZonedDateTime.parse("2024-01-15T10:00:00+01:00"))
         })

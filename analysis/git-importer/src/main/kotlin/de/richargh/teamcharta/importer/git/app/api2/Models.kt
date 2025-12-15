@@ -29,7 +29,7 @@ sealed interface BranchAssignment {
 }
 
 sealed interface Ref {
-    data class Head(val branch: BranchName) : Ref {
+    data class LocalHead(val branch: BranchName) : Ref {
         constructor(name: String): this(BranchName(name))
     }
     data class BranchTip(val name: BranchName) : Ref {

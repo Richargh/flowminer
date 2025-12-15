@@ -1,6 +1,5 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.BranchName
 import de.richargh.teamcharta.importer.git.app.api2.Ref
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
@@ -15,7 +14,7 @@ class RefDetectionTest {
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
-                refHead("origin/main")
+                refHead("main")
             }
         }
 
@@ -27,7 +26,7 @@ class RefDetectionTest {
         // Then
         result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
             Ref.BranchTip("origin/main"),
-            Ref.Head("origin/main")
+            Ref.LocalHead("main")
         )
     }
 
@@ -108,7 +107,7 @@ class RefDetectionTest {
 
         // Then
         result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
-            Ref.Head("main"),
+            Ref.LocalHead("main"),
             Ref.BranchTip("origin/main"),
             Ref.Tag("v1.0.0")
         )

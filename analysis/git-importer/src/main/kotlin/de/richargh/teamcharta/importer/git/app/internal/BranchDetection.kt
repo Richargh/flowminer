@@ -11,12 +11,12 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     // Build commit hash -> Commit lookup
     val commitByHash = commits.associateBy { it.hash.rawValue }
 
-    // Find all tip commits (commits with branch refs)
+    // Find all tip commits (commits with remote branch refs)
+    // Only consider BranchTip refs, not Head refs (we track remote branches, not local ones)
     val branchTips = mutableMapOf<BranchName, Commit>()
     for (commit in commits) {
-        for (ref in commit.refs) {
-            val branch = extractBranchName(ref) ?: continue
-            branchTips[branch] = commit
+        for (ref in commit.refs.filterIsInstance<Ref.BranchTip>()) {
+            branchTips[ref.name] = commit
         }
     }
 
@@ -72,7 +72,8 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
             // Second parent (index 1) is the branch being merged (git convention)
             val secondParentHash = commit.parents.getOrNull(1)?.rawValue ?: continue
             val mergedBranchName = commitToBranch[secondParentHash] ?: continue
-            val targetBranch = commit.refs.firstNotNullOfOrNull { extractBranchName(it) }
+            val targetBranch = commit.refs.filterIsInstance<Ref.BranchTip>().firstOrNull()?.name
+                ?: commit.refs.filterIsInstance<Ref.LocalHead>().firstOrNull()?.branch
             if (targetBranch != null && mergedBranchName != targetBranch) {
                 // Only record if target is a main branch (merging into main = branch complete)
                 val isTargetMainBranch = targetBranch.value.contains("main") ||
@@ -107,12 +108,4 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     }
 
     return BranchInfos(result)
-}
-
-private fun extractBranchName(ref: Ref): BranchName? {
-    return when (ref) {
-        is Ref.Head -> ref.branch
-        is Ref.BranchTip -> ref.name
-        is Ref.Tag -> null
-    }
 }

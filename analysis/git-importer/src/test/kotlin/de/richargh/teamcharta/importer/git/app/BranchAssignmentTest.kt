@@ -106,7 +106,7 @@ class BranchAssignmentTest {
         // Given - merge commit with deleted feature branch
         val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/main|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
+            HEAD -> main, origin/main, origin/HEAD|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -153,10 +153,10 @@ class BranchAssignmentTest {
         //        / \
         //       1   2 (main, feature - independent branches)
         //        \ /
-        //         3 (merge, HEAD -> origin/main)
+        //         3 (merge, HEAD -> main, origin/main)
         val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/main|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
+            HEAD -> main, origin/main, origin/HEAD|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -211,7 +211,7 @@ class BranchAssignmentTest {
         // Given - feature branch ref still exists
         val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/main|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
+            HEAD -> main, origin/main, origin/HEAD|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -246,7 +246,7 @@ class BranchAssignmentTest {
         // Given - regular merge with deleted branch and non-standard message
         val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/main|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Integrated feature work
+            HEAD -> main, origin/main, origin/HEAD|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Integrated feature work
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -287,7 +287,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
             
             -----COMMIT_START-----
-            HEAD -> origin/trunk|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
+            HEAD -> trunk, origin/trunk, origin/HEAD|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -347,7 +347,7 @@ class BranchAssignmentTest {
             // Given - octopus merge with 3 feature branches (all deleted)
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/main|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'
+            HEAD -> main, origin/main, origin/HEAD|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -410,7 +410,7 @@ class BranchAssignmentTest {
             // Given - octopus merge with 3 feature branches (all still have refs)
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/main|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'
+            HEAD -> main, origin/main, origin/HEAD|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -465,7 +465,7 @@ class BranchAssignmentTest {
             // Given - octopus merge: feat1 has ref, feat2 and feat3 deleted
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/main|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'
+            HEAD -> main, origin/main, origin/HEAD|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -520,7 +520,7 @@ class BranchAssignmentTest {
             // Given - octopus merge with non-standard message format
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/main|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Combined feat1 feat2 feat3 into main
+            HEAD -> main, origin/main, origin/HEAD|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Combined feat1 feat2 feat3 into main
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
