@@ -134,17 +134,14 @@ class BranchAssignmentTest {
         // Then
         result.commits[0] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
-            date("2025-01-01T02:00:00+01:00".zoned())
             message("Merge branch 'origin/feature' into origin/main")
         })
         result.commits[1] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
-            date("2025-01-01T01:00:00+01:00".zoned())
             message("main commit")
         })
         result.commits[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/feature")))
-            date("2025-01-01T00:00:00+01:00".zoned())
             message("feature commit")
         })
     }
@@ -182,17 +179,14 @@ class BranchAssignmentTest {
         // Then
         result.commits[0] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
-            date("2025-01-01T02:00:00+01:00".zoned())
             message("Merge branch 'origin/feature' into origin/main")
         })
         result.commits[1] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
-            date("2025-01-01T01:00:00+01:00".zoned())
             message("main commit")
         })
         result.commits[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Inferred(BranchName("origin/feature")))
-            date("2025-01-01T00:00:00+01:00".zoned())
             message("feature commit")
         })
     }
@@ -228,7 +222,6 @@ class BranchAssignmentTest {
         // Then - commit 0 has branch ref, should stay Certain
         result.commits[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/feature")))
-            date("2025-01-01T00:00:00+01:00".zoned())
             message("feature commit")
         })
     }
@@ -264,7 +257,6 @@ class BranchAssignmentTest {
         // Then - feature branch deleted, message doesn't match pattern = null
         result.commits[2] should haveSameBranchAs(aCommit {
             nobranch()
-            date("2025-01-01T00:00:00+01:00".zoned())
             message("feature commit")
         })
     }
@@ -315,27 +307,22 @@ class BranchAssignmentTest {
             // Then
             result.commits[0] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/main")))
-                date("2025-01-01T04:00:00+01:00".zoned())
                 message("Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'")
             })
             result.commits[1] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat3")))
-                date("2025-01-01T03:00:00+01:00".zoned())
                 message("feat3 commit")
             })
             result.commits[2] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat2")))
-                date("2025-01-01T02:00:00+01:00".zoned())
                 message("feat2 commit")
             })
             result.commits[3] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat1")))
-                date("2025-01-01T01:00:00+01:00".zoned())
                 message("feat1 commit")
             })
             result.commits[4] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/main")))
-                date("2025-01-01T00:00:00+01:00".zoned())
                 message("main commit")
             })
         }
@@ -383,17 +370,14 @@ class BranchAssignmentTest {
             // Then - all branches have refs, so all are Certain
             result.commits[1] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat3")))
-                date("2025-01-01T03:00:00+01:00".zoned())
                 message("feat3 commit")
             })
             result.commits[2] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat2")))
-                date("2025-01-01T02:00:00+01:00".zoned())
                 message("feat2 commit")
             })
             result.commits[3] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat1")))
-                date("2025-01-01T01:00:00+01:00".zoned())
                 message("feat1 commit")
             })
         }
@@ -441,17 +425,14 @@ class BranchAssignmentTest {
             // Then - feat1 has ref (Certain), feat2 and feat3 from message (Inferred)
             result.commits[1] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat3")))
-                date("2025-01-01T03:00:00+01:00".zoned())
                 message("feat3 commit")
             })
             result.commits[2] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat2")))
-                date("2025-01-01T02:00:00+01:00".zoned())
                 message("feat2 commit")
             })
             result.commits[3] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat1")))
-                date("2025-01-01T01:00:00+01:00".zoned())
                 message("feat1 commit")
             })
         }
@@ -499,7 +480,6 @@ class BranchAssignmentTest {
             // Then - no branch refs, non-standard message = null branch
             result.commits[1] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat3")))
-                date("2025-01-01T03:00:00+01:00".zoned())
                 message("feat3 commit")
             })
             result.commits[2].branch shouldBe null

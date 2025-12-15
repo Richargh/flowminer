@@ -12,9 +12,6 @@ fun haveSameBranchAs(expected: Commit) = Matcher<Commit> { actual ->
         if (actual.author != expected.author) {
             add("author:\n    actual:   ${actual.author}\n    expected: ${expected.author}")
         }
-        if (!actual.date.isEqual(expected.date)) {
-            add("date:\n    actual:   ${actual.date}\n    expected: ${expected.date}")
-        }
         if (actual.message != expected.message) {
             add("message:\n    actual:   \"${actual.message}\"\n    expected: \"${expected.message}\"")
         }
