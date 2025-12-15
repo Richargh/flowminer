@@ -6,6 +6,7 @@ import de.richargh.teamcharta.importer.git.app.api2.Ref
 
 class BranchTracker {
     private val branchFor = mutableMapOf<CommitHash, BranchAssignment>()
+    private val headChain = mutableSetOf<CommitHash>()
 
     fun trackBranch(
         hash: CommitHash,
@@ -13,9 +14,14 @@ class BranchTracker {
         parents: List<CommitHash>,
         message: String
     ): BranchAssignment? {
+        val hasHead = refs.any { it is Ref.Head }
+        if (hasHead) {
+            headChain.add(hash)
+        }
+
         val branch = byTipOrHead(hash, refs) ?: byRegistry(hash)
 
-        registerParents(branch, parents, message)
+        registerParents(branch, parents, message, hash in headChain)
 
         return branch
     }
@@ -23,10 +29,11 @@ class BranchTracker {
     private fun registerParents(
         branch: BranchAssignment?,
         parents: List<CommitHash>,
-        message: String
+        message: String,
+        isChildOnHeadChain: Boolean
     ) {
         if (branch != null && parents.isNotEmpty()) {
-            registerParent(parents.first(), branch)
+            registerFirstParent(parents.first(), branch, isChildOnHeadChain)
         }
 
         if (parents.size >= 2) {
@@ -48,8 +55,11 @@ class BranchTracker {
         return null
     }
 
-    private fun registerParent(parentHash: CommitHash, childBranch: BranchAssignment) {
-        if (parentHash !in branchFor) {
+    private fun registerFirstParent(parentHash: CommitHash, childBranch: BranchAssignment, isChildOnHeadChain: Boolean) {
+        if (isChildOnHeadChain) {
+            headChain.add(parentHash)
+            branchFor[parentHash] = childBranch
+        } else if (parentHash !in headChain && parentHash !in branchFor) {
             branchFor[parentHash] = childBranch
         }
     }
@@ -59,7 +69,14 @@ class BranchTracker {
         mergedBranches: List<BranchAssignment.Inferred>
     ) {
         mergedBranches.zip(mergedParents).forEach { (branch, parentHash) ->
-            registerParent(parentHash, branch)
+            registerMergedParent(parentHash, branch)
+        }
+    }
+
+    private fun registerMergedParent(parentHash: CommitHash, branch: BranchAssignment.Inferred) {
+        // Merged parents never overwrite HEAD chain or existing assignments
+        if (parentHash !in headChain && parentHash !in branchFor) {
+            branchFor[parentHash] = branch
         }
     }
 

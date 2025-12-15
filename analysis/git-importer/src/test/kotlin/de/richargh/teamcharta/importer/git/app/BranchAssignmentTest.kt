@@ -149,12 +149,24 @@ class BranchAssignmentTest {
     @Test
     fun `should assign Inferred to second parent from merge message, when feature branch has been deleted`() {
         // Given - merge commit with deleted feature branch
+        // Graph:  0 (root)
+        //        / \
+        //       1   2 (main, feature - independent branches)
+        //        \ /
+        //         3 (merge, HEAD -> origin/main)
         val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> origin/main|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
+            HEAD -> origin/main|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feature commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0	0	feature.md
 
             -----COMMIT_START-----
             |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
@@ -164,11 +176,10 @@ class BranchAssignmentTest {
             0	0	main.md
 
             -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|feature commit
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
-            0	0	feature.md
         """.trimIndent()
 
         val testee = GitLogParser2()
@@ -182,12 +193,16 @@ class BranchAssignmentTest {
             message("Merge branch 'origin/feature' into origin/main")
         })
         result.commits[1] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Inferred(BranchName("origin/feature")))
+            message("feature commit")
+        })
+        result.commits[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("main commit")
         })
-        result.commits[2] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Inferred(BranchName("origin/feature")))
-            message("feature commit")
+        result.commits[3] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            message("initial commit")
         })
     }
 
@@ -258,6 +273,69 @@ class BranchAssignmentTest {
         result.commits[2] should haveSameBranchAs(aCommit {
             nobranch()
             message("feature commit")
+        })
+    }
+
+    @Test
+    fun `should assign branch names based on what HEAD is`() {
+        // Given - merge commit with deleted feature branch
+        val gitLogContent = """
+            -----COMMIT_START-----
+            origin/feat|4|2|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat2 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            
+            -----COMMIT_START-----
+            HEAD -> origin/trunk|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat1 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk2 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|trunk1 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/feat")))
+            message("feat2 commit")
+        })
+        result.commits[1] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/trunk")))
+            message("Merge branch 'feat' into trunk")
+        })
+        result.commits[2] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/feat")))
+            message("feat1 commit")
+        })
+        result.commits[3] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/trunk")))
+            message("trunk2 commit")
+        })
+        result.commits[4] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/trunk")))
+            message("trunk1 commit")
         })
     }
 
