@@ -14,6 +14,7 @@ class CommitBuilder {
     private var coAuthors: Set<Author> = emptySet()
     private var commitType: CommitType = CommitType.UNKNOWN
     private var workKeys: List<WorkKey> = emptyList()
+    private var branch: BranchAssignment? = null
 
     fun hash(hash: String) = apply { this.hash = CommitHash(hash) }
     fun author(name: String, email: String) = apply { this.author = Author(name, email) }
@@ -23,12 +24,15 @@ class CommitBuilder {
     fun parents(vararg parents: String) = apply { this.parents = parents.toList().map(::CommitHash) }
     fun refs(vararg refs: Ref) = apply { this.refs = refs.toList() }
     fun headRef(branchName: String) = apply { this.refs += Ref.Head(BranchName(branchName)) }
-    fun branch(name: String) = apply { this.refs += Ref.BranchTip(BranchName(name)) }
+    fun branchTip(name: String) = apply { this.refs += Ref.BranchTip(BranchName(name)) }
     fun tag(name: String) = apply { this.refs += Ref.Tag(name) }
     fun fileChanges(vararg fileChanges: FileChange) = apply { this.fileChanges = fileChanges.toList() }
     fun trailers(vararg trailers: Pair<String, String>) = apply { this.trailers = trailers.toList() }
     fun coAuthors(vararg coAuthors: Author) = apply { this.coAuthors = coAuthors.toSet() }
     fun workKeys(vararg workKeys: WorkKey) = apply { this.workKeys = workKeys.toList() }
+    fun branch(branch: BranchAssignment?) = apply { this.branch = branch }
+    fun certainBranch(name: String) = apply { this.branch = BranchAssignment.Certain(BranchName(name)) }
+    fun inferredBranch(name: String) = apply { this.branch = BranchAssignment.Inferred(BranchName(name)) }
 
     fun build(): Commit = Commit(
         hash = hash,
@@ -41,7 +45,8 @@ class CommitBuilder {
         trailers = trailers,
         coAuthors = coAuthors,
         commitType = commitType,
-        workKeys = workKeys
+        workKeys = workKeys,
+        branch = branch
     )
 }
 

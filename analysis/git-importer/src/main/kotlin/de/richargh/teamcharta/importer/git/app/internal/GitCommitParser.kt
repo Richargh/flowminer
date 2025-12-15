@@ -5,10 +5,11 @@ import java.time.ZonedDateTime
 import kotlin.collections.map
 
 fun parseCommits(rawCommits: Sequence<RawCommit>): Sequence<Commit> {
-    return rawCommits.map { parseCommit(it) }
+    val tracker = BranchTracker()
+    return rawCommits.map { parseCommit(it, tracker) }
 }
 
-private fun parseCommit(raw: RawCommit): Commit {
+private fun parseCommit(raw: RawCommit, tracker: BranchTracker): Commit {
     val hash = raw.headerFields["hash"]?.let(::CommitHash)
         ?: throw IllegalArgumentException("Commit has no hash")
     val date = raw.headerFields["authorDate"]?.let(ZonedDateTime::parse)
@@ -28,6 +29,8 @@ private fun parseCommit(raw: RawCommit): Commit {
     val commitType = detectCommitTypes(message)
     val workKeys = detectWorkKeys(message)
 
+    val branch = tracker.trackBranch(hash, refs, parents, message)
+
     return Commit(
         hash = hash,
         author = author,
@@ -39,7 +42,8 @@ private fun parseCommit(raw: RawCommit): Commit {
         trailers = trailers,
         coAuthors = coAuthors,
         commitType = commitType,
-        workKeys = workKeys
+        workKeys = workKeys,
+        branch = branch
     )
 }
 

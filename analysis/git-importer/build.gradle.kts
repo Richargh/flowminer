@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.jackson.jsr310)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.assertions)
+    testFixturesImplementation(libs.kotest.assertions)
 }
 
 application {

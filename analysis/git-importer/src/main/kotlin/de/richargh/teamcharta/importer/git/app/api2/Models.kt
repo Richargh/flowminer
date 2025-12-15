@@ -14,7 +14,19 @@ enum class CommitType {
 
 data class WorkKey(val key: String)
 data class CommitHash(val rawValue: String)
-data class BranchName(val value: String)
+data class BranchName(val value: String) {
+    override fun toString() = value
+}
+
+sealed interface BranchAssignment {
+    val name: BranchName
+
+    /** Branch ref exists on this commit or was propagated via first-parent */
+    data class Certain(override val name: BranchName) : BranchAssignment
+
+    /** Inferred from merge commit message (e.g., "Merge branch 'feature'") */
+    data class Inferred(override val name: BranchName) : BranchAssignment
+}
 
 sealed interface Ref {
     data class Head(val branch: BranchName) : Ref {
@@ -50,7 +62,8 @@ data class Commit(
     val trailers: List<Pair<String, String>>,
     val coAuthors: Set<Author>,
     val commitType: CommitType,
-    val workKeys: List<WorkKey>
+    val workKeys: List<WorkKey>,
+    val branch: BranchAssignment? = null
 )
 
 data class BranchInfo(

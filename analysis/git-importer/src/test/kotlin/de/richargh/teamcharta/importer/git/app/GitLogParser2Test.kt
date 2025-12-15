@@ -34,6 +34,7 @@ class GitLogParser2Test {
             headRef("main")
             fileChanges(
                 FileChange("src/Main.kt", additions = 5, deletions = 2))
+            certainBranch("main")
         })
     }
 
