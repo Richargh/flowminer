@@ -4,26 +4,31 @@ import de.richargh.teamcharta.importer.git.app.api2.BranchAssignment
 import de.richargh.teamcharta.importer.git.app.api2.CommitHash
 import de.richargh.teamcharta.importer.git.app.api2.Ref
 
+data class TrackingResult(
+    val branch: BranchAssignment?,
+    val isOnActiveBranch: Boolean
+)
+
 class BranchTracker {
     private val branchFor = mutableMapOf<CommitHash, BranchAssignment>()
-    private val headChain = mutableSetOf<CommitHash>()
+    private val activeChain = mutableSetOf<CommitHash>()
 
     fun trackBranch(
         hash: CommitHash,
         refs: List<Ref>,
         parents: List<CommitHash>,
         message: String
-    ): BranchAssignment? {
+    ): TrackingResult {
         val hasHead = refs.any { it is Ref.LocalHead }
         if (hasHead) {
-            headChain.add(hash)
+            activeChain.add(hash)
         }
 
         val branch = byTipOrHead(hash, refs) ?: byRegistry(hash)
 
-        registerParents(branch, parents, message, hash in headChain)
+        registerParents(branch, parents, message, hash in activeChain)
 
-        return branch
+        return TrackingResult(branch, hash in activeChain)
     }
 
     private fun registerParents(
@@ -57,9 +62,9 @@ class BranchTracker {
 
     private fun registerFirstParent(parentHash: CommitHash, childBranch: BranchAssignment, isChildOnHeadChain: Boolean) {
         if (isChildOnHeadChain) {
-            headChain.add(parentHash)
+            activeChain.add(parentHash)
             branchFor[parentHash] = childBranch
-        } else if (parentHash !in headChain && parentHash !in branchFor) {
+        } else if (parentHash !in activeChain && parentHash !in branchFor) {
             branchFor[parentHash] = childBranch
         }
     }
@@ -75,7 +80,7 @@ class BranchTracker {
 
     private fun registerMergedParent(parentHash: CommitHash, branch: BranchAssignment.Inferred) {
         // Merged parents never overwrite HEAD chain or existing assignments
-        if (parentHash !in headChain && parentHash !in branchFor) {
+        if (parentHash !in activeChain && parentHash !in branchFor) {
             branchFor[parentHash] = branch
         }
     }

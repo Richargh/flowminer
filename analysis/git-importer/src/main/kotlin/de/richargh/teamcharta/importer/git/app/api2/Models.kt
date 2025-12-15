@@ -63,7 +63,8 @@ data class Commit(
     val coAuthors: Set<Author>,
     val commitType: CommitType,
     val workKeys: List<WorkKey>,
-    val branch: BranchAssignment? = null
+    val branch: BranchAssignment? = null,
+    val isOnActiveBranch: Boolean = false
 )
 
 data class BranchInfo(

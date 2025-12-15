@@ -15,6 +15,7 @@ class CommitBuilder {
     private var commitType: CommitType = CommitType.UNKNOWN
     private var workKeys: List<WorkKey> = emptyList()
     private var branch: BranchAssignment? = null
+    private var isOnActiveBranch: Boolean = false
 
     fun hash(hash: String) = apply { this.hash = CommitHash(hash) }
     fun author(name: String, email: String) = apply { this.author = Author(name, email) }
@@ -34,6 +35,7 @@ class CommitBuilder {
     fun branch(branch: BranchAssignment?) = apply { this.branch = branch }
     fun certainBranch(name: String) = apply { this.branch = BranchAssignment.Certain(BranchName(name)) }
     fun inferredBranch(name: String) = apply { this.branch = BranchAssignment.Inferred(BranchName(name)) }
+    fun isOnActiveBranch() = apply { this.isOnActiveBranch = true }
 
     fun build(): Commit = Commit(
         hash = hash,
@@ -47,7 +49,8 @@ class CommitBuilder {
         coAuthors = coAuthors,
         commitType = commitType,
         workKeys = workKeys,
-        branch = branch
+        branch = branch,
+        isOnActiveBranch = isOnActiveBranch
     )
 }
 

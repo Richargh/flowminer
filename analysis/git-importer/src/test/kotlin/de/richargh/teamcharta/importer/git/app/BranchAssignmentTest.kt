@@ -4,7 +4,6 @@ import de.richargh.teamcharta.importer.git.app.api2.BranchAssignment
 import de.richargh.teamcharta.importer.git.app.api2.BranchName
 import de.richargh.teamcharta.importer.git.app.api2.aCommit
 import de.richargh.teamcharta.importer.git.app.internal.atStartOfYear
-import de.richargh.teamcharta.importer.git.app.internal.zoned
 import de.richargh.teamcharta.importer.git.app.test.haveSameBranchAs
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
@@ -563,5 +562,46 @@ class BranchAssignmentTest {
             result.commits[2].branch shouldBe null
             result.commits[3].branch shouldBe null
         }
+    }
+
+    @Test
+    fun `should mark commits on HEAD chain as isOnActiveBranch`() {
+        // Given - HEAD points to main, with feature branch
+        val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> main, origin/main|2|1|2025-01-01T02:00:00+01:00|John Doe|john@example.com|main commit 2
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feature|3|0|2025-01-01T01:30:00+01:00|John Doe|john@example.com|feature commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then - commits reachable from HEAD should be marked
+        result.commits[0].isOnActiveBranch shouldBe true  // main commit 2 (HEAD)
+        result.commits[1].isOnActiveBranch shouldBe false // feature commit (not on HEAD chain)
+        result.commits[2].isOnActiveBranch shouldBe true  // main commit 1 (first parent of HEAD)
+        result.commits[3].isOnActiveBranch shouldBe true  // initial commit (ancestor of HEAD)
     }
 }

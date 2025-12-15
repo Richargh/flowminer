@@ -29,7 +29,7 @@ private fun parseCommit(raw: RawCommit, tracker: BranchTracker): Commit {
     val commitType = detectCommitTypes(message)
     val workKeys = detectWorkKeys(message)
 
-    val branch = tracker.trackBranch(hash, refs, parents, message)
+    val tracking = tracker.trackBranch(hash, refs, parents, message)
 
     return Commit(
         hash = hash,
@@ -43,7 +43,8 @@ private fun parseCommit(raw: RawCommit, tracker: BranchTracker): Commit {
         coAuthors = coAuthors,
         commitType = commitType,
         workKeys = workKeys,
-        branch = branch
+        branch = tracking.branch,
+        isOnActiveBranch = tracking.isOnActiveBranch
     )
 }
 
