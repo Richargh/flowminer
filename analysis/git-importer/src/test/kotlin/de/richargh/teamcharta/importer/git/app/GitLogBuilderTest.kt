@@ -10,25 +10,25 @@ class GitLogBuilderTest {
     fun `should auto-increment hash`(){
         // when
         val result = aGitLog {
-            anEntry("main"){
+            anEntry("origin/main"){
             }
-            anEntry("develop"){
+            anEntry("origin/develop"){
             }
-            anEntry("stage"){
+            anEntry("origin/stage"){
             }
         }
         // then
         result shouldBe """
             -----COMMIT_START-----
-            stage|2||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            origin/stage|2||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            develop|1||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            origin/develop|1||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            main|0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            origin/main|0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 
@@ -39,9 +39,9 @@ class GitLogBuilderTest {
     fun `should automatically link a commit to its parent`(){
         // when
         val result = aGitLog {
-            anEntry("main"){
+            anEntry("origin/main"){
             }
-            anEntry("main"){
+            anEntry("origin/main"){
                 author("John Min")
                 authorMail("min@example.com")
                 subject("Later commit")
@@ -50,7 +50,7 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            main|1|0|2024-01-15T10:00+01:00|John Min|min@example.com|Later commit
+            origin/main|1|0|2024-01-15T10:00+01:00|John Min|min@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
@@ -65,22 +65,22 @@ class GitLogBuilderTest {
     fun `should allow branching off`(){
         // when
         val result = aGitLog {
-            anEntry("main"){ }
-            anEntry("feature-1", "main"){
+            anEntry("origin/main"){ }
+            anEntry("origin/feature-1", "origin/main"){
                 subject("Feature commit")
             }
-            anEntry("main"){
+            anEntry("origin/main"){
                 subject("Latest commit")
             }
         }
         // then
         result shouldBe """
             -----COMMIT_START-----
-            main|2|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
+            origin/main|2|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            feature-1|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
+            origin/feature-1|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
@@ -95,14 +95,14 @@ class GitLogBuilderTest {
     fun `should allow branching off when setting the hash values manually`(){
         // when
         val result = aGitLog {
-            anEntry("main"){
+            anEntry("origin/main"){
                 hash("mmm123".hash())
             }
-            anEntry("feature-1", "main"){
+            anEntry("origin/feature-1", "origin/main"){
                 hash("fff123".hash())
                 subject("Feature commit")
             }
-            anEntry("main"){
+            anEntry("origin/main"){
                 hash("mmm456".hash())
                 subject("Latest commit")
             }
@@ -110,11 +110,11 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            main|mmm456|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
+            origin/main|mmm456|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            feature-1|fff123|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
+            origin/feature-1|fff123|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
@@ -129,22 +129,22 @@ class GitLogBuilderTest {
     fun `should allow merging back`(){
         // when
         val result = aGitLog {
-            anEntry("main"){ }
-            anEntry("feature-1", "main"){
+            anEntry("origin/main"){ }
+            anEntry("origin/feature-1", "origin/main"){
                 subject("Feature commit")
             }
-            anEntry("main", "feature-1"){
+            anEntry("origin/main", "origin/feature-1"){
                 subject("Latest commit")
             }
         }
         // then
         result shouldBe """
             -----COMMIT_START-----
-            main|2|0 1|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
+            origin/main|2|0 1|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            feature-1|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
+            origin/feature-1|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
@@ -159,14 +159,14 @@ class GitLogBuilderTest {
     fun `should allow merging back when setting the hash values manually`(){
         // when
         val result = aGitLog {
-            anEntry("main"){
+            anEntry("origin/main"){
                 hash("mmm123".hash())
             }
-            anEntry("feature-1", "main"){
+            anEntry("origin/feature-1", "origin/main"){
                 hash("fff123".hash())
                 subject("Feature commit")
             }
-            anEntry("main", "feature-1"){
+            anEntry("origin/main", "origin/feature-1"){
                 hash("mmm456".hash())
                 subject("Latest commit")
             }
@@ -174,11 +174,11 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            main|mmm456|mmm123 fff123|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
+            origin/main|mmm456|mmm123 fff123|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            feature-1|fff123|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
+            origin/feature-1|fff123|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
@@ -193,25 +193,25 @@ class GitLogBuilderTest {
     fun `should allow merging back then adding a new commit`(){
         // when
         val result = aGitLog {
-            anEntry("main"){ }
-            anEntry("feature-1", "main"){
+            anEntry("origin/main"){ }
+            anEntry("origin/feature-1", "origin/main"){
                 subject("Feature commit 1")
             }
-            anEntry("main", "feature-1"){
+            anEntry("origin/main", "origin/feature-1"){
                 subject("Merge commit")
             }
-            anEntry("feature-1", "main"){
+            anEntry("origin/feature-1", "origin/main"){
                 subject("Feature commit 2")
             }
         }
         // then
         result shouldBe """
             -----COMMIT_START-----
-            feature-1|3|2|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit 2
+            origin/feature-1|3|2|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit 2
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            main|2|0 1|2024-01-15T10:00+01:00|John Doe|john@example.com|Merge commit
+            origin/main|2|0 1|2024-01-15T10:00+01:00|John Doe|john@example.com|Merge commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
@@ -230,16 +230,16 @@ class GitLogBuilderTest {
     fun `should allow setting head`(){
         // when
         val result = aGitLog {
-            anEntry("main"){ }
-            anEntry("main"){
+            anEntry("origin/main"){ }
+            anEntry("origin/main"){
                 subject("Later commit")
-                refHead("main")
+                refHead("origin/main")
             }
         }
         // then
         result shouldBe """
             -----COMMIT_START-----
-            HEAD -> main, main|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
+            HEAD -> origin/main, origin/main|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
@@ -254,8 +254,8 @@ class GitLogBuilderTest {
     fun `should allow setting tag`(){
         // when
         val result = aGitLog {
-            anEntry("main"){ }
-            anEntry("main"){
+            anEntry("origin/main"){ }
+            anEntry("origin/main"){
                 subject("Later commit")
                 refTag("v1.1.0")
             }
@@ -263,7 +263,7 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            tag: v1.1.0, main|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
+            tag: v1.1.0, origin/main|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----

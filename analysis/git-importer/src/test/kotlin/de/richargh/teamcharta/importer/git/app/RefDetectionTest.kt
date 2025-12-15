@@ -14,8 +14,8 @@ class RefDetectionTest {
     fun `should parse HEAD ref`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry("main") {
-                refHead("main")
+            anEntry("origin/main") {
+                refHead("origin/main")
             }
         }
 
@@ -26,8 +26,8 @@ class RefDetectionTest {
 
         // Then
         result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
-            Ref.BranchTip("main"),
-            Ref.Head("main")
+            Ref.BranchTip("origin/main"),
+            Ref.Head("origin/main")
         )
     }
 
@@ -35,7 +35,7 @@ class RefDetectionTest {
     fun `should parse tag ref`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry("main") { refTag("v1.0.0") }
+            anEntry("origin/main") { refTag("v1.0.0") }
         }
 
         val testee = GitLogParser2()
@@ -45,7 +45,7 @@ class RefDetectionTest {
 
         // Then
         result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
-            Ref.BranchTip("main"),
+            Ref.BranchTip("origin/main"),
             Ref.Tag("v1.0.0")
         )
     }
@@ -54,7 +54,7 @@ class RefDetectionTest {
     fun `should parse branch ref without slash`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry("develop") {  }
+            anEntry("origin/develop") {  }
         }
 
         val testee = GitLogParser2()
@@ -63,7 +63,7 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(Ref.BranchTip("develop"))
+        result.commits.first().refs shouldContainExactly listOf(Ref.BranchTip("origin/develop"))
     }
 
     @ParameterizedTest(name = "should parse nested branch ref: {0}")

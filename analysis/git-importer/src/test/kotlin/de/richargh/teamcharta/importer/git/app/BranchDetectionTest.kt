@@ -148,13 +148,13 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
+            HEAD -> origin/trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
 
             -----COMMIT_START-----
-            feat|3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
+            origin/feat|3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -189,16 +189,16 @@ class BranchDetectionTest {
 
             // Then
             result.branches.size() shouldBe 2
-            result.branches["trunk"] shouldBe aBranch {
-                name("trunk")
+            result.branches["origin/trunk"] shouldBe aBranch {
+                name("origin/trunk")
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
             }
-            result.branches["feat"] shouldBe aBranch {
-                name("feat")
+            result.branches["origin/feat"] shouldBe aBranch {
+                name("origin/feat")
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                mergedInto("trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+                mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
             }
         }
 
@@ -207,7 +207,7 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
+            HEAD -> origin/trunk|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -248,8 +248,8 @@ class BranchDetectionTest {
 
             // Then
             result.branches.size() shouldBe 1
-            result.branches["trunk"] shouldBe aBranch {
-                name("trunk")
+            result.branches["origin/trunk"] shouldBe aBranch {
+                name("origin/trunk")
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
             }
@@ -258,23 +258,23 @@ class BranchDetectionTest {
         @Test
         fun `should extract branch info when main is merged into feat before feat is merged back`() {
             // Graph:
-            // trunk: 0───1───2───────────6 (trunk) [merge feat]
+            // trunk: 0───1───2───────────6 (origin/trunk) [merge feat]
             //         \       \         /
             // feat:    \       \       /
-            //           3───4───5─────┘ (feat)
+            //           3───4───5─────┘ (origin/feat)
             //                   ^
             //                   merge trunk into feat (parents: 4, 2)
 
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> trunk|6|2 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'feat' into trunk
+            HEAD -> origin/trunk|6|2 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
 
             -----COMMIT_START-----
-            feat|5|4 2|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'trunk' into feat
+            origin/feat|5|4 2|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/trunk' into origin/feat
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -322,16 +322,16 @@ class BranchDetectionTest {
 
             // Then
             result.branches.size() shouldBe 2
-            result.branches["trunk"] shouldBe aBranch {
-                name("trunk")
+            result.branches["origin/trunk"] shouldBe aBranch {
+                name("origin/trunk")
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
             }
-            result.branches["feat"] shouldBe aBranch {
-                name("feat")
+            result.branches["origin/feat"] shouldBe aBranch {
+                name("origin/feat")
                 firstCommitHash("3".hash())
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
-                mergedInto("trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
+                mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
             }
         }
     }
