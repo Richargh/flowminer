@@ -14,6 +14,8 @@ class BranchAssignmentTest {
 
     @Test
     fun `should assign Certain branch from tip`() {
+        // main: 0 (origin/main)
+
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
@@ -32,7 +34,9 @@ class BranchAssignmentTest {
 
     @Test
     fun `should propagate Certain to first parent`() {
-        // Given - two commits on main, newest first in output
+        // main: 0───1 (origin/main)
+
+        // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
                 subject("First")
@@ -60,7 +64,9 @@ class BranchAssignmentTest {
 
     @Test
     fun `should propagate Certain to grand parents`() {
-        // Given - two commits on main, newest first in output
+        // main: 0───1───2───3 (origin/main)
+
+        // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
                 subject("First")
@@ -101,14 +107,25 @@ class BranchAssignmentTest {
     }
 
     @Test
-    fun `should assign Certain to second parent from merge message, when branch tip still exists`() {
-        // Given - merge commit with deleted feature branch
+    fun `should assign Certain to second parent, when feature branch still exists`() {
+        // main:    0───1───3 (HEAD -> main, origin/main) [merge feature]
+        //           \     /
+        // feature:   └─2─┘
+
+        // Given
         val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> main, origin/main, origin/HEAD|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
+            HEAD -> main, origin/main, origin/HEAD|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feature|2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feature commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0	0	feature.md
 
             -----COMMIT_START-----
             |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
@@ -118,11 +135,10 @@ class BranchAssignmentTest {
             0	0	main.md
 
             -----COMMIT_START-----
-            origin/feature|0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|feature commit
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
-            0	0	feature.md
         """.trimIndent()
 
         val testee = GitLogParser2()
@@ -136,23 +152,26 @@ class BranchAssignmentTest {
             message("Merge branch 'origin/feature' into origin/main")
         })
         result.commits[1] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/feature")))
+            message("feature commit")
+        })
+        result.commits[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("main commit")
         })
-        result.commits[2] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/feature")))
-            message("feature commit")
+        result.commits[3] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            message("initial commit")
         })
     }
 
     @Test
     fun `should assign Inferred to second parent from merge message, when feature branch has been deleted`() {
-        // Given - merge commit with deleted feature branch
-        // Graph:  0 (root)
-        //        / \
-        //       1   2 (main, feature - independent branches)
-        //        \ /
-        //         3 (merge, HEAD -> main, origin/main)
+        // main:    0───1───3 (HEAD -> main, origin/main) [merge feature]
+        //           \     /
+        // feature:   └─2─┘ (deleted)
+
+        // Given
         val gitLogContent = """
             -----COMMIT_START-----
             HEAD -> main, origin/main, origin/HEAD|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
@@ -206,8 +225,120 @@ class BranchAssignmentTest {
     }
 
     @Test
+    fun `should assign null to second parent from merge message, when feature branch has been deleted and merge message non-standard`() {
+        // main:    0───1───3 (HEAD -> main, origin/main) [merge feature]
+        //           \     /
+        // feature:   └─2─┘ (deleted)
+
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> main, origin/main, origin/HEAD|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch feature into main
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feature commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0	0	feature.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0	0	main.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            message("Merge branch feature into main")
+        })
+        result.commits[1] should haveSameBranchAs(aCommit {
+            nobranch()
+            message("feature commit")
+        })
+        result.commits[2] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            message("main commit")
+        })
+        result.commits[3] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            message("initial commit")
+        })
+    }
+
+    @Test
+    fun `should assign branches, even when feature branches do not haven parents`() {
+        // main:    1───2 (HEAD -> main, origin/main) [merge feature]
+        //             /
+        // feature: 0─┘ (origin/feature)
+
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> main, origin/main, origin/HEAD|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |1||2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0	0	main.md
+
+            -----COMMIT_START-----
+            origin/feature|0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|feature commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0	0	feature.md
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.commits[0] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            message("Merge branch 'origin/feature' into origin/main")
+        })
+        result.commits[1] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            message("main commit")
+        })
+        result.commits[2] should haveSameBranchAs(aCommit {
+            branch(BranchAssignment.Certain(BranchName("origin/feature")))
+            message("feature commit")
+        })
+    }
+
+    @Test
     fun `should not overwrite Certain with Inferred`() {
-        // Given - feature branch ref still exists
+        // main:        1───2 (HEAD -> main, origin/main) [merge feature]
+        //             /
+        // feature: 0─┘ (origin/feature)
+
+        // Given
         val gitLogContent = """
             -----COMMIT_START-----
             HEAD -> main, origin/main, origin/HEAD|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feature' into origin/main
@@ -241,43 +372,12 @@ class BranchAssignmentTest {
     }
 
     @Test
-    fun `should assign null branch when feature deleted and merge message non-standard`() {
-        // Given - regular merge with deleted branch and non-standard message
-        val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> main, origin/main, origin/HEAD|2|1 0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|Integrated feature work
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
+    fun `should prioritize the HEAD branch, when a commit is in multiple possible branches, even when first commit is not on head branch`() {
+        // trunk: 0───1───3 (HEAD -> trunk, origin/trunk) [merge feat]
+        //         \     /
+        // feat:    └──2───4 (origin/feat)
 
-            -----COMMIT_START-----
-            |1||2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|feature commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-        """.trimIndent()
-
-        val testee = GitLogParser2()
-
-        // When
-        val result = testee.parse(gitLogContent.lineSequence())
-
-        // Then - feature branch deleted, message doesn't match pattern = null
-        result.commits[2] should haveSameBranchAs(aCommit {
-            nobranch()
-            message("feature commit")
-        })
-    }
-
-    @Test
-    fun `should assign branch names based on what HEAD is`() {
-        // Given - merge commit with deleted feature branch
+        // Given
         val gitLogContent = """
             -----COMMIT_START-----
             origin/feat|4|2|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat2 commit
@@ -338,12 +438,63 @@ class BranchAssignmentTest {
         })
     }
 
+    @Test
+    fun `should mark commits on HEAD chain as isOnActiveBranch`() {
+        // main:    0───1───2 (HEAD -> main, origin/main)
+        //           \
+        // feature:   └─3 (origin/feature)
+
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> main, origin/main|2|1|2025-01-01T02:00:00+01:00|John Doe|john@example.com|main commit 2
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feature|3|0|2025-01-01T01:30:00+01:00|John Doe|john@example.com|feature commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+        """.trimIndent()
+
+        val testee = GitLogParser2()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then - commits reachable from HEAD should be marked
+        result.commits[0].isOnActiveBranch shouldBe true  // main commit 2 (HEAD)
+        result.commits[1].isOnActiveBranch shouldBe false // feature commit (not on HEAD chain)
+        result.commits[2].isOnActiveBranch shouldBe true  // main commit 1 (first parent of HEAD)
+        result.commits[3].isOnActiveBranch shouldBe true  // initial commit (ancestor of HEAD)
+    }
+
     @Nested
     inner class OctopusMerge {
 
         @Test
         fun `should assign Inferred to all parents in octopus merge when all branches deleted`() {
-            // Given - octopus merge with 3 feature branches (all deleted)
+            // main:  0───────4 (HEAD -> main, origin/main) [octopus merge]
+            //       /|\     /|\
+            // feat: 1 2 3──┘ │ │ (all deleted)
+            //          └─────┘ │
+            //            └─────┘
+
+            // Given
             val gitLogContent = """
             -----COMMIT_START-----
             HEAD -> main, origin/main, origin/HEAD|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'
@@ -406,7 +557,13 @@ class BranchAssignmentTest {
 
         @Test
         fun `should assign Certain to all parents in octopus merge when all branches have tips`() {
-            // Given - octopus merge with 3 feature branches (all still have refs)
+            // main:  0───────4 (HEAD -> main, origin/main) [octopus merge]
+            //       /|\     /|\
+            // feat: 1 2 3──┘ │ │ (origin/feat1, origin/feat2, origin/feat3)
+            //          └─────┘ │
+            //            └─────┘
+
+            // Given
             val gitLogContent = """
             -----COMMIT_START-----
             HEAD -> main, origin/main, origin/HEAD|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'
@@ -461,7 +618,13 @@ class BranchAssignmentTest {
 
         @Test
         fun `should assign mixed Certain and Inferred in octopus merge when some branches have tips`() {
-            // Given - octopus merge: feat1 has ref, feat2 and feat3 deleted
+            // main:  0───────4 (HEAD -> main, origin/main) [octopus merge]
+            //       /|\     /|\
+            // feat: 1 2 3──┘ │ │ (origin/feat1 exists, feat2 & feat3 deleted)
+            //          └─────┘ │
+            //            └─────┘
+
+            // Given
             val gitLogContent = """
             -----COMMIT_START-----
             HEAD -> main, origin/main, origin/HEAD|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'
@@ -516,7 +679,13 @@ class BranchAssignmentTest {
 
         @Test
         fun `should assign mixed Certain and null in octopus merge when some branches have tips and merge-message is non-standard`() {
-            // Given - octopus merge with non-standard message format
+            // main:  0───────4 (HEAD -> main, origin/main) [octopus merge, non-standard message]
+            //       /|\     /|\
+            // feat: 1 2 3──┘ │ │ (origin/feat3 exists, feat1 & feat2 deleted)
+            //          └─────┘ │
+            //            └─────┘
+
+            // Given
             val gitLogContent = """
             -----COMMIT_START-----
             HEAD -> main, origin/main, origin/HEAD|4|0 1 2 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Combined feat1 feat2 feat3 into main
@@ -562,46 +731,5 @@ class BranchAssignmentTest {
             result.commits[2].branch shouldBe null
             result.commits[3].branch shouldBe null
         }
-    }
-
-    @Test
-    fun `should mark commits on HEAD chain as isOnActiveBranch`() {
-        // Given - HEAD points to main, with feature branch
-        val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> main, origin/main|2|1|2025-01-01T02:00:00+01:00|John Doe|john@example.com|main commit 2
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feature|3|0|2025-01-01T01:30:00+01:00|John Doe|john@example.com|feature commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-        """.trimIndent()
-
-        val testee = GitLogParser2()
-
-        // When
-        val result = testee.parse(gitLogContent.lineSequence())
-
-        // Then - commits reachable from HEAD should be marked
-        result.commits[0].isOnActiveBranch shouldBe true  // main commit 2 (HEAD)
-        result.commits[1].isOnActiveBranch shouldBe false // feature commit (not on HEAD chain)
-        result.commits[2].isOnActiveBranch shouldBe true  // main commit 1 (first parent of HEAD)
-        result.commits[3].isOnActiveBranch shouldBe true  // initial commit (ancestor of HEAD)
     }
 }

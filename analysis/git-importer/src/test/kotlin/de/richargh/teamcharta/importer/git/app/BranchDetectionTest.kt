@@ -12,6 +12,8 @@ class BranchDetectionTest {
 
     @Test
     fun `should extract branch info for initial commit`() {
+        // main: 0 (origin/main)
+
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
@@ -35,6 +37,8 @@ class BranchDetectionTest {
 
     @Test
     fun `should extract branch info for multiple commits on branch`() {
+        // main: 0───1───2 (origin/main)
+
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
@@ -64,6 +68,10 @@ class BranchDetectionTest {
 
     @Test
     fun `should extract branch info from merge commits`() {
+        // main:    0───2 (origin/main) [merge feature-login]
+        //           \ /
+        // feature:   1 (origin/feature-login)
+
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
@@ -99,6 +107,12 @@ class BranchDetectionTest {
 
     @Test
     fun `should extract branch info when one branch is unmerged`() {
+        // main:           0─────3 (origin/main) [merge feature-login]
+        //                 │    /
+        // feature-login:  ├─1─┘ (origin/feature-login)
+        //                 │
+        // feature-user:   └─2 (origin/feature-user, unmerged)
+
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
@@ -145,6 +159,10 @@ class BranchDetectionTest {
 
         @Test
         fun `should extract branch info from merge commits with explicit merge commit`() {
+            // trunk: 0───1───────4 (HEAD -> trunk, origin/trunk) [merge feat]
+            //         \         /
+            // feat:    └─2───3─┘ (origin/feat)
+
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
@@ -204,6 +222,10 @@ class BranchDetectionTest {
 
         @Test
         fun `should extract branch info from merge commits after branch is deleted`() {
+            // trunk: 0───1───────4 (HEAD -> trunk, origin/trunk) [merge feat]
+            //         \         /
+            // feat:    └─2───3─┘ (deleted)
+
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
@@ -257,11 +279,9 @@ class BranchDetectionTest {
 
         @Test
         fun `should extract branch info when main is merged into feat before feat is merged back`() {
-            // Graph:
             // trunk: 0───1───2───────────6 (origin/trunk) [merge feat]
             //         \       \         /
-            // feat:    \       \       /
-            //           3───4───5─────┘ (origin/feat)
+            // feat:    3───4───5───────┘ (origin/feat)
             //                   ^
             //                   merge trunk into feat (parents: 4, 2)
 
