@@ -18,12 +18,12 @@ sealed interface NameCertainty {
 }
 
 data class BranchInfo(
-    val nameCertainty: NameCertainty,
     val firstCommitHash: CommitHash,
     val firstCommitDate: ZonedDateTime,
     val mergeCommitHash: CommitHash?,
     val mergeDate: ZonedDateTime?,
-    val targetBranch: BranchName?
+    val targetBranch: BranchName?,
+    val nameCertainty: NameCertainty
 ) {
     /** Returns the branch name, or null if unnamed */
     val name: BranchName? get() = when (nameCertainty) {

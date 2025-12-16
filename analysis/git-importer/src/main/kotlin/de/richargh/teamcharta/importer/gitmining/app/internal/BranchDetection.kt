@@ -10,7 +10,7 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     val branchByHash = commits.associate { it.hash to it.branch }
     val hasActiveBranch = commits.any { it.isOnActiveBranch }
 
-    data class BranchState(
+    data class MutableBranchInfo(
         var firstCommitHash: CommitHash,
         var firstCommitDate: ZonedDateTime,
         var mergeCommitHash: CommitHash? = null,
@@ -19,8 +19,8 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
         var nameCertainty: NameCertainty
     )
 
-    val namedBranchStates = mutableMapOf<BranchName, BranchState>()
-    val unnamedBranchStates = mutableMapOf<CommitHash, BranchState>()
+    val namedBranchStates = mutableMapOf<BranchName, MutableBranchInfo>()
+    val unnamedBranchStates = mutableMapOf<CommitHash, MutableBranchInfo>()
 
     for (commit in commits) {
         val branch = commit.branch
@@ -31,7 +31,7 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
         }
 
         val state = namedBranchStates.getOrPut(branchName) {
-            BranchState(commit.hash, commit.date, nameCertainty = nameCertainty)
+            MutableBranchInfo(commit.hash, commit.date, nameCertainty = nameCertainty)
         }
         if (commit.date < state.firstCommitDate) {
             state.firstCommitHash = commit.hash
@@ -46,7 +46,7 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
             when (mergedBranch) {
                 is BranchAssignment.Certain -> {
                     val mergedState = namedBranchStates.getOrPut(mergedBranch.name) {
-                        BranchState(mergedParentHash, commit.date, nameCertainty = NameCertainty.Certain(mergedBranch.name))
+                        MutableBranchInfo(mergedParentHash, commit.date, nameCertainty = NameCertainty.Certain(mergedBranch.name))
                     }
                     if (mergedState.mergeCommitHash == null) {
                         mergedState.mergeCommitHash = commit.hash
@@ -56,7 +56,7 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
                 }
                 is BranchAssignment.Inferred -> {
                     val mergedState = namedBranchStates.getOrPut(mergedBranch.name) {
-                        BranchState(mergedParentHash, commit.date, nameCertainty = NameCertainty.Inferred(mergedBranch.name))
+                        MutableBranchInfo(mergedParentHash, commit.date, nameCertainty = NameCertainty.Inferred(mergedBranch.name))
                     }
                     if (mergedState.mergeCommitHash == null) {
                         mergedState.mergeCommitHash = commit.hash
@@ -68,7 +68,7 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
                     // Unknown or null branch - track as unnamed
                     val firstCommitOfUnnamed = findFirstCommitOfBranch(commits, mergedParentHash, branchByHash)
                     val unnamedState = unnamedBranchStates.getOrPut(firstCommitOfUnnamed.hash) {
-                        BranchState(firstCommitOfUnnamed.hash, firstCommitOfUnnamed.date, nameCertainty = NameCertainty.Nameless)
+                        MutableBranchInfo(firstCommitOfUnnamed.hash, firstCommitOfUnnamed.date, nameCertainty = NameCertainty.Nameless)
                     }
                     if (unnamedState.mergeCommitHash == null) {
                         unnamedState.mergeCommitHash = commit.hash
@@ -82,23 +82,23 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
 
     val namedResult = namedBranchStates.map { (_, state) ->
         BranchInfo(
-            nameCertainty = state.nameCertainty,
             firstCommitHash = state.firstCommitHash,
             firstCommitDate = state.firstCommitDate,
             mergeCommitHash = state.mergeCommitHash,
             mergeDate = state.mergeDate,
-            targetBranch = state.targetBranch
+            targetBranch = state.targetBranch,
+            nameCertainty = state.nameCertainty
         )
     }
 
     val unnamedResult = unnamedBranchStates.map { (_, state) ->
         BranchInfo(
-            nameCertainty = NameCertainty.Nameless,
             firstCommitHash = state.firstCommitHash,
             firstCommitDate = state.firstCommitDate,
             mergeCommitHash = state.mergeCommitHash,
             mergeDate = state.mergeDate,
-            targetBranch = state.targetBranch
+            targetBranch = state.targetBranch,
+            nameCertainty = NameCertainty.Nameless
         )
     }
 
