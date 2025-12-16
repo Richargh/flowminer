@@ -59,7 +59,7 @@ private class BranchCollector(private val commits: List<Commit>) {
         }
     }
 
-    private fun isMergeOnActiveBranch(commit: Commit): Boolean = (!hasActiveBranch || !commit.isNotOnActiveBranch) && !commit.isNotMergeCommit
+    private fun isMergeOnActiveBranch(commit: Commit): Boolean = (!hasActiveBranch || commit.isOnActiveBranch) && commit.isMergeCommit
 
     private fun recordNamedMerge(
         mergeCommit: Commit,
