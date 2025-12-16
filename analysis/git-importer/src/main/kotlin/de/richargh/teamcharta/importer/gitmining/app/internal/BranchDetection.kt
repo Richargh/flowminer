@@ -40,14 +40,14 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     private fun updateBranchState(commit: Commit, commitBranchName: NamedBranch) {
-        val state = namedBranches.getOrPut(commitBranchName.name) {
+        val namedBranch = namedBranches.getOrPut(commitBranchName.name) {
             MutableBranch(commit.hash, commit.date, commit.hash, commit.date, commitBranchName)
         }
-        if (commit.date < state.firstCommitDate) {
-            state.firstCommit(commit.hash, commit.date)
+        if (commit.date < namedBranch.firstCommitDate) {
+            namedBranch.firstCommit(commit.hash, commit.date)
         }
-        if (commit.date > state.lastCommitDate) {
-            state.lastCommit(commit.hash, commit.date)
+        if (commit.date > namedBranch.lastCommitDate) {
+            namedBranch.lastCommit(commit.hash, commit.date)
         }
     }
 
@@ -65,7 +65,7 @@ private class BranchCollector(private val commits: List<Commit>) {
 
     private fun recordNamedMerge(
         mergeCommit: Commit,
-        targetBranchName: BranchName,
+        mergeCommitBranchName: BranchName,
         mergedParentHash: CommitHash,
         mergedBranchName: BranchName,
         branchNameCertainty: BranchNameCertainty
@@ -75,7 +75,7 @@ private class BranchCollector(private val commits: List<Commit>) {
             MutableBranch(mergedParentHash, mergedCommitDate, mergedParentHash, mergedCommitDate, branchNameCertainty)
         }
         if (mergedState.mergeCommitHash == null) {
-            mergedState.mergeCommit(mergeCommit.hash, mergeCommit.date, targetBranchName)
+            mergedState.mergeCommit(mergeCommit.hash, mergeCommit.date, mergeCommitBranchName)
         }
     }
 
