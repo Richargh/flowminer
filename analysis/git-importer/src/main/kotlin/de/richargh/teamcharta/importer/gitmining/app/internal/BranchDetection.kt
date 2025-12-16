@@ -30,13 +30,13 @@ private class BranchCollector(private val commits: List<Commit>) {
             is NamedBranch -> certainty
         }
 
-        updateBranchState(commit, commitBranchName)
+        updateBranch(commit, commitBranchName)
         if(isMergeOnAllowedBranch(commit)) {
             processMerge(commit, commitBranchName)
         }
     }
 
-    private fun updateBranchState(commit: Commit, commitBranchName: NamedBranch) {
+    private fun updateBranch(commit: Commit, commitBranchName: NamedBranch) {
         val namedBranch = namedBranches.getOrPut(commitBranchName.name) {
             MutableBranch(commit.hash, commit.date, commit.hash, commit.date, commitBranchName)
         }
