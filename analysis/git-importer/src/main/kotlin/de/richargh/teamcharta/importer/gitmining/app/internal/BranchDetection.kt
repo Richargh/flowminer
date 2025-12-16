@@ -54,12 +54,12 @@ private class BranchCollector(private val commits: List<Commit>) {
         when (val mergedBranch = branchByHash[mergedParentHash]) {
             is NamedBranch.Certain -> recordNamedMerge(
                 commit, commitBranchName.name,
-                mergedParentHash, mergedBranch.name, NamedBranch.Certain(mergedBranch.name)
+                mergedParentHash, NamedBranch.Certain(mergedBranch.name)
             )
 
             is NamedBranch.Inferred -> recordNamedMerge(
                 commit, commitBranchName.name,
-                mergedParentHash, mergedBranch.name, NamedBranch.Inferred(mergedBranch.name)
+                mergedParentHash, NamedBranch.Inferred(mergedBranch.name)
             )
 
             else -> recordUnnamedMerge(commit, commitBranchName.name, mergedParentHash)
@@ -70,12 +70,11 @@ private class BranchCollector(private val commits: List<Commit>) {
         mergeCommit: Commit,
         mergeCommitBranchName: BranchName,
         mergedParentHash: CommitHash,
-        mergedBranchName: BranchName,
-        branchNameCertainty: BranchNameCertainty
+        branchName: NamedBranch
     ) {
         val mergedCommitDate = commitByHash[mergedParentHash]?.date ?: mergeCommit.date
-        val mergedState = namedBranches.getOrPut(mergedBranchName) {
-            MutableBranch(mergedParentHash, mergedCommitDate, mergedParentHash, mergedCommitDate, branchNameCertainty)
+        val mergedState = namedBranches.getOrPut(branchName.name) {
+            MutableBranch(mergedParentHash, mergedCommitDate, mergedParentHash, mergedCommitDate, branchName)
         }
         if (mergedState.mergeCommitHash == null) {
             mergedState.mergeCommit(mergeCommit.hash, mergeCommit.date, mergeCommitBranchName)
