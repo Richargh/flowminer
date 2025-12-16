@@ -18,7 +18,8 @@ private class BranchCollector(private val allCommits: List<Commit>) {
     private var hasNoActiveBranch = true
 
     private val namedBranches = mutableMapOf<BranchName, MutableBranch>()
-    private val unnamedBranches = mutableMapOf<CommitHash, MutableBranch>()
+    private val unnamedBranches = mutableMapOf<CommitHash, MutableBranch>() // key: lastCommitHash
+    private val pendingUnnamedBranch = mutableMapOf<CommitHash, CommitHash>() // commitHash -> branchId
 
     fun processCommits() {
         val pendingMerges = mutableListOf<PendingMerge>()
@@ -30,7 +31,7 @@ private class BranchCollector(private val allCommits: List<Commit>) {
             commitByHash[commit.hash] = commit
 
             val branchName = commit.branch as? NamedBranch ?: continue
-            updateBranch(commit, branchName)
+            updateNamedBranch(commit, branchName)
             if (commit.isMerge) {
                 pendingMerges.add(PendingMerge(commit, branchName))
             }
@@ -41,9 +42,11 @@ private class BranchCollector(private val allCommits: List<Commit>) {
                 processFeatureBranches(pending.commit, pending.branchName)
             }
         }
+
+        processAllPendingUnnamedBranches()
     }
 
-    private fun updateBranch(commit: Commit, commitBranchName: NamedBranch) {
+    private fun updateNamedBranch(commit: Commit, commitBranchName: NamedBranch) {
         val namedBranch = namedBranches.getOrPut(commitBranchName.name) {
             MutableBranch(commit.hash, commit.date, commit.hash, commit.date, commitBranchName)
         }
@@ -59,13 +62,12 @@ private class BranchCollector(private val allCommits: List<Commit>) {
         val featureBranchHash = commit.parents[1]
         when (val featureBranchName = branchByHash[featureBranchHash]) {
             is NamedBranch -> recordNamedFeatureBranch(
-                commit,
-                commitBranchName.name,
-                featureBranchHash,
-                featureBranchName
+                commit, commitBranchName.name, featureBranchHash, featureBranchName
             )
 
-            is NamelessBranch, null -> recordUnnamedFeatureBranch(commit, commitBranchName.name, featureBranchHash)
+            is NamelessBranch, null -> scheduleUnnamedBranchPropagation(
+                commit, commitBranchName.name, featureBranchHash
+            )
         }
     }
 
@@ -84,20 +86,46 @@ private class BranchCollector(private val allCommits: List<Commit>) {
         }
     }
 
-    private fun recordUnnamedFeatureBranch(commit: Commit, commitBranchName: BranchName, featureBranchHash: CommitHash) {
-        val firstCommitOfUnnamed = findFirstCommitOfBranch(allCommits, featureBranchHash, branchByHash)
-        val lastCommitOfUnnamed = findLastCommitOfBranch(allCommits, featureBranchHash)
-        val unnamedBranch = unnamedBranches.getOrPut(firstCommitOfUnnamed.hash) {
-            MutableBranch(
-                firstCommitOfUnnamed.hash,
-                firstCommitOfUnnamed.date,
-                lastCommitOfUnnamed.hash,
-                lastCommitOfUnnamed.date,
-                NamelessBranch
-            )
+    private fun scheduleUnnamedBranchPropagation(
+        commit: Commit,
+        commitBranchName: BranchName,
+        featureBranchHash: CommitHash
+    ) {
+        val lastCommit = commitByHash[featureBranchHash]
+        unnamedBranches[featureBranchHash] = MutableBranch(
+            featureBranchHash, lastCommit?.date ?: commit.date,
+            featureBranchHash, lastCommit?.date ?: commit.date,
+            NamelessBranch
+        ).also { it.mergeCommit(commit.hash, commit.date, commitBranchName) }
+
+        pendingUnnamedBranch[featureBranchHash] = featureBranchHash
+    }
+
+    private fun processAllPendingUnnamedBranches() {
+        while (pendingUnnamedBranch.isNotEmpty()) {
+            val (commitHash, branchId) = pendingUnnamedBranch.entries.first()
+            pendingUnnamedBranch.remove(commitHash)
+            val commit = commitByHash[commitHash] ?: continue
+
+            updateUnnamedBranch(commit, branchId)
+
+            val firstParent = commit.parents.firstOrNull()
+            if (firstParent != null) {
+                val parentBranch = branchByHash[firstParent]
+                if (parentBranch !is NamedBranch.Certain && parentBranch !is NamedBranch.Inferred) {
+                    pendingUnnamedBranch[firstParent] = branchId
+                }
+            }
         }
-        if (unnamedBranch.mergeCommitHash == null) {
-            unnamedBranch.mergeCommit(commit.hash, commit.date, commitBranchName)
+    }
+
+    private fun updateUnnamedBranch(commit: Commit, branchId: CommitHash) {
+        val branch = unnamedBranches[branchId] ?: return
+        if (commit.date < branch.firstCommitDate) {
+            branch.firstCommit(commit.hash, commit.date)
+        }
+        if (commit.date > branch.lastCommitDate) {
+            branch.lastCommit(commit.hash, commit.date)
         }
     }
 
@@ -106,32 +134,6 @@ private class BranchCollector(private val allCommits: List<Commit>) {
         val unnamedResult = unnamedBranches.values.map(MutableBranch::toBranch)
         return Branches(namedResult + unnamedResult)
     }
-}
-
-private fun findFirstCommitOfBranch(
-    commits: List<Commit>,
-    startHash: CommitHash,
-    branchByHash: Map<CommitHash, BranchNameCertainty?>
-): Commit {
-    val commitByHash = commits.associateBy { it.hash }
-    var current = commitByHash[startHash] ?: return commits.first { it.hash == startHash }
-
-    while (true) {
-        val parent = current.parents.firstOrNull() ?: break
-        val parentCommit = commitByHash[parent] ?: break
-        val parentBranch = branchByHash[parent]
-        if (parentBranch is NamedBranch.Certain || parentBranch is NamedBranch.Inferred) {
-            break
-        }
-        current = parentCommit
-    }
-
-    return current
-}
-
-private fun findLastCommitOfBranch(commits: List<Commit>, startHash: CommitHash): Commit {
-    val commitByHash = commits.associateBy { it.hash }
-    return commitByHash[startHash] ?: commits.first { it.hash == startHash }
 }
 
 private data class PendingMerge(val commit: Commit, val branchName: NamedBranch)
