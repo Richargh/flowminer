@@ -1,8 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api.BranchNameCertainty
-import de.richargh.teamcharta.importer.git.app.api.BranchName
-import de.richargh.teamcharta.importer.git.app.api.aCommit
+import de.richargh.teamcharta.importer.git.app.api.*
 import de.richargh.teamcharta.importer.git.app.test.haveSameBranchAs
 import de.richargh.teamcharta.importer.shared.time.app.atStartOfYear
 import io.kotest.matchers.should
@@ -29,7 +27,7 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.first().branch shouldBe BranchNameCertainty.Named.Certain(BranchName("origin/main"))
+        result.first().branch shouldBe Named.Certain(BranchName("origin/main"))
     }
 
     @Test
@@ -728,8 +726,8 @@ class BranchAssignmentTest {
                 certainBranch("origin/feat3")
                 message("feat3 commit")
             })
-            result[2].branch shouldBe BranchNameCertainty.Nameless
-            result[3].branch shouldBe BranchNameCertainty.Nameless
+            result[2].branch shouldBe Nameless
+            result[3].branch shouldBe Nameless
         }
     }
 }

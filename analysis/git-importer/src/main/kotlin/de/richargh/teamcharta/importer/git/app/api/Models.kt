@@ -19,20 +19,19 @@ data class BranchName(val value: String) {
 }
 
 sealed interface BranchNameCertainty {
-
     val name: BranchName?
+}
 
-    sealed interface Named: BranchNameCertainty {
-        override val name: BranchName
+sealed interface Named: BranchNameCertainty {
+    override val name: BranchName
 
-        data class Certain(override val name: BranchName) : Named
+    data class Certain(override val name: BranchName) : Named
 
-        data class Inferred(override val name: BranchName) : Named
-    }
+    data class Inferred(override val name: BranchName) : Named
+}
 
-    object Nameless: BranchNameCertainty {
-        override val name: BranchName? = null
-    }
+object Nameless: BranchNameCertainty {
+    override val name: BranchName? = null
 }
 
 sealed interface Ref {
