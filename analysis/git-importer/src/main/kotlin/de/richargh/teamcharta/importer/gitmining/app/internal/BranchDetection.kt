@@ -1,6 +1,9 @@
-package de.richargh.teamcharta.importer.git.app.internal
+package de.richargh.teamcharta.importer.gitmining.app.internal
 
 import de.richargh.teamcharta.importer.git.app.api.*
+import de.richargh.teamcharta.importer.gitmining.app.api.BranchInfo
+import de.richargh.teamcharta.importer.gitmining.app.api.BranchInfos
+import de.richargh.teamcharta.importer.gitmining.app.api.NameCertainty
 import java.time.ZonedDateTime
 
 fun extractBranchInfo(commits: List<Commit>): BranchInfos {

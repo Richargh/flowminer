@@ -24,7 +24,7 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
+        result.first().refs shouldContainExactlyInAnyOrder listOf(
             Ref.BranchTip("origin/main"),
             Ref.LocalHead("main")
         )
@@ -43,7 +43,7 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
+        result.first().refs shouldContainExactlyInAnyOrder listOf(
             Ref.BranchTip("origin/main"),
             Ref.Tag("v1.0.0")
         )
@@ -53,7 +53,7 @@ class RefDetectionTest {
     fun `should parse branch ref without slash`() {
         // Given
         val gitLogContent = aGitLog {
-            anEntry("origin/develop") {  }
+            anEntry("origin/develop") { }
         }
 
         val testee = GitLogParser()
@@ -62,7 +62,7 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(Ref.BranchTip("origin/develop"))
+        result.first().refs shouldContainExactly listOf(Ref.BranchTip("origin/develop"))
     }
 
     @ParameterizedTest(name = "should parse nested branch ref: {0}")
@@ -78,7 +78,7 @@ class RefDetectionTest {
     fun `should parse nested branch refs`(branchName: String) {
         // Given
         val gitLogContent = aGitLog {
-            anEntry(branchName) {  }
+            anEntry(branchName) { }
         }
 
         val testee = GitLogParser()
@@ -87,7 +87,7 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactly listOf(Ref.BranchTip(branchName))
+        result.first().refs shouldContainExactly listOf(Ref.BranchTip(branchName))
     }
 
     @Test
@@ -106,7 +106,7 @@ class RefDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().refs shouldContainExactlyInAnyOrder listOf(
+        result.first().refs shouldContainExactlyInAnyOrder listOf(
             Ref.LocalHead("main"),
             Ref.BranchTip("origin/main"),
             Ref.Tag("v1.0.0")

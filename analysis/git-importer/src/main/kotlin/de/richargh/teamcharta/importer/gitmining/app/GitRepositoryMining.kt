@@ -1,10 +1,10 @@
-package de.richargh.teamcharta.importer.git.app
+package de.richargh.teamcharta.importer.gitmining.app
 
-import de.richargh.teamcharta.importer.git.app.api.GitMiningResult
+import de.richargh.teamcharta.importer.gitmining.app.api.GitMiningResult
 import java.io.File
 
-class GitRepositoryParser(
-    private val gitLogParser: GitLogParser = GitLogParser()
+class GitRepositoryMining(
+    private val gitLogParser: GitLogMining = GitLogMining()
 ) {
 
     fun parse(repoPath: File, since: String = "6 months ago"): GitMiningResult {

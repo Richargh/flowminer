@@ -1,4 +1,4 @@
-package de.richargh.teamcharta.importer.git.app.internal
+package de.richargh.teamcharta.importer.shared.time.app
 
 import java.time.LocalDate
 import java.time.LocalTime

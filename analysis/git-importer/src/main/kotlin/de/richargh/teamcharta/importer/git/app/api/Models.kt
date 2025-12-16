@@ -28,18 +28,6 @@ sealed interface BranchAssignment {
     object Unknown: BranchAssignment
 }
 
-/** Certainty level of a branch's name in BranchInfo */
-sealed interface NameCertainty {
-    /** Branch ref exists - name is certain */
-    data class Certain(val name: BranchName) : NameCertainty
-
-    /** Inferred from merge commit message */
-    data class Inferred(val name: BranchName) : NameCertainty
-
-    /** Cannot determine name - branch is unnamed */
-    object Nameless : NameCertainty
-}
-
 sealed interface Ref {
     data class LocalHead(val branch: BranchName) : Ref {
         constructor(name: String): this(BranchName(name))
@@ -81,51 +69,3 @@ data class Commit(
     val isMergeCommit = parents.size >= 2
 }
 
-data class BranchInfo(
-    val nameCertainty: NameCertainty,
-    val firstCommitHash: CommitHash,
-    val firstCommitDate: ZonedDateTime,
-    val mergeCommitHash: CommitHash?,
-    val mergeDate: ZonedDateTime?,
-    val targetBranch: BranchName?
-) {
-    /** Returns the branch name, or null if unnamed */
-    val name: BranchName? get() = when (nameCertainty) {
-        is NameCertainty.Certain -> nameCertainty.name
-        is NameCertainty.Inferred -> nameCertainty.name
-        is NameCertainty.Nameless -> null
-    }
-
-    val isNamed: Boolean get() = nameCertainty !is NameCertainty.Nameless
-    val isUnnamed: Boolean get() = nameCertainty is NameCertainty.Nameless
-    val isInferred: Boolean get() = nameCertainty is NameCertainty.Inferred
-}
-
-class Commits(private val commits: List<Commit>) {
-    operator fun get(index: Int): Commit = commits[index]
-
-    fun all(): Collection<Commit> = commits
-    fun first(): Commit = commits.first()
-    fun size(): Int = commits.size
-    fun isEmpty(): Boolean = commits.isEmpty()
-    fun isNotEmpty(): Boolean = commits.isNotEmpty()
-}
-
-class BranchInfos(branches: List<BranchInfo>) {
-    private val namedBranches: Map<BranchName, BranchInfo> = branches
-        .filter { it.isNamed }
-        .associateBy { it.name!! }
-
-    val unnamed: List<BranchInfo> = branches.filter { it.isUnnamed }
-
-    operator fun get(name: BranchName): BranchInfo? = namedBranches[name]
-    operator fun get(name: String): BranchInfo? = namedBranches[BranchName(name)]
-
-    fun all(): Collection<BranchInfo> = namedBranches.values + unnamed
-    fun size() = namedBranches.size + unnamed.size
-}
-
-data class GitMiningResult(
-    val commits: Commits,
-    val branches: BranchInfos = BranchInfos(emptyList())
-)

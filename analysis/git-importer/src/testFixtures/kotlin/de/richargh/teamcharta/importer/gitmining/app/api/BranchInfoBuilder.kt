@@ -1,5 +1,7 @@
-package de.richargh.teamcharta.importer.git.app.api
+package de.richargh.teamcharta.importer.gitmining.app.api
 
+import de.richargh.teamcharta.importer.git.app.api.BranchName
+import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import java.time.ZonedDateTime
 
 class BranchInfoBuilder {

@@ -2,16 +2,13 @@ package de.richargh.teamcharta.importer.git.app
 
 import de.richargh.teamcharta.importer.git.app.api.*
 import de.richargh.teamcharta.importer.git.app.internal.splitIntoRawCommits
-import de.richargh.teamcharta.importer.git.app.internal.extractBranchInfo
 import de.richargh.teamcharta.importer.git.app.internal.parseCommits
 
 class GitLogParser {
 
-    fun parse(lines: Sequence<String>): GitMiningResult {
+    fun parse(lines: Sequence<String>): List<Commit> {
         val rawCommits = splitIntoRawCommits(lines)
-        val commits = parseCommits(rawCommits).toList()
-        val branches = extractBranchInfo(commits)
-        return GitMiningResult(commits = Commits(commits), branches = branches)
+        return parseCommits(rawCommits).toList()
     }
 
 }

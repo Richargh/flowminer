@@ -3,8 +3,8 @@ package de.richargh.teamcharta.importer.git.app
 import de.richargh.teamcharta.importer.git.app.api.BranchAssignment
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.aCommit
-import de.richargh.teamcharta.importer.git.app.internal.atStartOfYear
 import de.richargh.teamcharta.importer.git.app.test.haveSameBranchAs
+import de.richargh.teamcharta.importer.shared.time.app.atStartOfYear
 import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
@@ -29,7 +29,7 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits.first().branch shouldBe BranchAssignment.Certain(BranchName("origin/main"))
+        result.first().branch shouldBe BranchAssignment.Certain(BranchName("origin/main"))
     }
 
     @Test
@@ -52,11 +52,11 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then - both commits should be on main
-        result.commits[0] should haveSameBranchAs(aCommit {
+        result[0] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("Second")
         })
-        result.commits[1] should haveSameBranchAs(aCommit {
+        result[1] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("First")
         })
@@ -88,19 +88,19 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then - both commits should be on main
-        result.commits[0] should haveSameBranchAs(aCommit {
+        result[0] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("Fourth")
         })
-        result.commits[1] should haveSameBranchAs(aCommit {
+        result[1] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("Third")
         })
-        result.commits[2] should haveSameBranchAs(aCommit {
+        result[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("Second")
         })
-        result.commits[3] should haveSameBranchAs(aCommit {
+        result[3] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("First")
         })
@@ -147,19 +147,19 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0] should haveSameBranchAs(aCommit {
+        result[0] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("Merge branch 'origin/feature' into origin/main")
         })
-        result.commits[1] should haveSameBranchAs(aCommit {
+        result[1] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/feature")))
             message("feature commit")
         })
-        result.commits[2] should haveSameBranchAs(aCommit {
+        result[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("main commit")
         })
-        result.commits[3] should haveSameBranchAs(aCommit {
+        result[3] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("initial commit")
         })
@@ -206,19 +206,19 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0] should haveSameBranchAs(aCommit {
+        result[0] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("Merge branch 'origin/feature' into origin/main")
         })
-        result.commits[1] should haveSameBranchAs(aCommit {
+        result[1] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Inferred(BranchName("origin/feature")))
             message("feature commit")
         })
-        result.commits[2] should haveSameBranchAs(aCommit {
+        result[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("main commit")
         })
-        result.commits[3] should haveSameBranchAs(aCommit {
+        result[3] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("initial commit")
         })
@@ -265,19 +265,19 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0] should haveSameBranchAs(aCommit {
+        result[0] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("Merge branch feature into main")
         })
-        result.commits[1] should haveSameBranchAs(aCommit {
+        result[1] should haveSameBranchAs(aCommit {
             nobranch()
             message("feature commit")
         })
-        result.commits[2] should haveSameBranchAs(aCommit {
+        result[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("main commit")
         })
-        result.commits[3] should haveSameBranchAs(aCommit {
+        result[3] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("initial commit")
         })
@@ -318,15 +318,15 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0] should haveSameBranchAs(aCommit {
+        result[0] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("Merge branch 'origin/feature' into origin/main")
         })
-        result.commits[1] should haveSameBranchAs(aCommit {
+        result[1] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/main")))
             message("main commit")
         })
-        result.commits[2] should haveSameBranchAs(aCommit {
+        result[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/feature")))
             message("feature commit")
         })
@@ -365,7 +365,7 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then - commit 0 has branch ref, should stay Certain
-        result.commits[2] should haveSameBranchAs(aCommit {
+        result[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/feature")))
             message("feature commit")
         })
@@ -416,23 +416,23 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0] should haveSameBranchAs(aCommit {
+        result[0] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/feat")))
             message("feat2 commit")
         })
-        result.commits[1] should haveSameBranchAs(aCommit {
+        result[1] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/trunk")))
             message("Merge branch 'feat' into trunk")
         })
-        result.commits[2] should haveSameBranchAs(aCommit {
+        result[2] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/feat")))
             message("feat1 commit")
         })
-        result.commits[3] should haveSameBranchAs(aCommit {
+        result[3] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/trunk")))
             message("trunk2 commit")
         })
-        result.commits[4] should haveSameBranchAs(aCommit {
+        result[4] should haveSameBranchAs(aCommit {
             branch(BranchAssignment.Certain(BranchName("origin/trunk")))
             message("trunk1 commit")
         })
@@ -477,10 +477,10 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then - commits reachable from HEAD should be marked
-        result.commits[0].isOnActiveBranch shouldBe true  // main commit 2 (HEAD)
-        result.commits[1].isOnActiveBranch shouldBe false // feature commit (not on HEAD chain)
-        result.commits[2].isOnActiveBranch shouldBe true  // main commit 1 (first parent of HEAD)
-        result.commits[3].isOnActiveBranch shouldBe true  // initial commit (ancestor of HEAD)
+        result[0].isOnActiveBranch shouldBe true  // main commit 2 (HEAD)
+        result[1].isOnActiveBranch shouldBe false // feature commit (not on HEAD chain)
+        result[2].isOnActiveBranch shouldBe true  // main commit 1 (first parent of HEAD)
+        result[3].isOnActiveBranch shouldBe true  // initial commit (ancestor of HEAD)
     }
 
     @Nested
@@ -533,23 +533,23 @@ class BranchAssignmentTest {
             val result = testee.parse(gitLogContent.lineSequence())
 
             // Then
-            result.commits[0] should haveSameBranchAs(aCommit {
+            result[0] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/main")))
                 message("Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'")
             })
-            result.commits[1] should haveSameBranchAs(aCommit {
+            result[1] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat3")))
                 message("feat3 commit")
             })
-            result.commits[2] should haveSameBranchAs(aCommit {
+            result[2] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat2")))
                 message("feat2 commit")
             })
-            result.commits[3] should haveSameBranchAs(aCommit {
+            result[3] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat1")))
                 message("feat1 commit")
             })
-            result.commits[4] should haveSameBranchAs(aCommit {
+            result[4] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/main")))
                 message("main commit")
             })
@@ -602,15 +602,15 @@ class BranchAssignmentTest {
             val result = testee.parse(gitLogContent.lineSequence())
 
             // Then - all branches have refs, so all are Certain
-            result.commits[1] should haveSameBranchAs(aCommit {
+            result[1] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat3")))
                 message("feat3 commit")
             })
-            result.commits[2] should haveSameBranchAs(aCommit {
+            result[2] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat2")))
                 message("feat2 commit")
             })
-            result.commits[3] should haveSameBranchAs(aCommit {
+            result[3] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat1")))
                 message("feat1 commit")
             })
@@ -663,15 +663,15 @@ class BranchAssignmentTest {
             val result = testee.parse(gitLogContent.lineSequence())
 
             // Then - feat1 has ref (Certain), feat2 and feat3 from message (Inferred)
-            result.commits[1] should haveSameBranchAs(aCommit {
+            result[1] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat3")))
                 message("feat3 commit")
             })
-            result.commits[2] should haveSameBranchAs(aCommit {
+            result[2] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Inferred(BranchName("origin/feat2")))
                 message("feat2 commit")
             })
-            result.commits[3] should haveSameBranchAs(aCommit {
+            result[3] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat1")))
                 message("feat1 commit")
             })
@@ -724,12 +724,12 @@ class BranchAssignmentTest {
             val result = testee.parse(gitLogContent.lineSequence())
 
             // Then - no branch refs, non-standard message = null branch
-            result.commits[1] should haveSameBranchAs(aCommit {
+            result[1] should haveSameBranchAs(aCommit {
                 branch(BranchAssignment.Certain(BranchName("origin/feat3")))
                 message("feat3 commit")
             })
-            result.commits[2].branch shouldBe null
-            result.commits[3].branch shouldBe null
+            result[2].branch shouldBe null
+            result[3].branch shouldBe null
         }
     }
 }

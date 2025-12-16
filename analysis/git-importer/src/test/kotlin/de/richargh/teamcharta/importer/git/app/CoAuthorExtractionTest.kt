@@ -24,11 +24,11 @@ class CoAuthorExtractionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0].trailers shouldContainExactly listOf(
+        result[0].trailers shouldContainExactly listOf(
             "Co-authored-by" to "John Doe <john@example.com>",
             "Co-authored-by" to "Alice Wonder <alice@example.com>"
         )
-        result.commits[0].coAuthors shouldContainExactly listOf(
+        result[0].coAuthors shouldContainExactly listOf(
             Author("John Doe", "john@example.com"),
             Author("Alice Wonder", "alice@example.com")
         )
@@ -55,7 +55,7 @@ class CoAuthorExtractionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.commits[0].coAuthors shouldContainExactly listOf(
+        result[0].coAuthors shouldContainExactly listOf(
             Author("John Doe", "john@example.com")
         )
     }
