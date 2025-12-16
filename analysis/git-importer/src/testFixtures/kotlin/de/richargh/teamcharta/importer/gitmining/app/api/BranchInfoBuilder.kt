@@ -33,14 +33,14 @@ class BranchInfoBuilder {
     }
 
     fun build(): Branch = Branch(
+        nameCertainty = name,
         firstCommitHash = firstCommitHash,
         firstCommitDate = firstCommitDate,
         lastCommitHash = lastCommitHash ?: firstCommitHash,
         lastCommitDate = lastCommitDate ?: firstCommitDate,
         mergeCommitHash = mergeCommitHash,
         mergeDate = mergeDate,
-        targetBranch = targetBranch,
-        nameCertainty = name
+        targetBranch = targetBranch
     )
 }
 
