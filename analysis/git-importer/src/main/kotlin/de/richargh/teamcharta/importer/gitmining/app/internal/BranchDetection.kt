@@ -13,8 +13,8 @@ fun extractBranchInfo(commits: List<Commit>): Branches {
 }
 
 private class BranchCollector(private val commits: List<Commit>) {
-    private val branchByHash = commits.associate { it.hash to it.branch }
-    private val commitByHash = commits.associateBy { it.hash }
+    private val branchByHash: Map<CommitHash, BranchNameCertainty> = commits.associate { it.hash to it.branch }
+    private val commitByHash: Map<CommitHash, Commit> = commits.associateBy { it.hash }
     private val hasActiveBranch = commits.any { it.isOnActiveBranch }
 
     private val namedBranches = mutableMapOf<BranchName, MutableBranch>()
@@ -31,7 +31,7 @@ private class BranchCollector(private val commits: List<Commit>) {
         }
 
         updateBranch(commit, commitBranchName)
-        if(isMergeOnAllowedBranch(commit)) {
+        if (isMergeOnAllowedBranch(commit)) {
             processMerge(commit, commitBranchName)
         }
     }
@@ -49,39 +49,41 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     private fun processMerge(commit: Commit, commitBranchName: NamedBranch) {
-        val mergedParentHash = commit.parents[1]
-        when (val mergedParentBranchName = branchByHash[mergedParentHash]) {
+        val featureBranchHash = commit.parents[1]
+        when (val featureBranchName = branchByHash[featureBranchHash]) {
             is NamedBranch -> recordNamedMerge(
                 commit, commitBranchName.name,
-                mergedParentHash, mergedParentBranchName
+                featureBranchHash, featureBranchName
             )
-            else -> recordUnnamedMerge(commit, commitBranchName.name, mergedParentHash)
+
+            is NamelessBranch, null -> recordUnnamedMerge(commit, commitBranchName.name, featureBranchHash)
         }
     }
 
-    private fun isMergeOnAllowedBranch(commit: Commit): Boolean = commit.isMergeCommit && isOnActiveBranchIfExists(commit)
+    private fun isMergeOnAllowedBranch(commit: Commit): Boolean =
+        commit.isMergeCommit && isOnActiveBranchIfExists(commit)
 
     private fun isOnActiveBranchIfExists(commit: Commit): Boolean = (!hasActiveBranch || commit.isOnActiveBranch)
 
     private fun recordNamedMerge(
-        mergeCommit: Commit,
-        mergeCommitBranchName: BranchName,
-        mergedParentHash: CommitHash,
-        branchName: NamedBranch
+        commit: Commit,
+        commitBranchName: BranchName,
+        featureBranchHash: CommitHash,
+        featureBranchName: NamedBranch
     ) {
-        val mergedCommitDate = commitByHash[mergedParentHash]?.date ?: mergeCommit.date
-        val mergedState = namedBranches.getOrPut(branchName.name) {
-            MutableBranch(mergedParentHash, mergedCommitDate, mergedParentHash, mergedCommitDate, branchName)
+        val mergedCommitDate = commitByHash[featureBranchHash]?.date ?: commit.date
+        val mergedBranch = namedBranches.getOrPut(featureBranchName.name) {
+            MutableBranch(featureBranchHash, mergedCommitDate, featureBranchHash, mergedCommitDate, featureBranchName)
         }
-        if (mergedState.mergeCommitHash == null) {
-            mergedState.mergeCommit(mergeCommit.hash, mergeCommit.date, mergeCommitBranchName)
+        if (mergedBranch.mergeCommitHash == null) {
+            mergedBranch.mergeCommit(commit.hash, commit.date, commitBranchName)
         }
     }
 
-    private fun recordUnnamedMerge(mergeCommit: Commit, targetBranchName: BranchName, mergedParentHash: CommitHash) {
-        val firstCommitOfUnnamed = findFirstCommitOfBranch(commits, mergedParentHash, branchByHash)
-        val lastCommitOfUnnamed = findLastCommitOfBranch(commits, mergedParentHash)
-        val unnamedState = unnamedBranches.getOrPut(firstCommitOfUnnamed.hash) {
+    private fun recordUnnamedMerge(commit: Commit, commitBranchName: BranchName, featureBranchHash: CommitHash) {
+        val firstCommitOfUnnamed = findFirstCommitOfBranch(commits, featureBranchHash, branchByHash)
+        val lastCommitOfUnnamed = findLastCommitOfBranch(commits, featureBranchHash)
+        val unnamedBranch = unnamedBranches.getOrPut(firstCommitOfUnnamed.hash) {
             MutableBranch(
                 firstCommitOfUnnamed.hash,
                 firstCommitOfUnnamed.date,
@@ -90,8 +92,8 @@ private class BranchCollector(private val commits: List<Commit>) {
                 NamelessBranch
             )
         }
-        if (unnamedState.mergeCommitHash == null) {
-            unnamedState.mergeCommit(mergeCommit.hash, mergeCommit.date, targetBranchName)
+        if (unnamedBranch.mergeCommitHash == null) {
+            unnamedBranch.mergeCommit(commit.hash, commit.date, commitBranchName)
         }
     }
 
