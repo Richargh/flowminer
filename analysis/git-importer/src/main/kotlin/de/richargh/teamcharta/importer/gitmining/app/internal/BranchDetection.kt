@@ -13,26 +13,33 @@ fun extractBranchInfo(commits: List<Commit>): Branches {
 }
 
 private class BranchCollector(private val commits: List<Commit>) {
-    private val branchByHash: Map<CommitHash, BranchNameCertainty> = commits.associate { it.hash to it.branch }
-    private val commitByHash: Map<CommitHash, Commit> = commits.associateBy { it.hash }
-    private val hasActiveBranch = commits.any { it.isOnActiveBranch }
+    private val branchByHash = mutableMapOf<CommitHash, BranchNameCertainty>()
+    private val commitByHash = mutableMapOf<CommitHash, Commit>()
+    private var hasNoActiveBranch = true
 
     private val namedBranches = mutableMapOf<BranchName, MutableBranch>()
     private val unnamedBranches = mutableMapOf<CommitHash, MutableBranch>()
 
     fun processCommits() {
-        commits.forEach(::processCommit)
-    }
+        val pendingMerges = mutableListOf<PendingMerge>()
 
-    private fun processCommit(commit: Commit) {
-        val commitBranchName: NamedBranch = when (val certainty = commit.branch) {
-            is NamelessBranch -> return
-            is NamedBranch -> certainty
+        for (commit in commits) {
+            if (commit.isOnActiveBranch) hasNoActiveBranch = false
+
+            branchByHash[commit.hash] = commit.branch
+            commitByHash[commit.hash] = commit
+
+            val branchName = commit.branch as? NamedBranch ?: continue
+            updateBranch(commit, branchName)
+            if (commit.isMerge) {
+                pendingMerges.add(PendingMerge(commit, branchName))
+            }
         }
 
-        updateBranch(commit, commitBranchName)
-        if (isMergeOnAllowedBranch(commit)) {
-            processMerge(commit, commitBranchName)
+        for (pending in pendingMerges) {
+            if (hasNoActiveBranch || pending.commit.isOnActiveBranch) {
+                processMerge(pending.commit, pending.branchName)
+            }
         }
     }
 
@@ -59,11 +66,6 @@ private class BranchCollector(private val commits: List<Commit>) {
             is NamelessBranch, null -> recordUnnamedMerge(commit, commitBranchName.name, featureBranchHash)
         }
     }
-
-    private fun isMergeOnAllowedBranch(commit: Commit): Boolean =
-        commit.isMergeCommit && isOnActiveBranchIfExists(commit)
-
-    private fun isOnActiveBranchIfExists(commit: Commit): Boolean = (!hasActiveBranch || commit.isOnActiveBranch)
 
     private fun recordNamedMerge(
         commit: Commit,
@@ -129,6 +131,8 @@ private fun findLastCommitOfBranch(commits: List<Commit>, startHash: CommitHash)
     val commitByHash = commits.associateBy { it.hash }
     return commitByHash[startHash] ?: commits.first { it.hash == startHash }
 }
+
+private data class PendingMerge(val commit: Commit, val branchName: NamedBranch)
 
 private class MutableBranch(
     firstCommitHash: CommitHash,
