@@ -6,7 +6,7 @@ import de.richargh.teamcharta.importer.git.app.internal.parseCommits
 import de.richargh.teamcharta.importer.gitmining.app.api.Commits
 import de.richargh.teamcharta.importer.gitmining.app.api.GitMiningResult
 
-class GitLogMining {
+class GitLogMiner {
 
     fun parse(lines: Sequence<String>): GitMiningResult {
         val rawCommits = splitIntoRawCommits(lines)

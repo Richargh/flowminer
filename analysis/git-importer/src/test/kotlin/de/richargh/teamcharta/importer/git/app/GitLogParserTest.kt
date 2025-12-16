@@ -1,8 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
 import de.richargh.teamcharta.importer.git.app.api.*
-import de.richargh.teamcharta.importer.gitmining.app.GitLogMining
-import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
 import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime

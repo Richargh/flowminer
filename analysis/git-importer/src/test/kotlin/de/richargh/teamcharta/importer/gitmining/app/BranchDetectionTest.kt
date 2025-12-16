@@ -26,7 +26,7 @@ class BranchDetectionTest {
                 }
             }
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -58,7 +58,7 @@ class BranchDetectionTest {
                 }
             }
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -92,7 +92,7 @@ class BranchDetectionTest {
                 }
             }
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -133,7 +133,7 @@ class BranchDetectionTest {
                 }
             }
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -192,7 +192,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -251,7 +251,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -280,7 +280,7 @@ class BranchDetectionTest {
             }
         }
 
-        val testee = GitLogMining()
+        val testee = GitLogMiner()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -313,7 +313,7 @@ class BranchDetectionTest {
             }
         }
 
-        val testee = GitLogMining()
+        val testee = GitLogMiner()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -348,7 +348,7 @@ class BranchDetectionTest {
             }
         }
 
-        val testee = GitLogMining()
+        val testee = GitLogMiner()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -396,7 +396,7 @@ class BranchDetectionTest {
             }
         }
 
-        val testee = GitLogMining()
+        val testee = GitLogMiner()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -473,7 +473,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -540,7 +540,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -607,7 +607,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -690,7 +690,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -779,7 +779,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -876,7 +876,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogMining()
+            val testee = GitLogMiner()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())

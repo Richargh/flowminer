@@ -8,7 +8,7 @@ import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 
-class GitLogMiningTest {
+class GitLogMinerTest {
 
     @Test
     fun `should parse single commit into Commit object`() {
@@ -22,7 +22,7 @@ class GitLogMiningTest {
             5	2	src/Main.kt
         """.trimIndent()
 
-        val testee = GitLogMining()
+        val testee = GitLogMiner()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -56,7 +56,7 @@ class GitLogMiningTest {
             5	2	src/Main.kt
         """.trimIndent()
 
-        val testee = GitLogMining()
+        val testee = GitLogMiner()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
