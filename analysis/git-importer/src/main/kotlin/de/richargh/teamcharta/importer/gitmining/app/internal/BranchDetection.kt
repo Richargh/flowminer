@@ -52,16 +52,10 @@ private class BranchCollector(private val commits: List<Commit>) {
 
         val mergedParentHash = commit.parents[1]
         when (val mergedBranch = branchByHash[mergedParentHash]) {
-            is NamedBranch.Certain -> recordNamedMerge(
+            is NamedBranch -> recordNamedMerge(
                 commit, commitBranchName.name,
                 mergedParentHash, mergedBranch
             )
-
-            is NamedBranch.Inferred -> recordNamedMerge(
-                commit, commitBranchName.name,
-                mergedParentHash, mergedBranch
-            )
-
             else -> recordUnnamedMerge(commit, commitBranchName.name, mergedParentHash)
         }
     }
