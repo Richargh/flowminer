@@ -20,13 +20,19 @@ data class BranchName(val value: String) {
 
 sealed interface NameCertainty {
 
-    sealed interface Named: NameCertainty {
-        data class Certain(val name: BranchName) : Named
+    val name: BranchName?
 
-        data class Inferred(val name: BranchName) : Named
+    sealed interface Named: NameCertainty {
+        override val name: BranchName
+
+        data class Certain(override val name: BranchName) : Named
+
+        data class Inferred(override val name: BranchName) : Named
     }
 
-    object Nameless: NameCertainty
+    object Nameless: NameCertainty {
+        override val name: BranchName? = null
+    }
 }
 
 sealed interface Ref {
@@ -68,11 +74,5 @@ data class Commit(
     val isOnActiveBranch: Boolean = false
 ) {
     val isMergeCommit = parents.size >= 2
-
-    val branchName: BranchName? get() = when (branch) {
-        is NameCertainty.Named.Certain -> branch.name
-        is NameCertainty.Named.Inferred -> branch.name
-        is NameCertainty.Nameless -> null
-    }
 }
 
