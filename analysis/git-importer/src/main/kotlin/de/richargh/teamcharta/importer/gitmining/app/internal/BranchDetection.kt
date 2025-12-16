@@ -11,17 +11,6 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     val commitByHash = commits.associateBy { it.hash }
     val hasActiveBranch = commits.any { it.isOnActiveBranch }
 
-    data class MutableBranchInfo(
-        var firstCommitHash: CommitHash,
-        var firstCommitDate: ZonedDateTime,
-        var lastCommitHash: CommitHash,
-        var lastCommitDate: ZonedDateTime,
-        var mergeCommitHash: CommitHash? = null,
-        var mergeDate: ZonedDateTime? = null,
-        var targetBranch: BranchName? = null,
-        var nameCertainty: NameCertainty
-    )
-
     val namedBranchStates = mutableMapOf<BranchName, MutableBranchInfo>()
     val unnamedBranchStates = mutableMapOf<CommitHash, MutableBranchInfo>()
 
@@ -153,3 +142,14 @@ private fun findLastCommitOfBranch(
     val commitByHash = commits.associateBy { it.hash }
     return commitByHash[startHash] ?: commits.first { it.hash == startHash }
 }
+
+private data class MutableBranchInfo(
+    var firstCommitHash: CommitHash,
+    var firstCommitDate: ZonedDateTime,
+    var lastCommitHash: CommitHash,
+    var lastCommitDate: ZonedDateTime,
+    var mergeCommitHash: CommitHash? = null,
+    var mergeDate: ZonedDateTime? = null,
+    var targetBranch: BranchName? = null,
+    var nameCertainty: NameCertainty
+)
