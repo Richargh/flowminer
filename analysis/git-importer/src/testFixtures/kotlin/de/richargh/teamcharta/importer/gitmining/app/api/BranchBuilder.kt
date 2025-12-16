@@ -4,7 +4,7 @@ import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import java.time.ZonedDateTime
 
-class BranchInfoBuilder {
+class BranchBuilder {
     private var name: NameCertainty = NameCertainty.Certain(BranchName("feature-branch"))
     private var firstCommitHash: CommitHash = CommitHash("abc123")
     private var firstCommitDate: ZonedDateTime = ZonedDateTime.parse("2024-01-10T10:00:00+01:00")
@@ -44,5 +44,5 @@ class BranchInfoBuilder {
     )
 }
 
-fun aBranch(block: BranchInfoBuilder.() -> Unit = {}): Branch =
-    BranchInfoBuilder().apply(block).build()
+fun aBranch(block: BranchBuilder.() -> Unit = {}): Branch =
+    BranchBuilder().apply(block).build()
