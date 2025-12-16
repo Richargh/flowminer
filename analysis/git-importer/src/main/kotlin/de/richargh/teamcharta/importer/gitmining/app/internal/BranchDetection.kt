@@ -8,11 +8,14 @@ import java.time.ZonedDateTime
 
 fun extractBranchInfo(commits: List<Commit>): BranchInfos {
     val branchByHash = commits.associate { it.hash to it.branch }
+    val commitByHash = commits.associateBy { it.hash }
     val hasActiveBranch = commits.any { it.isOnActiveBranch }
 
     data class MutableBranchInfo(
         var firstCommitHash: CommitHash,
         var firstCommitDate: ZonedDateTime,
+        var lastCommitHash: CommitHash,
+        var lastCommitDate: ZonedDateTime,
         var mergeCommitHash: CommitHash? = null,
         var mergeDate: ZonedDateTime? = null,
         var targetBranch: BranchName? = null,
@@ -31,11 +34,15 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
         }
 
         val state = namedBranchStates.getOrPut(branchName) {
-            MutableBranchInfo(commit.hash, commit.date, nameCertainty = nameCertainty)
+            MutableBranchInfo(commit.hash, commit.date, commit.hash, commit.date, nameCertainty = nameCertainty)
         }
         if (commit.date < state.firstCommitDate) {
             state.firstCommitHash = commit.hash
             state.firstCommitDate = commit.date
+        }
+        if (commit.date > state.lastCommitDate) {
+            state.lastCommitHash = commit.hash
+            state.lastCommitDate = commit.date
         }
 
 
@@ -45,8 +52,10 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
             val mergedBranch = branchByHash[mergedParentHash]
             when (mergedBranch) {
                 is BranchAssignment.Certain -> {
+                    val mergedCommit = commitByHash[mergedParentHash]
+                    val mergedCommitDate = mergedCommit?.date ?: commit.date
                     val mergedState = namedBranchStates.getOrPut(mergedBranch.name) {
-                        MutableBranchInfo(mergedParentHash, commit.date, nameCertainty = NameCertainty.Certain(mergedBranch.name))
+                        MutableBranchInfo(mergedParentHash, mergedCommitDate, mergedParentHash, mergedCommitDate, nameCertainty = NameCertainty.Certain(mergedBranch.name))
                     }
                     if (mergedState.mergeCommitHash == null) {
                         mergedState.mergeCommitHash = commit.hash
@@ -55,8 +64,10 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
                     }
                 }
                 is BranchAssignment.Inferred -> {
+                    val mergedCommit = commitByHash[mergedParentHash]
+                    val mergedCommitDate = mergedCommit?.date ?: commit.date
                     val mergedState = namedBranchStates.getOrPut(mergedBranch.name) {
-                        MutableBranchInfo(mergedParentHash, commit.date, nameCertainty = NameCertainty.Inferred(mergedBranch.name))
+                        MutableBranchInfo(mergedParentHash, mergedCommitDate, mergedParentHash, mergedCommitDate, nameCertainty = NameCertainty.Inferred(mergedBranch.name))
                     }
                     if (mergedState.mergeCommitHash == null) {
                         mergedState.mergeCommitHash = commit.hash
@@ -67,8 +78,9 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
                 else -> {
                     // Unknown or null branch - track as unnamed
                     val firstCommitOfUnnamed = findFirstCommitOfBranch(commits, mergedParentHash, branchByHash)
+                    val lastCommitOfUnnamed = findLastCommitOfBranch(commits, mergedParentHash, branchByHash)
                     val unnamedState = unnamedBranchStates.getOrPut(firstCommitOfUnnamed.hash) {
-                        MutableBranchInfo(firstCommitOfUnnamed.hash, firstCommitOfUnnamed.date, nameCertainty = NameCertainty.Nameless)
+                        MutableBranchInfo(firstCommitOfUnnamed.hash, firstCommitOfUnnamed.date, lastCommitOfUnnamed.hash, lastCommitOfUnnamed.date, nameCertainty = NameCertainty.Nameless)
                     }
                     if (unnamedState.mergeCommitHash == null) {
                         unnamedState.mergeCommitHash = commit.hash
@@ -84,6 +96,8 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
         BranchInfo(
             firstCommitHash = state.firstCommitHash,
             firstCommitDate = state.firstCommitDate,
+            lastCommitHash = state.lastCommitHash,
+            lastCommitDate = state.lastCommitDate,
             mergeCommitHash = state.mergeCommitHash,
             mergeDate = state.mergeDate,
             targetBranch = state.targetBranch,
@@ -95,6 +109,8 @@ fun extractBranchInfo(commits: List<Commit>): BranchInfos {
         BranchInfo(
             firstCommitHash = state.firstCommitHash,
             firstCommitDate = state.firstCommitDate,
+            lastCommitHash = state.lastCommitHash,
+            lastCommitDate = state.lastCommitDate,
             mergeCommitHash = state.mergeCommitHash,
             mergeDate = state.mergeDate,
             targetBranch = state.targetBranch,
@@ -125,4 +141,15 @@ private fun findFirstCommitOfBranch(
     }
 
     return current
+}
+
+private fun findLastCommitOfBranch(
+    commits: List<Commit>,
+    startHash: CommitHash,
+    @Suppress("UNUSED_PARAMETER") branchByHash: Map<CommitHash, BranchAssignment?>
+): Commit {
+    // startHash is typically the second parent of a merge commit (the tip of the merged branch)
+    // This is already the last commit on that branch
+    val commitByHash = commits.associateBy { it.hash }
+    return commitByHash[startHash] ?: commits.first { it.hash == startHash }
 }

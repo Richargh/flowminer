@@ -20,6 +20,8 @@ sealed interface NameCertainty {
 data class BranchInfo(
     val firstCommitHash: CommitHash,
     val firstCommitDate: ZonedDateTime,
+    val lastCommitHash: CommitHash,
+    val lastCommitDate: ZonedDateTime,
     val mergeCommitHash: CommitHash?,
     val mergeDate: ZonedDateTime?,
     val targetBranch: BranchName?,
