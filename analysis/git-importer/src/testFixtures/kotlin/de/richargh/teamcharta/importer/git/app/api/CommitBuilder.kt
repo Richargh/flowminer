@@ -14,7 +14,7 @@ class CommitBuilder {
     private var coAuthors: Set<Author> = emptySet()
     private var commitType: CommitType = CommitType.UNKNOWN
     private var workKeys: List<WorkKey> = emptyList()
-    private var branch: BranchNameCertainty = Nameless
+    private var branch: BranchNameCertainty = NamelessBranch
     private var isOnActiveBranch: Boolean = false
 
     fun hash(hash: String) = apply { this.hash = CommitHash(hash) }
@@ -31,10 +31,10 @@ class CommitBuilder {
     fun trailers(vararg trailers: Pair<String, String>) = apply { this.trailers = trailers.toList() }
     fun coAuthors(vararg coAuthors: Author) = apply { this.coAuthors = coAuthors.toSet() }
     fun workKeys(vararg workKeys: WorkKey) = apply { this.workKeys = workKeys.toList() }
-    fun nobranch() = apply { this.branch = Nameless }
-    fun branch(branch: Named) = apply { this.branch = branch }
-    fun certainBranch(name: String) = apply { this.branch = Named.Certain(BranchName(name)) }
-    fun inferredBranch(name: String) = apply { this.branch = Named.Inferred(BranchName(name)) }
+    fun nobranch() = apply { this.branch = NamelessBranch }
+    fun branch(branch: NamedBranch) = apply { this.branch = branch }
+    fun certainBranch(name: String) = apply { this.branch = NamedBranch.Certain(BranchName(name)) }
+    fun inferredBranch(name: String) = apply { this.branch = NamedBranch.Inferred(BranchName(name)) }
     fun isOnActiveBranch() = apply { this.isOnActiveBranch = true }
 
     fun build(): Commit = Commit(

@@ -27,7 +27,7 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.first().branch shouldBe Named.Certain(BranchName("origin/main"))
+        result.first().branch shouldBe NamedBranch.Certain(BranchName("origin/main"))
     }
 
     @Test
@@ -726,8 +726,8 @@ class BranchAssignmentTest {
                 certainBranch("origin/feat3")
                 message("feat3 commit")
             })
-            result[2].branch shouldBe Nameless
-            result[3].branch shouldBe Nameless
+            result[2].branch shouldBe NamelessBranch
+            result[3].branch shouldBe NamelessBranch
         }
     }
 }

@@ -22,15 +22,15 @@ sealed interface BranchNameCertainty {
     val name: BranchName?
 }
 
-sealed interface Named: BranchNameCertainty {
+sealed interface NamedBranch: BranchNameCertainty {
     override val name: BranchName
 
-    data class Certain(override val name: BranchName) : Named
+    data class Certain(override val name: BranchName) : NamedBranch
 
-    data class Inferred(override val name: BranchName) : Named
+    data class Inferred(override val name: BranchName) : NamedBranch
 }
 
-object Nameless: BranchNameCertainty {
+object NamelessBranch: BranchNameCertainty {
     override val name: BranchName? = null
 }
 

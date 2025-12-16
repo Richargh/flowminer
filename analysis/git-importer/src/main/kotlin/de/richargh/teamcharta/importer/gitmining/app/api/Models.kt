@@ -4,8 +4,8 @@ import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.git.app.api.BranchNameCertainty
-import de.richargh.teamcharta.importer.git.app.api.Named
-import de.richargh.teamcharta.importer.git.app.api.Nameless
+import de.richargh.teamcharta.importer.git.app.api.NamedBranch
+import de.richargh.teamcharta.importer.git.app.api.NamelessBranch
 import java.time.ZonedDateTime
 
 data class Branch(
@@ -19,14 +19,14 @@ data class Branch(
     val targetBranch: BranchName?
 ) {
     val name: BranchName? get() = when (branchNameCertainty) {
-        is Named.Certain -> branchNameCertainty.name
-        is Named.Inferred -> branchNameCertainty.name
-        is Nameless -> null
+        is NamedBranch.Certain -> branchNameCertainty.name
+        is NamedBranch.Inferred -> branchNameCertainty.name
+        is NamelessBranch -> null
     }
 
-    val isNamed: Boolean get() = branchNameCertainty is Named
-    val isUnnamed: Boolean get() = branchNameCertainty is Nameless
-    val isInferred: Boolean get() = branchNameCertainty is Named.Inferred
+    val isNamed: Boolean get() = branchNameCertainty is NamedBranch
+    val isUnnamed: Boolean get() = branchNameCertainty is NamelessBranch
+    val isInferred: Boolean get() = branchNameCertainty is NamedBranch.Inferred
 }
 
 class Commits(private val commits: List<Commit>) {

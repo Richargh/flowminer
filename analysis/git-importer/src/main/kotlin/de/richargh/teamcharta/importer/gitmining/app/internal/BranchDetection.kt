@@ -2,8 +2,8 @@ package de.richargh.teamcharta.importer.gitmining.app.internal
 
 import de.richargh.teamcharta.importer.git.app.api.BranchNameCertainty
 import de.richargh.teamcharta.importer.git.app.api.BranchName
-import de.richargh.teamcharta.importer.git.app.api.Named
-import de.richargh.teamcharta.importer.git.app.api.Nameless
+import de.richargh.teamcharta.importer.git.app.api.NamedBranch
+import de.richargh.teamcharta.importer.git.app.api.NamelessBranch
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.gitmining.app.api.Branch
@@ -30,16 +30,16 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     private fun processCommit(commit: Commit) {
-        val branchNameCertainty: Named = when(val certainty = commit.branch){
-            is Nameless -> return
-            is Named -> certainty
+        val branchNameCertainty: NamedBranch = when(val certainty = commit.branch){
+            is NamelessBranch -> return
+            is NamedBranch -> certainty
         }
 
         updateBranchState(commit, branchNameCertainty)
         processMergeIfApplicable(commit, branchNameCertainty)
     }
 
-    private fun updateBranchState(commit: Commit, commitBranch: Named) {
+    private fun updateBranchState(commit: Commit, commitBranch: NamedBranch) {
         val state = namedBranchStates.getOrPut(commitBranch.name) {
             MutableBranch(commit.hash, commit.date, commit.hash, commit.date, commitBranch)
         }
@@ -51,14 +51,14 @@ private class BranchCollector(private val commits: List<Commit>) {
         }
     }
 
-    private fun processMergeIfApplicable(commit: Commit, commitBranch: Named) {
+    private fun processMergeIfApplicable(commit: Commit, commitBranch: NamedBranch) {
         val shouldRecordMerge = !hasActiveBranch || commit.isOnActiveBranch
         if (!commit.isMergeCommit || !shouldRecordMerge) return
 
         val mergedParentHash = commit.parents[1]
         when (val mergedBranch = branchByHash[mergedParentHash]) {
-            is Named.Certain -> recordNamedMerge(commit, commitBranch.name, mergedParentHash, mergedBranch.name, Named.Certain(mergedBranch.name))
-            is Named.Inferred -> recordNamedMerge(commit, commitBranch.name, mergedParentHash, mergedBranch.name, Named.Inferred(mergedBranch.name))
+            is NamedBranch.Certain -> recordNamedMerge(commit, commitBranch.name, mergedParentHash, mergedBranch.name, NamedBranch.Certain(mergedBranch.name))
+            is NamedBranch.Inferred -> recordNamedMerge(commit, commitBranch.name, mergedParentHash, mergedBranch.name, NamedBranch.Inferred(mergedBranch.name))
             else -> recordUnnamedMerge(commit, commitBranch.name, mergedParentHash)
         }
     }
@@ -88,7 +88,7 @@ private class BranchCollector(private val commits: List<Commit>) {
                 firstCommitOfUnnamed.date,
                 lastCommitOfUnnamed.hash,
                 lastCommitOfUnnamed.date,
-                Nameless
+                NamelessBranch
             )
         }
         if (unnamedState.mergeCommitHash == null) {
@@ -115,7 +115,7 @@ private fun findFirstCommitOfBranch(
         val parent = current.parents.firstOrNull() ?: break
         val parentCommit = commitByHash[parent] ?: break
         val parentBranch = branchByHash[parent]
-        if (parentBranch is Named.Certain || parentBranch is Named.Inferred) {
+        if (parentBranch is NamedBranch.Certain || parentBranch is NamedBranch.Inferred) {
             break
         }
         current = parentCommit
