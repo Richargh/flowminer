@@ -17,7 +17,7 @@ sealed interface NameCertainty {
     object Nameless : NameCertainty
 }
 
-data class BranchInfo(
+data class Branch(
     val firstCommitHash: CommitHash,
     val firstCommitDate: ZonedDateTime,
     val lastCommitHash: CommitHash,
@@ -49,21 +49,21 @@ class Commits(private val commits: List<Commit>) {
     fun isNotEmpty(): Boolean = commits.isNotEmpty()
 }
 
-class BranchInfos(branches: List<BranchInfo>) {
-    private val namedBranches: Map<BranchName, BranchInfo> = branches
+class Branches(branches: List<Branch>) {
+    private val namedBranches: Map<BranchName, Branch> = branches
         .filter { it.isNamed }
         .associateBy { it.name!! }
 
-    val unnamed: List<BranchInfo> = branches.filter { it.isUnnamed }
+    val unnamed: List<Branch> = branches.filter { it.isUnnamed }
 
-    operator fun get(name: BranchName): BranchInfo? = namedBranches[name]
-    operator fun get(name: String): BranchInfo? = namedBranches[BranchName(name)]
+    operator fun get(name: BranchName): Branch? = namedBranches[name]
+    operator fun get(name: String): Branch? = namedBranches[BranchName(name)]
 
-    fun all(): Collection<BranchInfo> = namedBranches.values + unnamed
+    fun all(): Collection<Branch> = namedBranches.values + unnamed
     fun size() = namedBranches.size + unnamed.size
 }
 
 data class GitMiningResult(
     val commits: Commits,
-    val branches: BranchInfos = BranchInfos(emptyList())
+    val branches: Branches = Branches(emptyList())
 )

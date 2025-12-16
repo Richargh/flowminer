@@ -32,7 +32,7 @@ class BranchInfoBuilder {
         this.targetBranch = BranchName(targetBranch)
     }
 
-    fun build(): BranchInfo = BranchInfo(
+    fun build(): Branch = Branch(
         firstCommitHash = firstCommitHash,
         firstCommitDate = firstCommitDate,
         lastCommitHash = lastCommitHash ?: firstCommitHash,
@@ -44,5 +44,5 @@ class BranchInfoBuilder {
     )
 }
 
-fun aBranch(block: BranchInfoBuilder.() -> Unit = {}): BranchInfo =
+fun aBranch(block: BranchInfoBuilder.() -> Unit = {}): Branch =
     BranchInfoBuilder().apply(block).build()
