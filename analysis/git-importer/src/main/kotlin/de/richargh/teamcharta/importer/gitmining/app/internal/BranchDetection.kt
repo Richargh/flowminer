@@ -47,7 +47,8 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     private fun processMergeIfApplicable(commit: Commit, commitBranchName: NamedBranch) {
-        if (hasActiveBranch && commit.isNotOnActiveBranch || commit.isNotMergeCommit) return
+        if (hasActiveBranch && commit.isNotOnActiveBranch) return
+        if (commit.isNotMergeCommit) return
 
         val mergedParentHash = commit.parents[1]
         when (val mergedParentBranchName = branchByHash[mergedParentHash]) {
