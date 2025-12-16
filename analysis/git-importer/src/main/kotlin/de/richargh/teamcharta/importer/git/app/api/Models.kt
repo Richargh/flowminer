@@ -72,6 +72,8 @@ data class Commit(
     val branch: BranchNameCertainty,
     val isOnActiveBranch: Boolean = false
 ) {
+    val isNotOnActiveBranch = !isOnActiveBranch
     val isMergeCommit = parents.size >= 2
+    val isNotMergeCommit = !isMergeCommit
 }
 
