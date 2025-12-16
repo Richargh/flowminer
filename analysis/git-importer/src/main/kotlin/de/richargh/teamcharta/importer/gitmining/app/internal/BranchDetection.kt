@@ -1,11 +1,6 @@
 package de.richargh.teamcharta.importer.gitmining.app.internal
 
-import de.richargh.teamcharta.importer.git.app.api.BranchNameCertainty
-import de.richargh.teamcharta.importer.git.app.api.BranchName
-import de.richargh.teamcharta.importer.git.app.api.NamedBranch
-import de.richargh.teamcharta.importer.git.app.api.NamelessBranch
-import de.richargh.teamcharta.importer.git.app.api.Commit
-import de.richargh.teamcharta.importer.git.app.api.CommitHash
+import de.richargh.teamcharta.importer.git.app.api.*
 import de.richargh.teamcharta.importer.gitmining.app.api.Branch
 import de.richargh.teamcharta.importer.gitmining.app.api.Branches
 import java.time.ZonedDateTime
@@ -30,7 +25,7 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     private fun processCommit(commit: Commit) {
-        val commitBranchName: NamedBranch = when(val certainty = commit.branch){
+        val commitBranchName: NamedBranch = when (val certainty = commit.branch) {
             is NamelessBranch -> return
             is NamedBranch -> certainty
         }
@@ -57,8 +52,16 @@ private class BranchCollector(private val commits: List<Commit>) {
 
         val mergedParentHash = commit.parents[1]
         when (val mergedBranch = branchByHash[mergedParentHash]) {
-            is NamedBranch.Certain -> recordNamedMerge(commit, commitBranchName.name, mergedParentHash, mergedBranch.name, NamedBranch.Certain(mergedBranch.name))
-            is NamedBranch.Inferred -> recordNamedMerge(commit, commitBranchName.name, mergedParentHash, mergedBranch.name, NamedBranch.Inferred(mergedBranch.name))
+            is NamedBranch.Certain -> recordNamedMerge(
+                commit, commitBranchName.name,
+                mergedParentHash, mergedBranch.name, NamedBranch.Certain(mergedBranch.name)
+            )
+
+            is NamedBranch.Inferred -> recordNamedMerge(
+                commit, commitBranchName.name,
+                mergedParentHash, mergedBranch.name, NamedBranch.Inferred(mergedBranch.name)
+            )
+
             else -> recordUnnamedMerge(commit, commitBranchName.name, mergedParentHash)
         }
     }
