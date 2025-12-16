@@ -6,7 +6,7 @@ import de.richargh.teamcharta.importer.git.app.api.NameCertainty
 import java.time.ZonedDateTime
 
 class BranchBuilder {
-    private var name: NameCertainty = NameCertainty.Certain(BranchName("feature-branch"))
+    private var name: NameCertainty = NameCertainty.Named.Certain(BranchName("feature-branch"))
     private var firstCommitHash: CommitHash = CommitHash("abc123")
     private var firstCommitDate: ZonedDateTime = ZonedDateTime.parse("2024-01-10T10:00:00+01:00")
     private var lastCommitHash: CommitHash? = null
@@ -15,8 +15,8 @@ class BranchBuilder {
     private var mergeDate: ZonedDateTime? = null
     private var targetBranch: BranchName? = null
 
-    fun name(name: String) = apply { this.name = NameCertainty.Certain(BranchName(name)) }
-    fun inferredName(name: String) = apply { this.name = NameCertainty.Inferred(BranchName(name)) }
+    fun name(name: String) = apply { this.name = NameCertainty.Named.Certain(BranchName(name)) }
+    fun inferredName(name: String) = apply { this.name = NameCertainty.Named.Inferred(BranchName(name)) }
     fun unNamed() = apply { this.name = NameCertainty.Nameless }
 
     fun firstCommitHash(hash: CommitHash) = apply { this.firstCommitHash = hash }

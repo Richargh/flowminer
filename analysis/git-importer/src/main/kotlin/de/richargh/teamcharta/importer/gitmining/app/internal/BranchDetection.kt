@@ -30,7 +30,7 @@ private class BranchCollector(private val commits: List<Commit>) {
     private fun processCommit(commit: Commit) {
         val branchName = commit.branchName
         val nameCertainty = commit.branch
-        if(branchName == null || nameCertainty == null)
+        if(branchName == null || nameCertainty == NameCertainty.Nameless)
             return
 
         updateBranchState(commit, branchName, nameCertainty)
@@ -55,8 +55,8 @@ private class BranchCollector(private val commits: List<Commit>) {
 
         val mergedParentHash = commit.parents[1]
         when (val mergedBranch = branchByHash[mergedParentHash]) {
-            is NameCertainty.Certain -> recordNamedMerge(commit, branchName, mergedParentHash, mergedBranch.name, NameCertainty.Certain(mergedBranch.name))
-            is NameCertainty.Inferred -> recordNamedMerge(commit, branchName, mergedParentHash, mergedBranch.name, NameCertainty.Inferred(mergedBranch.name))
+            is NameCertainty.Named.Certain -> recordNamedMerge(commit, branchName, mergedParentHash, mergedBranch.name, NameCertainty.Named.Certain(mergedBranch.name))
+            is NameCertainty.Named.Inferred -> recordNamedMerge(commit, branchName, mergedParentHash, mergedBranch.name, NameCertainty.Named.Inferred(mergedBranch.name))
             else -> recordUnnamedMerge(commit, branchName, mergedParentHash)
         }
     }
@@ -113,7 +113,7 @@ private fun findFirstCommitOfBranch(
         val parent = current.parents.firstOrNull() ?: break
         val parentCommit = commitByHash[parent] ?: break
         val parentBranch = branchByHash[parent]
-        if (parentBranch is NameCertainty.Certain || parentBranch is NameCertainty.Inferred) {
+        if (parentBranch is NameCertainty.Named.Certain || parentBranch is NameCertainty.Named.Inferred) {
             break
         }
         current = parentCommit

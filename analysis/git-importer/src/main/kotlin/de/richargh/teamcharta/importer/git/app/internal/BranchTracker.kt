@@ -5,7 +5,7 @@ import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.git.app.api.Ref
 
 data class TrackingResult(
-    val branch: NameCertainty?,
+    val branch: NameCertainty,
     val isOnActiveBranch: Boolean
 )
 
@@ -24,7 +24,9 @@ class BranchTracker {
             activeChain.add(hash)
         }
 
-        val branch = byTipOrHead(hash, refs) ?: byRegistry(hash)
+        val branch = byTipOrHead(hash, refs)
+            ?: byRegistry(hash)
+            ?: NameCertainty.Nameless
 
         registerParents(branch, parents, message, hash in activeChain)
 
@@ -32,18 +34,18 @@ class BranchTracker {
     }
 
     private fun registerParents(
-        branch: NameCertainty?,
+        branch: NameCertainty,
         parents: List<CommitHash>,
         message: String,
         isChildOnHeadChain: Boolean
     ) {
-        if (branch != null && parents.isNotEmpty()) {
+        if (branch != NameCertainty.Nameless && parents.isNotEmpty()) {
             registerFirstParent(parents.first(), branch, isChildOnHeadChain)
         }
 
         if (parents.size >= 2) {
             val mergedParents = parents.drop(1)
-            val mergedBranches = extractAllMergedBranches(message).map(NameCertainty::Inferred)
+            val mergedBranches = extractAllMergedBranches(message).map(NameCertainty.Named::Inferred)
             registerMergedParents(mergedParents, mergedBranches)
         }
     }
@@ -53,7 +55,7 @@ class BranchTracker {
             ?: refs.filterIsInstance<Ref.LocalHead>().firstOrNull()?.let { Ref.BranchTip(it.branch) }
 
         if (branchRef != null) {
-            val assignment = NameCertainty.Certain(branchRef.name)
+            val assignment = NameCertainty.Named.Certain(branchRef.name)
             branchFor[hash] = assignment
             return assignment
         }
@@ -71,14 +73,14 @@ class BranchTracker {
 
     private fun registerMergedParents(
         mergedParents: List<CommitHash>,
-        mergedBranches: List<NameCertainty.Inferred>
+        mergedBranches: List<NameCertainty.Named.Inferred>
     ) {
         mergedBranches.zip(mergedParents).forEach { (branch, parentHash) ->
             registerMergedParent(parentHash, branch)
         }
     }
 
-    private fun registerMergedParent(parentHash: CommitHash, branch: NameCertainty.Inferred) {
+    private fun registerMergedParent(parentHash: CommitHash, branch: NameCertainty.Named.Inferred) {
         // Merged parents never overwrite HEAD chain or existing assignments
         if (parentHash !in activeChain && parentHash !in branchFor) {
             branchFor[parentHash] = branch

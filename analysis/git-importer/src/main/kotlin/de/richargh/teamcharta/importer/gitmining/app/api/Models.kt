@@ -17,14 +17,14 @@ data class Branch(
     val targetBranch: BranchName?
 ) {
     val name: BranchName? get() = when (nameCertainty) {
-        is NameCertainty.Certain -> nameCertainty.name
-        is NameCertainty.Inferred -> nameCertainty.name
+        is NameCertainty.Named.Certain -> nameCertainty.name
+        is NameCertainty.Named.Inferred -> nameCertainty.name
         is NameCertainty.Nameless -> null
     }
 
-    val isNamed: Boolean get() = nameCertainty !is NameCertainty.Nameless
+    val isNamed: Boolean get() = nameCertainty is NameCertainty.Named
     val isUnnamed: Boolean get() = nameCertainty is NameCertainty.Nameless
-    val isInferred: Boolean get() = nameCertainty is NameCertainty.Inferred
+    val isInferred: Boolean get() = nameCertainty is NameCertainty.Named.Inferred
 }
 
 class Commits(private val commits: List<Commit>) {
