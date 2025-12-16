@@ -19,13 +19,25 @@ data class BranchName(val value: String) {
 }
 
 sealed interface BranchAssignment {
-    val name: BranchName
-
     /** Branch ref exists on this commit or was propagated via first-parent */
-    data class Certain(override val name: BranchName) : BranchAssignment
+    data class Certain(val name: BranchName) : BranchAssignment
 
     /** Inferred from merge commit message (e.g., "Merge branch 'feature'") */
-    data class Inferred(override val name: BranchName) : BranchAssignment
+    data class Inferred(val name: BranchName) : BranchAssignment
+
+    object Unknown: BranchAssignment
+}
+
+/** Certainty level of a branch's name in BranchInfo */
+sealed interface NameCertainty {
+    /** Branch ref exists - name is certain */
+    data class Certain(val name: BranchName) : NameCertainty
+
+    /** Inferred from merge commit message */
+    data class Inferred(val name: BranchName) : NameCertainty
+
+    /** Cannot determine name - branch is unnamed */
+    object Nameless : NameCertainty
 }
 
 sealed interface Ref {
@@ -65,16 +77,29 @@ data class Commit(
     val workKeys: List<WorkKey>,
     val branch: BranchAssignment? = null,
     val isOnActiveBranch: Boolean = false
-)
+) {
+    val isMergeCommit = parents.size >= 2
+}
 
 data class BranchInfo(
-    val name: BranchName,
+    val nameCertainty: NameCertainty,
     val firstCommitHash: CommitHash,
     val firstCommitDate: ZonedDateTime,
     val mergeCommitHash: CommitHash?,
     val mergeDate: ZonedDateTime?,
     val targetBranch: BranchName?
-)
+) {
+    /** Returns the branch name, or null if unnamed */
+    val name: BranchName? get() = when (nameCertainty) {
+        is NameCertainty.Certain -> nameCertainty.name
+        is NameCertainty.Inferred -> nameCertainty.name
+        is NameCertainty.Nameless -> null
+    }
+
+    val isNamed: Boolean get() = nameCertainty !is NameCertainty.Nameless
+    val isUnnamed: Boolean get() = nameCertainty is NameCertainty.Nameless
+    val isInferred: Boolean get() = nameCertainty is NameCertainty.Inferred
+}
 
 class Commits(private val commits: List<Commit>) {
     operator fun get(index: Int): Commit = commits[index]
@@ -87,13 +112,17 @@ class Commits(private val commits: List<Commit>) {
 }
 
 class BranchInfos(branches: List<BranchInfo>) {
-    private val branchFor: Map<BranchName, BranchInfo> = branches.associateBy { it.name }
+    private val namedBranches: Map<BranchName, BranchInfo> = branches
+        .filter { it.isNamed }
+        .associateBy { it.name!! }
 
-    operator fun get(name: BranchName): BranchInfo? = branchFor[name]
-    operator fun get(name: String): BranchInfo? = branchFor[BranchName(name)]
+    val unnamed: List<BranchInfo> = branches.filter { it.isUnnamed }
 
-    fun all() = branchFor.values
-    fun size() = branchFor.size
+    operator fun get(name: BranchName): BranchInfo? = namedBranches[name]
+    operator fun get(name: String): BranchInfo? = namedBranches[BranchName(name)]
+
+    fun all(): Collection<BranchInfo> = namedBranches.values + unnamed
+    fun size() = namedBranches.size + unnamed.size
 }
 
 data class GitMiningResult(

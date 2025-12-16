@@ -1,111 +1,125 @@
 package de.richargh.teamcharta.importer.git.app.internal
 
-import de.richargh.teamcharta.importer.git.app.api2.BranchInfo
-import de.richargh.teamcharta.importer.git.app.api2.BranchInfos
-import de.richargh.teamcharta.importer.git.app.api2.BranchName
-import de.richargh.teamcharta.importer.git.app.api2.Commit
-import de.richargh.teamcharta.importer.git.app.api2.Ref
-
+import de.richargh.teamcharta.importer.git.app.api2.*
+import java.time.ZonedDateTime
 
 fun extractBranchInfo(commits: List<Commit>): BranchInfos {
-    // Build commit hash -> Commit lookup
-    val commitByHash = commits.associateBy { it.hash.rawValue }
+    val branchByHash = commits.associate { it.hash to it.branch }
+    val hasActiveBranch = commits.any { it.isOnActiveBranch }
 
-    // Find all tip commits (commits with remote branch refs)
-    // Only consider BranchTip refs, not Head refs (we track remote branches, not local ones)
-    val branchTips = mutableMapOf<BranchName, Commit>()
-    for (commit in commits) {
-        for (ref in commit.refs.filterIsInstance<Ref.BranchTip>()) {
-            branchTips[ref.name] = commit
-        }
-    }
+    data class BranchState(
+        var firstCommitHash: CommitHash,
+        var firstCommitDate: ZonedDateTime,
+        var mergeCommitHash: CommitHash? = null,
+        var mergeDate: ZonedDateTime? = null,
+        var targetBranch: BranchName? = null,
+        var nameCertainty: NameCertainty
+    )
 
-    // For each branch, walk backwards through parents to find all commits on that branch
-    // Stop when we hit a commit already claimed by another branch
-    // Process main/master branches first so they claim their commits before feature branches
-    val branchCommits = mutableMapOf<BranchName, MutableList<Commit>>()
-    val commitToBranch = mutableMapOf<String, BranchName>()
-
-    val sortedBranches = branchTips.entries.sortedBy { (name, _) ->
-        when {
-            name.value.contains("main") || name.value.contains("master") || name.value.contains("trunk") -> 0
-            else -> 1
-        }
-    }
-
-    for ((branchName, tipCommit) in sortedBranches) {
-        val commitsOnBranch = mutableListOf<Commit>()
-        var current: Commit? = tipCommit
-
-        while (current != null) {
-            val hash = current.hash.rawValue
-
-            // Stop if this commit is already assigned to another branch
-            if (hash in commitToBranch && commitToBranch[hash] != branchName) {
-                break
-            }
-
-            // Skip if already visited for this branch
-            if (hash in commitToBranch && commitToBranch[hash] == branchName) {
-                break
-            }
-
-            commitsOnBranch.add(current)
-            commitToBranch[hash] = branchName
-
-            // Always follow first parent to stay on the same branch
-            // In git, first parent is the branch you were on when merging
-            val nextParentHash = current.parents.firstOrNull()?.rawValue
-
-            current = nextParentHash?.let { commitByHash[it] }
-        }
-
-        branchCommits[branchName] = commitsOnBranch
-    }
-
-    // Find merge commits and associate them with branches
-    // Only record merges INTO main/master/trunk branches (feature branches are "complete" when merged into main)
-    val mergeInfo = mutableMapOf<BranchName, Pair<Commit, BranchName>>() // branchName -> (mergeCommit, targetBranch)
+    val namedBranchStates = mutableMapOf<BranchName, BranchState>()
+    val unnamedBranchStates = mutableMapOf<CommitHash, BranchState>()
 
     for (commit in commits) {
-        if (commit.parents.size > 1) { // Merge commit
-            // Second parent (index 1) is the branch being merged (git convention)
-            val secondParentHash = commit.parents.getOrNull(1)?.rawValue ?: continue
-            val mergedBranchName = commitToBranch[secondParentHash] ?: continue
-            val targetBranch = commit.refs.filterIsInstance<Ref.BranchTip>().firstOrNull()?.name
-                ?: commit.refs.filterIsInstance<Ref.LocalHead>().firstOrNull()?.branch
-            if (targetBranch != null && mergedBranchName != targetBranch) {
-                // Only record if target is a main branch (merging into main = branch complete)
-                val isTargetMainBranch = targetBranch.value.contains("main") ||
-                        targetBranch.value.contains("master") ||
-                        targetBranch.value.contains("trunk")
-                if (isTargetMainBranch) {
-                    mergeInfo[mergedBranchName] = commit to targetBranch
+        val branch = commit.branch
+        val (branchName, nameCertainty) = when (branch) {
+            is BranchAssignment.Certain -> branch.name to NameCertainty.Certain(branch.name)
+            is BranchAssignment.Inferred -> branch.name to NameCertainty.Inferred(branch.name)
+            else -> continue
+        }
+
+        val state = namedBranchStates.getOrPut(branchName) {
+            BranchState(commit.hash, commit.date, nameCertainty = nameCertainty)
+        }
+        if (commit.date < state.firstCommitDate) {
+            state.firstCommitHash = commit.hash
+            state.firstCommitDate = commit.date
+        }
+
+
+        val shouldRecordMerge = !hasActiveBranch || commit.isOnActiveBranch
+        if (commit.isMergeCommit && shouldRecordMerge) {
+            val mergedParentHash = commit.parents[1]
+            val mergedBranch = branchByHash[mergedParentHash]
+            when (mergedBranch) {
+                is BranchAssignment.Certain -> {
+                    val mergedState = namedBranchStates.getOrPut(mergedBranch.name) {
+                        BranchState(mergedParentHash, commit.date, nameCertainty = NameCertainty.Certain(mergedBranch.name))
+                    }
+                    if (mergedState.mergeCommitHash == null) {
+                        mergedState.mergeCommitHash = commit.hash
+                        mergedState.mergeDate = commit.date
+                        mergedState.targetBranch = branchName
+                    }
+                }
+                is BranchAssignment.Inferred -> {
+                    val mergedState = namedBranchStates.getOrPut(mergedBranch.name) {
+                        BranchState(mergedParentHash, commit.date, nameCertainty = NameCertainty.Inferred(mergedBranch.name))
+                    }
+                    if (mergedState.mergeCommitHash == null) {
+                        mergedState.mergeCommitHash = commit.hash
+                        mergedState.mergeDate = commit.date
+                        mergedState.targetBranch = branchName
+                    }
+                }
+                else -> {
+                    // Unknown or null branch - track as unnamed
+                    val firstCommitOfUnnamed = findFirstCommitOfBranch(commits, mergedParentHash, branchByHash)
+                    val unnamedState = unnamedBranchStates.getOrPut(firstCommitOfUnnamed.hash) {
+                        BranchState(firstCommitOfUnnamed.hash, firstCommitOfUnnamed.date, nameCertainty = NameCertainty.Nameless)
+                    }
+                    if (unnamedState.mergeCommitHash == null) {
+                        unnamedState.mergeCommitHash = commit.hash
+                        unnamedState.mergeDate = commit.date
+                        unnamedState.targetBranch = branchName
+                    }
                 }
             }
         }
     }
 
-    // Build BranchInfo for each branch
-    val result = mutableListOf<BranchInfo>()
-
-    for ((branchName, branchCommitsList) in branchCommits) {
-        // Skip branches with no commits (e.g., when multiple refs point to the same commit)
-        if (branchCommitsList.isEmpty()) continue
-
-        val sortedCommits = branchCommitsList.sortedBy { it.date }
-        val firstCommit = sortedCommits.first()
-        val merge = mergeInfo[branchName]
-
-        result.add(BranchInfo(
-            name = branchName,
-            firstCommitHash = firstCommit.hash,
-            firstCommitDate = firstCommit.date,
-            mergeCommitHash = merge?.first?.hash,
-            mergeDate = merge?.first?.date,
-            targetBranch = merge?.second
-        ))
+    val namedResult = namedBranchStates.map { (_, state) ->
+        BranchInfo(
+            nameCertainty = state.nameCertainty,
+            firstCommitHash = state.firstCommitHash,
+            firstCommitDate = state.firstCommitDate,
+            mergeCommitHash = state.mergeCommitHash,
+            mergeDate = state.mergeDate,
+            targetBranch = state.targetBranch
+        )
     }
 
-    return BranchInfos(result)
+    val unnamedResult = unnamedBranchStates.map { (_, state) ->
+        BranchInfo(
+            nameCertainty = NameCertainty.Nameless,
+            firstCommitHash = state.firstCommitHash,
+            firstCommitDate = state.firstCommitDate,
+            mergeCommitHash = state.mergeCommitHash,
+            mergeDate = state.mergeDate,
+            targetBranch = state.targetBranch
+        )
+    }
+
+    return BranchInfos(namedResult + unnamedResult)
+}
+
+private fun findFirstCommitOfBranch(
+    commits: List<Commit>,
+    startHash: CommitHash,
+    branchByHash: Map<CommitHash, BranchAssignment?>
+): Commit {
+    val commitByHash = commits.associateBy { it.hash }
+    var current = commitByHash[startHash] ?: return commits.first { it.hash == startHash }
+
+    while (true) {
+        val parent = current.parents.firstOrNull() ?: break
+        val parentCommit = commitByHash[parent] ?: break
+        val parentBranch = branchByHash[parent]
+        // Stop if parent belongs to a different (named) branch
+        if (parentBranch is BranchAssignment.Certain || parentBranch is BranchAssignment.Inferred) {
+            break
+        }
+        current = parentCommit
+    }
+
+    return current
 }
