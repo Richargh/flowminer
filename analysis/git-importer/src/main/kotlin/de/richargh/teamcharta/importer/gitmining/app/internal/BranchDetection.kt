@@ -22,8 +22,8 @@ private class BranchCollector(private val commits: List<Commit>) {
     private val commitByHash = commits.associateBy { it.hash }
     private val hasActiveBranch = commits.any { it.isOnActiveBranch }
 
-    private val namedBranchStates = mutableMapOf<BranchName, MutableBranch>()
-    private val unnamedBranchStates = mutableMapOf<CommitHash, MutableBranch>()
+    private val namedBranches = mutableMapOf<BranchName, MutableBranch>()
+    private val unnamedBranches = mutableMapOf<CommitHash, MutableBranch>()
 
     fun processCommits() {
         commits.forEach(::processCommit)
@@ -40,7 +40,7 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     private fun updateBranchState(commit: Commit, commitBranchName: NamedBranch) {
-        val state = namedBranchStates.getOrPut(commitBranchName.name) {
+        val state = namedBranches.getOrPut(commitBranchName.name) {
             MutableBranch(commit.hash, commit.date, commit.hash, commit.date, commitBranchName)
         }
         if (commit.date < state.firstCommitDate) {
@@ -71,7 +71,7 @@ private class BranchCollector(private val commits: List<Commit>) {
         branchNameCertainty: BranchNameCertainty
     ) {
         val mergedCommitDate = commitByHash[mergedParentHash]?.date ?: mergeCommit.date
-        val mergedState = namedBranchStates.getOrPut(mergedBranchName) {
+        val mergedState = namedBranches.getOrPut(mergedBranchName) {
             MutableBranch(mergedParentHash, mergedCommitDate, mergedParentHash, mergedCommitDate, branchNameCertainty)
         }
         if (mergedState.mergeCommitHash == null) {
@@ -82,7 +82,7 @@ private class BranchCollector(private val commits: List<Commit>) {
     private fun recordUnnamedMerge(mergeCommit: Commit, targetBranchName: BranchName, mergedParentHash: CommitHash) {
         val firstCommitOfUnnamed = findFirstCommitOfBranch(commits, mergedParentHash, branchByHash)
         val lastCommitOfUnnamed = findLastCommitOfBranch(commits, mergedParentHash)
-        val unnamedState = unnamedBranchStates.getOrPut(firstCommitOfUnnamed.hash) {
+        val unnamedState = unnamedBranches.getOrPut(firstCommitOfUnnamed.hash) {
             MutableBranch(
                 firstCommitOfUnnamed.hash,
                 firstCommitOfUnnamed.date,
@@ -97,8 +97,8 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     fun toBranches(): Branches {
-        val namedResult = namedBranchStates.values.map(MutableBranch::toBranch)
-        val unnamedResult = unnamedBranchStates.values.map(MutableBranch::toBranch)
+        val namedResult = namedBranches.values.map(MutableBranch::toBranch)
+        val unnamedResult = unnamedBranches.values.map(MutableBranch::toBranch)
         return Branches(namedResult + unnamedResult)
     }
 }
