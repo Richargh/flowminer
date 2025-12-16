@@ -31,7 +31,9 @@ private class BranchCollector(private val commits: List<Commit>) {
         }
 
         updateBranchState(commit, commitBranchName)
-        processMergeIfApplicable(commit, commitBranchName)
+        if(isMergeOnActiveBranch(commit)) {
+            processMerge(commit, commitBranchName)
+        }
     }
 
     private fun updateBranchState(commit: Commit, commitBranchName: NamedBranch) {
@@ -46,10 +48,7 @@ private class BranchCollector(private val commits: List<Commit>) {
         }
     }
 
-    private fun processMergeIfApplicable(commit: Commit, commitBranchName: NamedBranch) {
-        if (hasActiveBranch && commit.isNotOnActiveBranch) return
-        if (commit.isNotMergeCommit) return
-
+    private fun processMerge(commit: Commit, commitBranchName: NamedBranch) {
         val mergedParentHash = commit.parents[1]
         when (val mergedParentBranchName = branchByHash[mergedParentHash]) {
             is NamedBranch -> recordNamedMerge(
@@ -59,6 +58,8 @@ private class BranchCollector(private val commits: List<Commit>) {
             else -> recordUnnamedMerge(commit, commitBranchName.name, mergedParentHash)
         }
     }
+
+    private fun isMergeOnActiveBranch(commit: Commit): Boolean = !(hasActiveBranch && commit.isNotOnActiveBranch || commit.isNotMergeCommit)
 
     private fun recordNamedMerge(
         mergeCommit: Commit,
