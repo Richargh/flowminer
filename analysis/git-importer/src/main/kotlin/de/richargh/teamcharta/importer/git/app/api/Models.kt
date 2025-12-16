@@ -18,11 +18,11 @@ data class BranchName(val value: String) {
     override fun toString() = value
 }
 
-sealed interface NameCertainty {
+sealed interface BranchNameCertainty {
 
     val name: BranchName?
 
-    sealed interface Named: NameCertainty {
+    sealed interface Named: BranchNameCertainty {
         override val name: BranchName
 
         data class Certain(override val name: BranchName) : Named
@@ -30,7 +30,7 @@ sealed interface NameCertainty {
         data class Inferred(override val name: BranchName) : Named
     }
 
-    object Nameless: NameCertainty {
+    object Nameless: BranchNameCertainty {
         override val name: BranchName? = null
     }
 }
@@ -70,7 +70,7 @@ data class Commit(
     val coAuthors: Set<Author>,
     val commitType: CommitType,
     val workKeys: List<WorkKey>,
-    val branch: NameCertainty,
+    val branch: BranchNameCertainty,
     val isOnActiveBranch: Boolean = false
 ) {
     val isMergeCommit = parents.size >= 2

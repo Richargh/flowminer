@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.gitmining.app.internal
 
-import de.richargh.teamcharta.importer.git.app.api.NameCertainty
+import de.richargh.teamcharta.importer.git.app.api.BranchNameCertainty
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
@@ -28,18 +28,18 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     private fun processCommit(commit: Commit) {
-        val nameCertainty: NameCertainty.Named = when(val certainty = commit.branch){
-            is NameCertainty.Nameless -> return
-            is NameCertainty.Named -> certainty
+        val branchNameCertainty: BranchNameCertainty.Named = when(val certainty = commit.branch){
+            is BranchNameCertainty.Nameless -> return
+            is BranchNameCertainty.Named -> certainty
         }
 
-        updateBranchState(commit, nameCertainty)
-        processMergeIfApplicable(commit, nameCertainty)
+        updateBranchState(commit, branchNameCertainty)
+        processMergeIfApplicable(commit, branchNameCertainty)
     }
 
-    private fun updateBranchState(commit: Commit, nameCertainty: NameCertainty.Named) {
-        val state = namedBranchStates.getOrPut(nameCertainty.name) {
-            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, nameCertainty)
+    private fun updateBranchState(commit: Commit, commitBranch: BranchNameCertainty.Named) {
+        val state = namedBranchStates.getOrPut(commitBranch.name) {
+            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, commitBranch)
         }
         if (commit.date < state.firstCommitDate) {
             state.firstCommit(commit.hash, commit.date)
@@ -49,15 +49,15 @@ private class BranchCollector(private val commits: List<Commit>) {
         }
     }
 
-    private fun processMergeIfApplicable(commit: Commit, nameCertainty: NameCertainty.Named) {
+    private fun processMergeIfApplicable(commit: Commit, commitBranch: BranchNameCertainty.Named) {
         val shouldRecordMerge = !hasActiveBranch || commit.isOnActiveBranch
         if (!commit.isMergeCommit || !shouldRecordMerge) return
 
         val mergedParentHash = commit.parents[1]
         when (val mergedBranch = branchByHash[mergedParentHash]) {
-            is NameCertainty.Named.Certain -> recordNamedMerge(commit, nameCertainty.name, mergedParentHash, mergedBranch.name, NameCertainty.Named.Certain(mergedBranch.name))
-            is NameCertainty.Named.Inferred -> recordNamedMerge(commit, nameCertainty.name, mergedParentHash, mergedBranch.name, NameCertainty.Named.Inferred(mergedBranch.name))
-            else -> recordUnnamedMerge(commit, nameCertainty.name, mergedParentHash)
+            is BranchNameCertainty.Named.Certain -> recordNamedMerge(commit, commitBranch.name, mergedParentHash, mergedBranch.name, BranchNameCertainty.Named.Certain(mergedBranch.name))
+            is BranchNameCertainty.Named.Inferred -> recordNamedMerge(commit, commitBranch.name, mergedParentHash, mergedBranch.name, BranchNameCertainty.Named.Inferred(mergedBranch.name))
+            else -> recordUnnamedMerge(commit, commitBranch.name, mergedParentHash)
         }
     }
 
@@ -66,11 +66,11 @@ private class BranchCollector(private val commits: List<Commit>) {
         targetBranchName: BranchName,
         mergedParentHash: CommitHash,
         mergedBranchName: BranchName,
-        nameCertainty: NameCertainty
+        branchNameCertainty: BranchNameCertainty
     ) {
         val mergedCommitDate = commitByHash[mergedParentHash]?.date ?: mergeCommit.date
         val mergedState = namedBranchStates.getOrPut(mergedBranchName) {
-            MutableBranch(mergedParentHash, mergedCommitDate, mergedParentHash, mergedCommitDate, nameCertainty)
+            MutableBranch(mergedParentHash, mergedCommitDate, mergedParentHash, mergedCommitDate, branchNameCertainty)
         }
         if (mergedState.mergeCommitHash == null) {
             mergedState.mergeCommit(mergeCommit.hash, mergeCommit.date, targetBranchName)
@@ -86,7 +86,7 @@ private class BranchCollector(private val commits: List<Commit>) {
                 firstCommitOfUnnamed.date,
                 lastCommitOfUnnamed.hash,
                 lastCommitOfUnnamed.date,
-                NameCertainty.Nameless
+                BranchNameCertainty.Nameless
             )
         }
         if (unnamedState.mergeCommitHash == null) {
@@ -104,7 +104,7 @@ private class BranchCollector(private val commits: List<Commit>) {
 private fun findFirstCommitOfBranch(
     commits: List<Commit>,
     startHash: CommitHash,
-    branchByHash: Map<CommitHash, NameCertainty?>
+    branchByHash: Map<CommitHash, BranchNameCertainty?>
 ): Commit {
     val commitByHash = commits.associateBy { it.hash }
     var current = commitByHash[startHash] ?: return commits.first { it.hash == startHash }
@@ -113,7 +113,7 @@ private fun findFirstCommitOfBranch(
         val parent = current.parents.firstOrNull() ?: break
         val parentCommit = commitByHash[parent] ?: break
         val parentBranch = branchByHash[parent]
-        if (parentBranch is NameCertainty.Named.Certain || parentBranch is NameCertainty.Named.Inferred) {
+        if (parentBranch is BranchNameCertainty.Named.Certain || parentBranch is BranchNameCertainty.Named.Inferred) {
             break
         }
         current = parentCommit
@@ -132,7 +132,7 @@ private class MutableBranch(
     firstCommitDate: ZonedDateTime,
     lastCommitHash: CommitHash,
     lastCommitDate: ZonedDateTime,
-    val nameCertainty: NameCertainty
+    val branchNameCertainty: BranchNameCertainty
 ) {
     var firstCommitHash: CommitHash = firstCommitHash
         private set
@@ -166,7 +166,7 @@ private class MutableBranch(
     }
 
     fun toBranch(): Branch = Branch(
-        nameCertainty = nameCertainty,
+        branchNameCertainty = branchNameCertainty,
         firstCommitHash = firstCommitHash,
         firstCommitDate = firstCommitDate,
         lastCommitHash = lastCommitHash,
