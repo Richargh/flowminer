@@ -158,34 +158,34 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
+            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T00:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
 
             -----COMMIT_START-----
-            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
+            |3|2|2024-01-01T00:00:00+01:00|John Doe|john@example.com|feat 2 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat2.md
 
             -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
+            |2|0|2023-01-01T00:00:00+01:00|John Doe|john@example.com|feat 1 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat.md
 
             -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
+            |1|0|2022-01-01T00:00:00+01:00|John Doe|john@example.com|main commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       trunk2.md
 
             -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            |0||2021-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -201,10 +201,10 @@ class BranchDetectionTest {
             result.branches["origin/feat"] shouldBe aBranch {
                 inferredName("origin/feat")
                 firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                firstCommitDate(atStartOfYear(2023))
                 lastCommitHash("3".hash())
-                lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+                lastCommitDate(atStartOfYear(2024))
+                mergedInto("origin/trunk", atStartOfYear(2025), "4")
             }
         }
 
@@ -217,34 +217,34 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = """
             -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Squashed feature commits
+            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T00:00:00+01:00|John Doe|john@example.com|Squashed feature commits
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
 
             -----COMMIT_START-----
-            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
+            |3|2|2024-01-01T00:00:00+01:00|John Doe|john@example.com|feat 2 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat2.md
 
             -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
+            |2|0|2023-01-01T00:00:00+01:00|John Doe|john@example.com|feat 1 commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       feat.md
 
             -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
+            |1|0|2022-01-01T00:00:00+01:00|John Doe|john@example.com|main commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
             0       0       trunk2.md
 
             -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            |0||2021-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
             -----BODY_START-----
             -----TRAILERS_START-----
             -----FILES_START-----
@@ -261,10 +261,10 @@ class BranchDetectionTest {
             result.branches.unnamed.first() shouldBe aBranch {
                 unNamed()
                 firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                firstCommitDate(atStartOfYear(2023))
                 lastCommitHash("3".hash())
-                lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+                lastCommitDate(atStartOfYear(2024))
+                mergedInto("origin/trunk", atStartOfYear(2025), "4")
             }
         }
     }
