@@ -30,18 +30,18 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     private fun processCommit(commit: Commit) {
-        val branchNameCertainty: NamedBranch = when(val certainty = commit.branch){
+        val commitBranchName: NamedBranch = when(val certainty = commit.branch){
             is NamelessBranch -> return
             is NamedBranch -> certainty
         }
 
-        updateBranchState(commit, branchNameCertainty)
-        processMergeIfApplicable(commit, branchNameCertainty)
+        updateBranchState(commit, commitBranchName)
+        processMergeIfApplicable(commit, commitBranchName)
     }
 
-    private fun updateBranchState(commit: Commit, commitBranch: NamedBranch) {
-        val state = namedBranchStates.getOrPut(commitBranch.name) {
-            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, commitBranch)
+    private fun updateBranchState(commit: Commit, commitBranchName: NamedBranch) {
+        val state = namedBranchStates.getOrPut(commitBranchName.name) {
+            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, commitBranchName)
         }
         if (commit.date < state.firstCommitDate) {
             state.firstCommit(commit.hash, commit.date)
@@ -51,15 +51,15 @@ private class BranchCollector(private val commits: List<Commit>) {
         }
     }
 
-    private fun processMergeIfApplicable(commit: Commit, commitBranch: NamedBranch) {
+    private fun processMergeIfApplicable(commit: Commit, commitBranchName: NamedBranch) {
         val shouldRecordMerge = !hasActiveBranch || commit.isOnActiveBranch
         if (!commit.isMergeCommit || !shouldRecordMerge) return
 
         val mergedParentHash = commit.parents[1]
         when (val mergedBranch = branchByHash[mergedParentHash]) {
-            is NamedBranch.Certain -> recordNamedMerge(commit, commitBranch.name, mergedParentHash, mergedBranch.name, NamedBranch.Certain(mergedBranch.name))
-            is NamedBranch.Inferred -> recordNamedMerge(commit, commitBranch.name, mergedParentHash, mergedBranch.name, NamedBranch.Inferred(mergedBranch.name))
-            else -> recordUnnamedMerge(commit, commitBranch.name, mergedParentHash)
+            is NamedBranch.Certain -> recordNamedMerge(commit, commitBranchName.name, mergedParentHash, mergedBranch.name, NamedBranch.Certain(mergedBranch.name))
+            is NamedBranch.Inferred -> recordNamedMerge(commit, commitBranchName.name, mergedParentHash, mergedBranch.name, NamedBranch.Inferred(mergedBranch.name))
+            else -> recordUnnamedMerge(commit, commitBranchName.name, mergedParentHash)
         }
     }
 
