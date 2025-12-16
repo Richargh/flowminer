@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api.BranchAssignment
+import de.richargh.teamcharta.importer.git.app.api.NameCertainty
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.aCommit
 import de.richargh.teamcharta.importer.git.app.test.haveSameBranchAs
@@ -29,7 +29,7 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result.first().branch shouldBe BranchAssignment.Certain(BranchName("origin/main"))
+        result.first().branch shouldBe NameCertainty.Certain(BranchName("origin/main"))
     }
 
     @Test
@@ -53,11 +53,11 @@ class BranchAssignmentTest {
 
         // Then - both commits should be on main
         result[0] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("Second")
         })
         result[1] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("First")
         })
     }
@@ -89,19 +89,19 @@ class BranchAssignmentTest {
 
         // Then - both commits should be on main
         result[0] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("Fourth")
         })
         result[1] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("Third")
         })
         result[2] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("Second")
         })
         result[3] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("First")
         })
     }
@@ -148,19 +148,19 @@ class BranchAssignmentTest {
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("Merge branch 'origin/feature' into origin/main")
         })
         result[1] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/feature")))
+            branch(NameCertainty.Certain(BranchName("origin/feature")))
             message("feature commit")
         })
         result[2] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("main commit")
         })
         result[3] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("initial commit")
         })
     }
@@ -207,19 +207,19 @@ class BranchAssignmentTest {
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("Merge branch 'origin/feature' into origin/main")
         })
         result[1] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Inferred(BranchName("origin/feature")))
+            branch(NameCertainty.Inferred(BranchName("origin/feature")))
             message("feature commit")
         })
         result[2] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("main commit")
         })
         result[3] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("initial commit")
         })
     }
@@ -266,7 +266,7 @@ class BranchAssignmentTest {
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("Merge branch feature into main")
         })
         result[1] should haveSameBranchAs(aCommit {
@@ -274,11 +274,11 @@ class BranchAssignmentTest {
             message("feature commit")
         })
         result[2] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("main commit")
         })
         result[3] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("initial commit")
         })
     }
@@ -319,15 +319,15 @@ class BranchAssignmentTest {
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("Merge branch 'origin/feature' into origin/main")
         })
         result[1] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/main")))
+            branch(NameCertainty.Certain(BranchName("origin/main")))
             message("main commit")
         })
         result[2] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/feature")))
+            branch(NameCertainty.Certain(BranchName("origin/feature")))
             message("feature commit")
         })
     }
@@ -366,7 +366,7 @@ class BranchAssignmentTest {
 
         // Then - commit 0 has branch ref, should stay Certain
         result[2] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/feature")))
+            branch(NameCertainty.Certain(BranchName("origin/feature")))
             message("feature commit")
         })
     }
@@ -417,23 +417,23 @@ class BranchAssignmentTest {
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/feat")))
+            branch(NameCertainty.Certain(BranchName("origin/feat")))
             message("feat2 commit")
         })
         result[1] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/trunk")))
+            branch(NameCertainty.Certain(BranchName("origin/trunk")))
             message("Merge branch 'feat' into trunk")
         })
         result[2] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/feat")))
+            branch(NameCertainty.Certain(BranchName("origin/feat")))
             message("feat1 commit")
         })
         result[3] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/trunk")))
+            branch(NameCertainty.Certain(BranchName("origin/trunk")))
             message("trunk2 commit")
         })
         result[4] should haveSameBranchAs(aCommit {
-            branch(BranchAssignment.Certain(BranchName("origin/trunk")))
+            branch(NameCertainty.Certain(BranchName("origin/trunk")))
             message("trunk1 commit")
         })
     }
@@ -534,23 +534,23 @@ class BranchAssignmentTest {
 
             // Then
             result[0] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Certain(BranchName("origin/main")))
+                branch(NameCertainty.Certain(BranchName("origin/main")))
                 message("Merge branches 'origin/feat1', 'origin/feat2' and 'origin/feat3'")
             })
             result[1] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Inferred(BranchName("origin/feat3")))
+                branch(NameCertainty.Inferred(BranchName("origin/feat3")))
                 message("feat3 commit")
             })
             result[2] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Inferred(BranchName("origin/feat2")))
+                branch(NameCertainty.Inferred(BranchName("origin/feat2")))
                 message("feat2 commit")
             })
             result[3] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Inferred(BranchName("origin/feat1")))
+                branch(NameCertainty.Inferred(BranchName("origin/feat1")))
                 message("feat1 commit")
             })
             result[4] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Certain(BranchName("origin/main")))
+                branch(NameCertainty.Certain(BranchName("origin/main")))
                 message("main commit")
             })
         }
@@ -603,15 +603,15 @@ class BranchAssignmentTest {
 
             // Then - all branches have refs, so all are Certain
             result[1] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Certain(BranchName("origin/feat3")))
+                branch(NameCertainty.Certain(BranchName("origin/feat3")))
                 message("feat3 commit")
             })
             result[2] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Certain(BranchName("origin/feat2")))
+                branch(NameCertainty.Certain(BranchName("origin/feat2")))
                 message("feat2 commit")
             })
             result[3] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Certain(BranchName("origin/feat1")))
+                branch(NameCertainty.Certain(BranchName("origin/feat1")))
                 message("feat1 commit")
             })
         }
@@ -664,15 +664,15 @@ class BranchAssignmentTest {
 
             // Then - feat1 has ref (Certain), feat2 and feat3 from message (Inferred)
             result[1] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Inferred(BranchName("origin/feat3")))
+                branch(NameCertainty.Inferred(BranchName("origin/feat3")))
                 message("feat3 commit")
             })
             result[2] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Inferred(BranchName("origin/feat2")))
+                branch(NameCertainty.Inferred(BranchName("origin/feat2")))
                 message("feat2 commit")
             })
             result[3] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Certain(BranchName("origin/feat1")))
+                branch(NameCertainty.Certain(BranchName("origin/feat1")))
                 message("feat1 commit")
             })
         }
@@ -725,7 +725,7 @@ class BranchAssignmentTest {
 
             // Then - no branch refs, non-standard message = null branch
             result[1] should haveSameBranchAs(aCommit {
-                branch(BranchAssignment.Certain(BranchName("origin/feat3")))
+                branch(NameCertainty.Certain(BranchName("origin/feat3")))
                 message("feat3 commit")
             })
             result[2].branch shouldBe null

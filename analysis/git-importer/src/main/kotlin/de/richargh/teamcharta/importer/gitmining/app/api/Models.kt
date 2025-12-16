@@ -3,19 +3,8 @@ package de.richargh.teamcharta.importer.gitmining.app.api
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
+import de.richargh.teamcharta.importer.git.app.api.NameCertainty
 import java.time.ZonedDateTime
-
-/** Certainty level of a branch's name in BranchInfo */
-sealed interface NameCertainty {
-    /** Branch ref exists - name is certain */
-    data class Certain(val name: BranchName) : NameCertainty
-
-    /** Inferred from merge commit message */
-    data class Inferred(val name: BranchName) : NameCertainty
-
-    /** Cannot determine name - branch is unnamed */
-    object Nameless : NameCertainty
-}
 
 data class Branch(
     val nameCertainty: NameCertainty,

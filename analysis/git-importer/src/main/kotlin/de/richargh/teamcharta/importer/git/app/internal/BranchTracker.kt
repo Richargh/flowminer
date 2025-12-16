@@ -1,16 +1,16 @@
 package de.richargh.teamcharta.importer.git.app.internal
 
-import de.richargh.teamcharta.importer.git.app.api.BranchAssignment
+import de.richargh.teamcharta.importer.git.app.api.NameCertainty
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.git.app.api.Ref
 
 data class TrackingResult(
-    val branch: BranchAssignment?,
+    val branch: NameCertainty?,
     val isOnActiveBranch: Boolean
 )
 
 class BranchTracker {
-    private val branchFor = mutableMapOf<CommitHash, BranchAssignment>()
+    private val branchFor = mutableMapOf<CommitHash, NameCertainty>()
     private val activeChain = mutableSetOf<CommitHash>()
 
     fun trackBranch(
@@ -32,7 +32,7 @@ class BranchTracker {
     }
 
     private fun registerParents(
-        branch: BranchAssignment?,
+        branch: NameCertainty?,
         parents: List<CommitHash>,
         message: String,
         isChildOnHeadChain: Boolean
@@ -43,24 +43,24 @@ class BranchTracker {
 
         if (parents.size >= 2) {
             val mergedParents = parents.drop(1)
-            val mergedBranches = extractAllMergedBranches(message).map(BranchAssignment::Inferred)
+            val mergedBranches = extractAllMergedBranches(message).map(NameCertainty::Inferred)
             registerMergedParents(mergedParents, mergedBranches)
         }
     }
 
-    private fun byTipOrHead(hash: CommitHash, refs: List<Ref>): BranchAssignment? {
+    private fun byTipOrHead(hash: CommitHash, refs: List<Ref>): NameCertainty? {
         val branchRef = refs.filterIsInstance<Ref.BranchTip>().firstOrNull()
             ?: refs.filterIsInstance<Ref.LocalHead>().firstOrNull()?.let { Ref.BranchTip(it.branch) }
 
         if (branchRef != null) {
-            val assignment = BranchAssignment.Certain(branchRef.name)
+            val assignment = NameCertainty.Certain(branchRef.name)
             branchFor[hash] = assignment
             return assignment
         }
         return null
     }
 
-    private fun registerFirstParent(parentHash: CommitHash, childBranch: BranchAssignment, isChildOnHeadChain: Boolean) {
+    private fun registerFirstParent(parentHash: CommitHash, childBranch: NameCertainty, isChildOnHeadChain: Boolean) {
         if (isChildOnHeadChain) {
             activeChain.add(parentHash)
             branchFor[parentHash] = childBranch
@@ -71,20 +71,20 @@ class BranchTracker {
 
     private fun registerMergedParents(
         mergedParents: List<CommitHash>,
-        mergedBranches: List<BranchAssignment.Inferred>
+        mergedBranches: List<NameCertainty.Inferred>
     ) {
         mergedBranches.zip(mergedParents).forEach { (branch, parentHash) ->
             registerMergedParent(parentHash, branch)
         }
     }
 
-    private fun registerMergedParent(parentHash: CommitHash, branch: BranchAssignment.Inferred) {
+    private fun registerMergedParent(parentHash: CommitHash, branch: NameCertainty.Inferred) {
         // Merged parents never overwrite HEAD chain or existing assignments
         if (parentHash !in activeChain && parentHash !in branchFor) {
             branchFor[parentHash] = branch
         }
     }
 
-    private fun byRegistry(hash: CommitHash): BranchAssignment? = branchFor[hash]
+    private fun byRegistry(hash: CommitHash): NameCertainty? = branchFor[hash]
 
 }

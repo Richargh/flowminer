@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.gitmining.app.api
 
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
+import de.richargh.teamcharta.importer.git.app.api.NameCertainty
 import java.time.ZonedDateTime
 
 class BranchBuilder {

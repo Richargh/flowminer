@@ -1,12 +1,11 @@
 package de.richargh.teamcharta.importer.gitmining.app.internal
 
-import de.richargh.teamcharta.importer.git.app.api.BranchAssignment
+import de.richargh.teamcharta.importer.git.app.api.NameCertainty
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.gitmining.app.api.Branch
 import de.richargh.teamcharta.importer.gitmining.app.api.Branches
-import de.richargh.teamcharta.importer.gitmining.app.api.NameCertainty
 import java.time.ZonedDateTime
 
 fun extractBranchInfo(commits: List<Commit>): Branches {
@@ -37,8 +36,8 @@ private class BranchCollector(private val commits: List<Commit>) {
 
     private fun extractBranchInfo(commit: Commit): Pair<BranchName, NameCertainty>? {
         return when (val branch = commit.branch) {
-            is BranchAssignment.Certain -> branch.name to NameCertainty.Certain(branch.name)
-            is BranchAssignment.Inferred -> branch.name to NameCertainty.Inferred(branch.name)
+            is NameCertainty.Certain -> branch.name to NameCertainty.Certain(branch.name)
+            is NameCertainty.Inferred -> branch.name to NameCertainty.Inferred(branch.name)
             else -> null
         }
     }
@@ -61,8 +60,8 @@ private class BranchCollector(private val commits: List<Commit>) {
 
         val mergedParentHash = commit.parents[1]
         when (val mergedBranch = branchByHash[mergedParentHash]) {
-            is BranchAssignment.Certain -> recordNamedMerge(commit, branchName, mergedParentHash, mergedBranch.name, NameCertainty.Certain(mergedBranch.name))
-            is BranchAssignment.Inferred -> recordNamedMerge(commit, branchName, mergedParentHash, mergedBranch.name, NameCertainty.Inferred(mergedBranch.name))
+            is NameCertainty.Certain -> recordNamedMerge(commit, branchName, mergedParentHash, mergedBranch.name, NameCertainty.Certain(mergedBranch.name))
+            is NameCertainty.Inferred -> recordNamedMerge(commit, branchName, mergedParentHash, mergedBranch.name, NameCertainty.Inferred(mergedBranch.name))
             else -> recordUnnamedMerge(commit, branchName, mergedParentHash)
         }
     }
@@ -110,7 +109,7 @@ private class BranchCollector(private val commits: List<Commit>) {
 private fun findFirstCommitOfBranch(
     commits: List<Commit>,
     startHash: CommitHash,
-    branchByHash: Map<CommitHash, BranchAssignment?>
+    branchByHash: Map<CommitHash, NameCertainty?>
 ): Commit {
     val commitByHash = commits.associateBy { it.hash }
     var current = commitByHash[startHash] ?: return commits.first { it.hash == startHash }
@@ -119,7 +118,7 @@ private fun findFirstCommitOfBranch(
         val parent = current.parents.firstOrNull() ?: break
         val parentCommit = commitByHash[parent] ?: break
         val parentBranch = branchByHash[parent]
-        if (parentBranch is BranchAssignment.Certain || parentBranch is BranchAssignment.Inferred) {
+        if (parentBranch is NameCertainty.Certain || parentBranch is NameCertainty.Inferred) {
             break
         }
         current = parentCommit

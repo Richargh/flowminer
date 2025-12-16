@@ -18,14 +18,14 @@ data class BranchName(val value: String) {
     override fun toString() = value
 }
 
-sealed interface BranchAssignment {
+sealed interface NameCertainty {
     /** Branch ref exists on this commit or was propagated via first-parent */
-    data class Certain(val name: BranchName) : BranchAssignment
+    data class Certain(val name: BranchName) : NameCertainty
 
     /** Inferred from merge commit message (e.g., "Merge branch 'feature'") */
-    data class Inferred(val name: BranchName) : BranchAssignment
+    data class Inferred(val name: BranchName) : NameCertainty
 
-    object Unknown: BranchAssignment
+    object Nameless: NameCertainty
 }
 
 sealed interface Ref {
@@ -63,7 +63,7 @@ data class Commit(
     val coAuthors: Set<Author>,
     val commitType: CommitType,
     val workKeys: List<WorkKey>,
-    val branch: BranchAssignment? = null,
+    val branch: NameCertainty? = null,
     val isOnActiveBranch: Boolean = false
 ) {
     val isMergeCommit = parents.size >= 2
