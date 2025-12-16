@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app.internal
 
-import de.richargh.teamcharta.importer.git.app.api2.*
+import de.richargh.teamcharta.importer.git.app.api.*
 import java.time.ZonedDateTime
 import kotlin.collections.map
 

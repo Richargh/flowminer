@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app.test
 
-import de.richargh.teamcharta.importer.git.app.api2.Commit
+import de.richargh.teamcharta.importer.git.app.api.Commit
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 

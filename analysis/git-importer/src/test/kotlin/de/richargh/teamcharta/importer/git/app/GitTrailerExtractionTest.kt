@@ -18,7 +18,7 @@ class GitTrailerExtractionTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())

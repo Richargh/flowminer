@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app.internal
 
-import de.richargh.teamcharta.importer.git.app.api2.BranchName
+import de.richargh.teamcharta.importer.git.app.api.BranchName
 
 private val MERGE_PATTERN = """Merge branch(es)? (.+)""".toRegex()
 private val BRANCH_NAME_PATTERN = """'([^']+)'""".toRegex()

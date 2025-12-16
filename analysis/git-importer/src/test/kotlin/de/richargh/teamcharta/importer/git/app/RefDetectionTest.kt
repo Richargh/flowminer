@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.Ref
+import de.richargh.teamcharta.importer.git.app.api.Ref
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import org.junit.jupiter.api.Test
@@ -18,7 +18,7 @@ class RefDetectionTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -37,7 +37,7 @@ class RefDetectionTest {
             anEntry("origin/main") { refTag("v1.0.0") }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -56,7 +56,7 @@ class RefDetectionTest {
             anEntry("origin/develop") {  }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -81,7 +81,7 @@ class RefDetectionTest {
             anEntry(branchName) {  }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -100,7 +100,7 @@ class RefDetectionTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())

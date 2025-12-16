@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.Author
+import de.richargh.teamcharta.importer.git.app.api.Author
 import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.jupiter.api.Test
 
@@ -18,7 +18,7 @@ class CoAuthorExtractionTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -49,7 +49,7 @@ class CoAuthorExtractionTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())

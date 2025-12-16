@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.CommitType
+import de.richargh.teamcharta.importer.git.app.api.CommitType
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -20,7 +20,7 @@ class CommitTypeDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -80,7 +80,7 @@ class CommitTypeDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -146,7 +146,7 @@ class CommitTypeDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -206,7 +206,7 @@ class CommitTypeDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -266,7 +266,7 @@ class CommitTypeDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -332,7 +332,7 @@ class CommitTypeDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -399,7 +399,7 @@ class CommitTypeDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())

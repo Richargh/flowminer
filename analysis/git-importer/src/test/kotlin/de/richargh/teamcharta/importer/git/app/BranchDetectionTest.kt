@@ -1,7 +1,7 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.aBranch
-import de.richargh.teamcharta.importer.git.app.api2.hash
+import de.richargh.teamcharta.importer.git.app.api.aBranch
+import de.richargh.teamcharta.importer.git.app.api.hash
 import de.richargh.teamcharta.importer.git.app.internal.atStartOfYear
 import de.richargh.teamcharta.importer.git.app.internal.zoned
 import io.kotest.matchers.collections.shouldHaveSize
@@ -22,7 +22,7 @@ class BranchDetectionTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -53,7 +53,7 @@ class BranchDetectionTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -86,7 +86,7 @@ class BranchDetectionTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -130,7 +130,7 @@ class BranchDetectionTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -201,7 +201,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogParser2()
+            val testee = GitLogParser()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -264,7 +264,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogParser2()
+            val testee = GitLogParser()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -327,7 +327,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogParser2()
+            val testee = GitLogParser()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -406,7 +406,7 @@ class BranchDetectionTest {
             0       0       trunk.md
         """.trimIndent()
 
-            val testee = GitLogParser2()
+            val testee = GitLogParser()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())

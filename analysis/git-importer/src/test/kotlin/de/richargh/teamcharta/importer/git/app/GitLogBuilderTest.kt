@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.hash
+import de.richargh.teamcharta.importer.git.app.api.hash
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 

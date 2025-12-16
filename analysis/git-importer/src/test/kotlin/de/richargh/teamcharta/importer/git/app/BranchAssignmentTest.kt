@@ -1,8 +1,8 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.BranchAssignment
-import de.richargh.teamcharta.importer.git.app.api2.BranchName
-import de.richargh.teamcharta.importer.git.app.api2.aCommit
+import de.richargh.teamcharta.importer.git.app.api.BranchAssignment
+import de.richargh.teamcharta.importer.git.app.api.BranchName
+import de.richargh.teamcharta.importer.git.app.api.aCommit
 import de.richargh.teamcharta.importer.git.app.internal.atStartOfYear
 import de.richargh.teamcharta.importer.git.app.test.haveSameBranchAs
 import io.kotest.matchers.should
@@ -23,7 +23,7 @@ class BranchAssignmentTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -46,7 +46,7 @@ class BranchAssignmentTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -82,7 +82,7 @@ class BranchAssignmentTest {
             }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -141,7 +141,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -200,7 +200,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -259,7 +259,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -312,7 +312,7 @@ class BranchAssignmentTest {
             0	0	feature.md
         """.trimIndent()
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -359,7 +359,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -410,7 +410,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -471,7 +471,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -527,7 +527,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-            val testee = GitLogParser2()
+            val testee = GitLogParser()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -596,7 +596,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-            val testee = GitLogParser2()
+            val testee = GitLogParser()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -657,7 +657,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-            val testee = GitLogParser2()
+            val testee = GitLogParser()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())
@@ -718,7 +718,7 @@ class BranchAssignmentTest {
             -----FILES_START-----
         """.trimIndent()
 
-            val testee = GitLogParser2()
+            val testee = GitLogParser()
 
             // When
             val result = testee.parse(gitLogContent.lineSequence())

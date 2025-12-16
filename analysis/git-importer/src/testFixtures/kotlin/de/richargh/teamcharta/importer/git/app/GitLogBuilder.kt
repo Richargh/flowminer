@@ -1,8 +1,8 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.BranchName
-import de.richargh.teamcharta.importer.git.app.api2.CommitHash
-import de.richargh.teamcharta.importer.git.app.api2.hash
+import de.richargh.teamcharta.importer.git.app.api.BranchName
+import de.richargh.teamcharta.importer.git.app.api.CommitHash
+import de.richargh.teamcharta.importer.git.app.api.hash
 import java.time.ZonedDateTime
 
 class GitLogEntryBuilder {

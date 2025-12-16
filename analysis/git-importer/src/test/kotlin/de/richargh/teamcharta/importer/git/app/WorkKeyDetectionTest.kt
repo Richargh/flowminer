@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.WorkKey
+import de.richargh.teamcharta.importer.git.app.api.WorkKey
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
@@ -23,7 +23,7 @@ class WorkKeyDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -46,7 +46,7 @@ class WorkKeyDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -69,7 +69,7 @@ class WorkKeyDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -92,7 +92,7 @@ class WorkKeyDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -113,7 +113,7 @@ class WorkKeyDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -133,7 +133,7 @@ class WorkKeyDetectionTest {
             anEntry("origin/main") { subject(subject) }
         }
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())

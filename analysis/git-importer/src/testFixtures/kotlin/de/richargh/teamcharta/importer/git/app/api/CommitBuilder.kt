@@ -1,4 +1,4 @@
-package de.richargh.teamcharta.importer.git.app.api2
+package de.richargh.teamcharta.importer.git.app.api
 
 import java.time.ZonedDateTime
 

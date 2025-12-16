@@ -1,8 +1,8 @@
 package de.richargh.teamcharta.importer.git.app.internal
 
-import de.richargh.teamcharta.importer.git.app.api2.BranchAssignment
-import de.richargh.teamcharta.importer.git.app.api2.CommitHash
-import de.richargh.teamcharta.importer.git.app.api2.Ref
+import de.richargh.teamcharta.importer.git.app.api.BranchAssignment
+import de.richargh.teamcharta.importer.git.app.api.CommitHash
+import de.richargh.teamcharta.importer.git.app.api.Ref
 
 data class TrackingResult(
     val branch: BranchAssignment?,

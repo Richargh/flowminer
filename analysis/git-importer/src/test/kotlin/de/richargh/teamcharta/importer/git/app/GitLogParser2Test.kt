@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
-import de.richargh.teamcharta.importer.git.app.api2.*
+import de.richargh.teamcharta.importer.git.app.api.*
 import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
@@ -19,7 +19,7 @@ class GitLogParser2Test {
             5	2	src/Main.kt
         """.trimIndent()
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
@@ -52,7 +52,7 @@ class GitLogParser2Test {
             5	2	src/Main.kt
         """.trimIndent()
 
-        val testee = GitLogParser2()
+        val testee = GitLogParser()
 
         // When
         val result = testee.parse(gitLogContent.lineSequence())
