@@ -67,5 +67,12 @@ data class Commit(
     val isOnActiveBranch: Boolean = false
 ) {
     val isMergeCommit = parents.size >= 2
+
+    val branchName: BranchName? get() = when (branch) {
+        is NameCertainty.Certain -> branch.name
+        is NameCertainty.Inferred -> branch.name
+        is NameCertainty.Nameless -> null
+        null -> null
+    }
 }
 

@@ -16,7 +16,6 @@ data class Branch(
     val mergeDate: ZonedDateTime?,
     val targetBranch: BranchName?
 ) {
-    /** Returns the branch name, or null if unnamed */
     val name: BranchName? get() = when (nameCertainty) {
         is NameCertainty.Certain -> nameCertainty.name
         is NameCertainty.Inferred -> nameCertainty.name

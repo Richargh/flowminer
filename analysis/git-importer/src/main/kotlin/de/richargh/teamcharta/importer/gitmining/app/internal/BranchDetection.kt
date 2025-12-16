@@ -28,18 +28,13 @@ private class BranchCollector(private val commits: List<Commit>) {
     }
 
     private fun processCommit(commit: Commit) {
-        val (branchName, nameCertainty) = extractBranchInfo(commit) ?: return
+        val branchName = commit.branchName
+        val nameCertainty = commit.branch
+        if(branchName == null || nameCertainty == null)
+            return
 
         updateBranchState(commit, branchName, nameCertainty)
         processMergeIfApplicable(commit, branchName)
-    }
-
-    private fun extractBranchInfo(commit: Commit): Pair<BranchName, NameCertainty>? {
-        return when (val branch = commit.branch) {
-            is NameCertainty.Certain -> branch.name to NameCertainty.Certain(branch.name)
-            is NameCertainty.Inferred -> branch.name to NameCertainty.Inferred(branch.name)
-            else -> null
-        }
     }
 
     private fun updateBranchState(commit: Commit, branchName: BranchName, nameCertainty: NameCertainty) {
