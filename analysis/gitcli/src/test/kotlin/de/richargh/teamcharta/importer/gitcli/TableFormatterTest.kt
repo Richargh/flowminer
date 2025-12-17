@@ -464,7 +464,7 @@ class TableFormatterTest {
 
             // Then
             result shouldContain "| Branch"
-            result shouldContain "| main"
+            result shouldContain "|   main"
         }
 
         @Test
@@ -499,6 +499,53 @@ class TableFormatterTest {
             // Then
             result shouldContain "| Workkeys"
             result shouldContain "ABC-123,DEF-456"
+        }
+
+        @Test
+        fun `shows Commits header with count`() {
+            // When
+            val commits = listOf(
+                aCommit { message("First") },
+                aCommit { message("Second") }
+            )
+
+            val result = TableFormatter.formatCommits(commits, totalCount = 5)
+
+            // Then
+            result shouldContain "Commits (2 out of 5)"
+        }
+
+        @Test
+        fun `marks only the top commit on current branch with asterisk`() {
+            // When
+            val commits = listOf(
+                aCommit {
+                    certainBranch("main")
+                    isOnCurrentBranch()
+                    date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                    message("HEAD commit")
+                },
+                aCommit {
+                    certainBranch("main")
+                    isOnCurrentBranch()
+                    date(ZonedDateTime.parse("2024-01-14T10:30:00+01:00"))
+                    message("Second commit on current branch")
+                },
+                aCommit {
+                    certainBranch("feature")
+                    date(ZonedDateTime.parse("2024-01-13T10:30:00+01:00"))
+                    message("Other branch commit")
+                }
+            )
+
+            val result = TableFormatter.formatCommits(commits)
+
+            // Then
+            val lines = result.lines()
+            val dataLines = lines.filter { it.startsWith("|") && !it.contains("Branch") && !it.contains("---") }
+            dataLines[0] shouldContain "| * main"
+            dataLines[1] shouldContain "|   main"
+            dataLines[2] shouldContain "|   feature"
         }
 
         @Test
@@ -540,9 +587,10 @@ class TableFormatterTest {
 
             // Then
             result shouldBe """
+                Commits (1 out of 1)
                 | Branch | Date       | Type    | Author   | Workkeys | +  | - | Message           |
                 |--------|------------|---------|----------|----------|----|---|-------------------|
-                | main   | 2024-01-15 | FEATURE | Jane Doe | ABC-1    | 10 | 5 | Add login feature |
+                |   main | 2024-01-15 | FEATURE | Jane Doe | ABC-1    | 10 | 5 | Add login feature |
             """.trimIndent()
         }
 
@@ -570,10 +618,11 @@ class TableFormatterTest {
 
             // Then
             result shouldBe """
-                | Branch       | Date       | Type    | Author     | Workkeys | + | - | Message                    |
-                |--------------|------------|---------|------------|----------|---|---|----------------------------|
-                | main         | 2024-01-15 | FIX     | Jane Doe   |          | 0 | 0 | Fix bug                    |
-                | feature/auth | 2024-01-16 | FEATURE | John Smith |          | 0 | 0 | Add authentication feature |
+                Commits (2 out of 2)
+                | Branch         | Date       | Type    | Author     | Workkeys | + | - | Message                    |
+                |----------------|------------|---------|------------|----------|---|---|----------------------------|
+                |   main         | 2024-01-15 | FIX     | Jane Doe   |          | 0 | 0 | Fix bug                    |
+                |   feature/auth | 2024-01-16 | FEATURE | John Smith |          | 0 | 0 | Add authentication feature |
             """.trimIndent()
         }
     }

@@ -97,11 +97,14 @@ object TableFormatter {
         }
     }
 
-    fun formatCommits(commits: List<Commit>): String {
+    fun formatCommits(commits: List<Commit>, totalCount: Int = commits.size): String {
         val headers = listOf("Branch", "Date", "Type", "Author", "Workkeys", "+", "-", "Message")
+        var headMarked = false
         val rows = commits.map { commit ->
+            val isHead = commit.isOnCurrentBranch && !headMarked
+            if (isHead) headMarked = true
             listOf(
-                commit.branch.name?.toString() ?: "-",
+                formatCommitBranch(commit, isHead),
                 commit.date.format(dateFormatter),
                 commit.commitType.name,
                 commit.author.name,
@@ -111,7 +114,14 @@ object TableFormatter {
                 commit.message
             )
         }
-        return formatTable(headers, rows)
+        val table = formatTable(headers, rows)
+        val header = "Commits (${commits.size} out of $totalCount)"
+        return "$header\n$table"
+    }
+
+    private fun formatCommitBranch(commit: Commit, isHead: Boolean): String {
+        val prefix = if (isHead) "* " else "  "
+        return prefix + (commit.branch.name?.toString() ?: "-")
     }
 
     private fun formatTable(headers: List<String>, rows: List<List<String>>): String {

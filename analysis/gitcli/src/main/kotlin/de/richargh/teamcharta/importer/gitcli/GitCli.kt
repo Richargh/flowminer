@@ -41,10 +41,9 @@ class GitCli : Callable<Int> {
         println(TableFormatter.formatBranches(branches, now))
 
         println()
-        println("## Commits (max 20)")
-        println()
-        val commits = result.commits.all().take(20).toList()
-        println(TableFormatter.formatCommits(commits))
+        val allCommits = result.commits.all().toList()
+        val displayedCommits = allCommits.take(20)
+        println(TableFormatter.formatCommits(displayedCommits, totalCount = allCommits.size))
 
         return 0
     }
