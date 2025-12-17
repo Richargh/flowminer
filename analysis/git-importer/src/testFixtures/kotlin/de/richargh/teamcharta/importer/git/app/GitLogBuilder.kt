@@ -81,22 +81,41 @@ class GitLogBuilder {
     private val branchForEntry = mutableMapOf<CommitHash, BranchName>()
     private val entriesForBranch = mutableMapOf<BranchName, MutableList<GitLogEntryBuilder>>()
     private val originOfBranch = mutableMapOf<BranchName, BranchName?>()
-    private val parentBranchForEntry = mutableMapOf<CommitHash, BranchName?>()
+    private val parentBranchesForEntry = mutableMapOf<CommitHash, List<BranchName>>()
+    private val deletedBranches = mutableSetOf<BranchName>()
+    // Tracks which branches have been merged into which at which commit index
+    // Key: merged branch, Value: (target branch, commit index)
+    private val mergedInto = mutableMapOf<BranchName, Pair<BranchName, Int>>()
 
-    fun anEntry(branch: String, parentBranchName: String? = null, block: GitLogEntryBuilder.() -> Unit = {}): CommitHash {
+    fun isDeletedBranch(branch: String) = apply { deletedBranches.add(BranchName(branch)) }
+
+    fun anEntry(branch: String, vararg parentBranches: String, block: GitLogEntryBuilder.() -> Unit = {}): CommitHash {
         val builder = GitLogEntryBuilder()
         builder.hash(entries.size.toString().hash())
         builder.apply(block)
 
         val branchName = BranchName(branch)
-        if (branchName !in originOfBranch) {
-            originOfBranch[branchName] = parentBranchName?.let { BranchName(it) }
-        }
-        parentBranchForEntry[builder.hash()] = parentBranchName?.let { BranchName(it) }
+        val parentBranchNames = parentBranches.map { BranchName(it) }
 
-        if(parentBranchName != null) {
-            val parentCommit = findLatestInBranch(BranchName(parentBranchName))
-            builder.parents(parentCommit)
+        // First parent branch is used for determining branch origin (fork point)
+        if (branchName !in originOfBranch) {
+            originOfBranch[branchName] = parentBranchNames.firstOrNull()
+        }
+        parentBranchesForEntry[builder.hash()] = parentBranchNames
+
+        // Track when a branch is merged INTO this branch (not for first commit / fork)
+        val isFirstCommitOnBranch = branchName !in entriesForBranch
+
+        // Add all parent branches as parents
+        parentBranchNames.forEach { parentBranch ->
+            val parentCommit = findLatestInBranch(parentBranch)
+            builder.parents() += parentCommit
+            // Only track as merge when a child branch is merged back into its parent
+            // e.g., anEntry("origin/main", "origin/feat") means feat is merged into main
+            // We only track this if feat originated from main (child merged into parent)
+            if (!isFirstCommitOnBranch && parentBranch in entriesForBranch && originOfBranch[parentBranch] == branchName) {
+                mergedInto[parentBranch] = branchName to entries.size
+            }
         }
         addCommitToBranch(builder, branchName)
         entries.add(builder)
@@ -116,14 +135,24 @@ class GitLogBuilder {
         val reversedEntries = entries.reversed()
         for ((i, e) in reversedEntries.withIndex()) {
             val (branch, before, entry, after) = findBeforeAfterInBranch(e.hash())
-            val parentBranch = parentBranchForEntry[e.hash()]
-            val shouldAddBefore = before != null && (
-                parentBranch == null ||
-                originOfBranch[parentBranch] == branch
+            val parentBranches = parentBranchesForEntry[e.hash()] ?: emptyList()
+            val currentCommitIndex = entries.size - 1 - i  // Convert reverse index to forward index
+            // Add the previous commit on this branch as a parent when:
+            // 1. No parent branches specified (continuation on same branch), OR
+            // 2. A parent branch originated from this branch (merge feat into main), OR
+            // 3. This branch originated from a parent branch (merge main into feat)
+            // BUT NOT when this branch was already merged into the parent branch BEFORE this commit (re-branch scenario)
+            val wasAlreadyMergedIntoParent = parentBranches.any { parentBranch ->
+                val mergeInfo = mergedInto[branch]
+                mergeInfo != null && mergeInfo.first == parentBranch && mergeInfo.second < currentCommitIndex
+            }
+            val shouldAddBefore = before != null && !wasAlreadyMergedIntoParent && (
+                parentBranches.isEmpty() ||
+                parentBranches.any { originOfBranch[it] == branch || originOfBranch[branch] == it }
             )
             if (shouldAddBefore)
                 entry + before!!.hash()
-            if (after == null) {
+            if (after == null && branch !in deletedBranches) {
                 entry.refBranchTip(branch)
                 // Add origin/HEAD when this is the HEAD commit and branch is origin/*
                 if (entry.hasHeadRef() && branch.value.startsWith("origin/")) {

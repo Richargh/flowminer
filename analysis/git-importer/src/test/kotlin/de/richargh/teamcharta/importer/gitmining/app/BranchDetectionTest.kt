@@ -160,41 +160,34 @@ class BranchDetectionTest {
             // feat:    └─2───3─┘ (deleted, inferred from merge message)
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T00:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |3|2|2024-01-01T00:00:00+01:00|John Doe|john@example.com|feat 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
-
-            -----COMMIT_START-----
-            |2|0|2023-01-01T00:00:00+01:00|John Doe|john@example.com|feat 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat.md
-
-            -----COMMIT_START-----
-            |1|0|2022-01-01T00:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |0||2021-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                isDeletedBranch("origin/feat")
+                anEntry("origin/trunk") {
+                    subject("initial commit")
+                    authorDate(atStartOfYear(2021))
+                    file("trunk.md")
+                }
+                anEntry("origin/trunk") {
+                    subject("main commit")
+                    authorDate(atStartOfYear(2022))
+                    file("trunk2.md")
+                }
+                anEntry("origin/feat", "origin/trunk") {
+                    subject("feat 1 commit")
+                    authorDate(atStartOfYear(2023))
+                    file("feat.md")
+                }
+                anEntry("origin/feat") {
+                    subject("feat 2 commit")
+                    authorDate(atStartOfYear(2024))
+                    file("feat2.md")
+                }
+                anEntry("origin/trunk", "origin/feat") {
+                    refHead("trunk")
+                    subject("Merge branch 'origin/feat' into origin/trunk")
+                    authorDate(atStartOfYear(2025))
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -220,41 +213,34 @@ class BranchDetectionTest {
             // ???:     └─2───3─┘ (deleted, cannot infer name)
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T00:00:00+01:00|John Doe|john@example.com|Squashed feature commits
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |3|2|2024-01-01T00:00:00+01:00|John Doe|john@example.com|feat 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
-
-            -----COMMIT_START-----
-            |2|0|2023-01-01T00:00:00+01:00|John Doe|john@example.com|feat 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat.md
-
-            -----COMMIT_START-----
-            |1|0|2022-01-01T00:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |0||2021-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                isDeletedBranch("unnamed-branch")
+                anEntry("origin/trunk") {
+                    subject("initial commit")
+                    authorDate(atStartOfYear(2021))
+                    file("trunk.md")
+                }
+                anEntry("origin/trunk") {
+                    subject("main commit")
+                    authorDate(atStartOfYear(2022))
+                    file("trunk2.md")
+                }
+                anEntry("unnamed-branch", "origin/trunk") {
+                    subject("feat 1 commit")
+                    authorDate(atStartOfYear(2023))
+                    file("feat.md")
+                }
+                anEntry("unnamed-branch") {
+                    subject("feat 2 commit")
+                    authorDate(atStartOfYear(2024))
+                    file("feat2.md")
+                }
+                anEntry("origin/trunk", "unnamed-branch") {
+                    refHead("trunk")
+                    subject("Squashed feature commits")
+                    authorDate(atStartOfYear(2025))
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -444,55 +430,30 @@ class BranchDetectionTest {
         // feat:      └─1───2───3───4───5 (origin/feat)
 
         // Given
-        val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|6|0 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feat|5|4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|feat commit 5
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat5.md
-
-            -----COMMIT_START-----
-            |4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat commit 4
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat4.md
-
-            -----COMMIT_START-----
-            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat commit 3
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat3.md
-
-            -----COMMIT_START-----
-            |2|1|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 2
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|feat commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat1.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
+        val gitLogContent = aGitLog {
+            anEntry("origin/trunk") {
+                authorDate("2025-01-01T00:00:00+01:00".zoned())
+            }
+            anEntry("origin/feat", "origin/trunk") {
+                authorDate("2025-01-01T01:00:00+01:00".zoned())
+            }
+            anEntry("origin/feat") {
+                authorDate("2025-01-01T02:00:00+01:00".zoned())
+            }
+            anEntry("origin/feat") {
+                authorDate("2025-01-01T03:00:00+01:00".zoned())
+            }
+            anEntry("origin/feat") {
+                authorDate("2025-01-01T04:00:00+01:00".zoned())
+            }
+            anEntry("origin/feat") {
+                authorDate("2025-01-01T05:00:00+01:00".zoned())
+            }
+            anEntry("origin/trunk", "origin/feat") {
+                refHead("trunk")
+                authorDate("2025-01-01T06:00:00+01:00".zoned())
+            }
+        }
 
         val testee = GitLogMiner()
 
@@ -525,43 +486,27 @@ class BranchDetectionTest {
             // feat-b:         └─3-4 (deleted, inferred from merge message)
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|5|1 2 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat-a' and 'origin/feat-b' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feat-b|4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feat-a|2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                anEntry("origin/trunk") {
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                }
+                anEntry("origin/trunk") {
+                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-a", "origin/trunk") {
+                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-b", "origin/trunk") {
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-b") {
+                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                }
+                anEntry("origin/trunk", "origin/feat-b", "origin/feat-a") {
+                    refHead("trunk")
+                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -579,15 +524,6 @@ class BranchDetectionTest {
                 lastCommitHash("5".hash())
                 lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
             }
-            result.branches["origin/feat-a"] shouldBe aBranch {
-                name("origin/feat-a")
-                isCompleted()
-                firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                lastCommitHash("2".hash())
-                lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
-            }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 name("origin/feat-b")
                 isCompleted()
@@ -595,6 +531,15 @@ class BranchDetectionTest {
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
                 lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+            }
+            result.branches["origin/feat-a"] shouldBe aBranch {
+                name("origin/feat-a")
+                isCompleted()
+                firstCommitHash("2".hash())
+                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                lastCommitHash("2".hash())
+                lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
             }
         }
@@ -608,43 +553,30 @@ class BranchDetectionTest {
             // feat-b:         └─3-4 (deleted, inferred from merge message)
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|5|1 2 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat-a' and 'origin/feat-b' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                isDeletedBranch("origin/feat-a")
+                isDeletedBranch("origin/feat-b")
+                anEntry("origin/trunk") {
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                }
+                anEntry("origin/trunk") {
+                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-a", "origin/trunk") {
+                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-b", "origin/trunk") {
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-b") {
+                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                }
+                anEntry("origin/trunk", "origin/feat-a", "origin/feat-b") {
+                    refHead("trunk")
+                    subject("Merge branches 'origin/feat-a' and 'origin/feat-b' into origin/trunk")
+                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -691,43 +623,30 @@ class BranchDetectionTest {
             // feat-b:         └─3-4 (deleted, inferred from merge message)
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|5|1 2 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Octopus merge all the things into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                isDeletedBranch("origin/feat-a")
+                isDeletedBranch("origin/feat-b")
+                anEntry("origin/trunk") {
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                }
+                anEntry("origin/trunk") {
+                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-a", "origin/trunk") {
+                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-b", "origin/trunk") {
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-b") {
+                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                }
+                anEntry("origin/trunk", "origin/feat-b", "origin/feat-a") {
+                    refHead("trunk")
+                    subject("Octopus merge all the things into origin/trunk")
+                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -776,43 +695,33 @@ class BranchDetectionTest {
             // feat-b:         └─3-4 (origin/feat-b)
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|5|1 2 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Octopus merge all the things into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feat-b|4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                isDeletedBranch("origin/feat-a")
+                anEntry("origin/trunk") {
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                }
+                anEntry("origin/trunk") {
+                    subject("trunk commit")
+                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-a", "origin/trunk") {
+                    subject("feat-a commit")
+                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-b", "origin/trunk") {
+                    subject("feat-b 1 commit")
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat-b") {
+                    subject("feat-b 2 commit")
+                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                }
+                anEntry("origin/trunk", "origin/feat-b", "origin/feat-a") {
+                    refHead("trunk")
+                    subject("Octopus merge all the things into origin/trunk")
+                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -865,54 +774,42 @@ class BranchDetectionTest {
             // feat-b:            └─4─┘ (origin/feat-b, branched from feat-a commit 3)
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|6|1 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat-a' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feat-a|5|3 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat-b' into origin/feat-a
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feat-b|4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-b.md
-
-            -----COMMIT_START-----
-            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-a 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-a2.md
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-a1.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                anEntry("origin/trunk") {
+                    subject("initial commit")
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    file("trunk.md")
+                }
+                anEntry("origin/trunk") {
+                    subject("trunk commit")
+                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    file("trunk2.md")
+                }
+                anEntry("origin/feat-a", "origin/trunk") {
+                    subject("feat-a 1 commit")
+                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    file("feat-a1.md")
+                }
+                anEntry("origin/feat-a") {
+                    subject("feat-a 2 commit")
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    file("feat-a2.md")
+                }
+                anEntry("origin/feat-b", "origin/feat-a") {
+                    subject("feat-b commit")
+                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    file("feat-b.md")
+                }
+                anEntry("origin/feat-a", "origin/feat-b") {
+                    subject("Merge branch 'origin/feat-b' into origin/feat-a")
+                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                }
+                anEntry("origin/trunk", "origin/feat-a") {
+                    refHead("trunk")
+                    subject("Merge branch 'origin/feat-a' into origin/trunk")
+                    authorDate("2025-01-01T06:00:00+01:00".zoned())
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -963,47 +860,37 @@ class BranchDetectionTest {
             // feat:      └───────2───4───┘ (origin/feat)
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> main, origin/main, origin/HEAD|5|3 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feat|4|2|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat commit 2
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
-
-            -----COMMIT_START-----
-            |3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat1.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       main.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       initial.md
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    subject("initial commit")
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    file("initial.md")
+                }
+                anEntry("origin/main") {
+                    subject("main commit")
+                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    file("main.md")
+                }
+                anEntry("origin/feat", "origin/main") {
+                    subject("feat commit 1")
+                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    file("feat1.md")
+                }
+                anEntry("origin/main", "origin/feat") {
+                    subject("Merge branch 'origin/feat' into origin/main")
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat") {
+                    subject("feat commit 2")
+                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    file("feat2.md")
+                }
+                anEntry("origin/main", "origin/feat") {
+                    refHead("main")
+                    subject("Merge branch 'origin/feat' into origin/main")
+                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -1043,67 +930,51 @@ class BranchDetectionTest {
             //            merge 1    merge 2
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            origin/feat|8|6|2025-01-01T08:00:00+01:00|John Doe|john@example.com|feat commit 5
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            HEAD -> main, origin/main, origin/HEAD|7|4|2025-01-01T07:00:00+01:00|John Doe|john@example.com|main commit 3
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       main3.md
-
-            -----COMMIT_START-----
-            |6|5 4|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/main' into origin/feat
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat3.md
-
-            -----COMMIT_START-----
-            |5|3|2025-01-01T05:00:00+01:00|John Doe|john@example.com|feat commit 3
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |4|1|2025-01-01T04:00:00+01:00|John Doe|john@example.com|main commit 2
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       main2.md
-
-            -----COMMIT_START-----
-            |3|2 1|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/main' into origin/feat
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat1.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       main1.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       initial.md
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    subject("initial commit")
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    file("initial.md")
+                }
+                anEntry("origin/main") {
+                    subject("main commit 1")
+                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    file("main1.md")
+                }
+                anEntry("origin/feat", "origin/main") {
+                    subject("feat commit 1")
+                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    file("feat1.md")
+                }
+                anEntry("origin/feat", "origin/main") {
+                    subject("Merge branch 'origin/main' into origin/feat")
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                }
+                anEntry("origin/main") {
+                    subject("main commit 2")
+                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    file("main2.md")
+                }
+                anEntry("origin/feat") {
+                    subject("feat commit 3")
+                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat", "origin/main") {
+                    subject("Merge branch 'origin/main' into origin/feat")
+                    authorDate("2025-01-01T06:00:00+01:00".zoned())
+                    file("feat3.md")
+                }
+                anEntry("origin/main") {
+                    refHead("main")
+                    subject("main commit 3")
+                    authorDate("2025-01-01T07:00:00+01:00".zoned())
+                    file("main3.md")
+                }
+                anEntry("origin/feat") {
+                    subject("feat commit 5")
+                    authorDate("2025-01-01T08:00:00+01:00".zoned())
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -1141,61 +1012,47 @@ class BranchDetectionTest {
             //            merge 1    merge 2
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> main, origin/main, origin/HEAD|7|4 6|2025-01-01T07:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       main3.md
-
-            -----COMMIT_START-----
-            origin/feat|6|5 4|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/main' into origin/feat
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat3.md
-
-            -----COMMIT_START-----
-            |5|3|2025-01-01T05:00:00+01:00|John Doe|john@example.com|feat commit 3
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |4|1|2025-01-01T04:00:00+01:00|John Doe|john@example.com|main commit 2
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       main2.md
-
-            -----COMMIT_START-----
-            |3|2 1|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/main' into origin/feat
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat1.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       main1.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       initial.md
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    subject("initial commit")
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    file("initial.md")
+                }
+                anEntry("origin/main") {
+                    subject("main commit 1")
+                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    file("main1.md")
+                }
+                anEntry("origin/feat", "origin/main") {
+                    subject("feat commit 1")
+                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    file("feat1.md")
+                }
+                anEntry("origin/feat", "origin/main") {
+                    subject("Merge branch 'origin/main' into origin/feat")
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                }
+                anEntry("origin/main") {
+                    subject("main commit 2")
+                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    file("main2.md")
+                }
+                anEntry("origin/feat") {
+                    subject("feat commit 3")
+                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat", "origin/main") {
+                    subject("Merge branch 'origin/main' into origin/feat")
+                    authorDate("2025-01-01T06:00:00+01:00".zoned())
+                    file("feat3.md")
+                }
+                anEntry("origin/main", "origin/feat") {
+                    refHead("main")
+                    subject("Merge branch 'origin/feat' into origin/main")
+                    authorDate("2025-01-01T07:00:00+01:00".zoned())
+                    file("main3.md")
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -1226,210 +1083,429 @@ class BranchDetectionTest {
         }
     }
 
-    @Nested
-    inner class RealData {
 
-        @Test
-        fun `should extract branch info from merge commits with explicit merge commit`() {
-            // trunk: 0───1───────4 (HEAD -> trunk, origin/trunk) [merge feat]
-            //         \         /
-            // feat:    └─2───3─┘ (origin/feat)
+    @Test
+    fun `should extract branch info from merge commits with explicit merge commit`() {
+        // trunk: 0───1───────4 (HEAD -> trunk, origin/trunk) [merge feat]
+        //         \         /
+        // feat:    └─2───3─┘ (origin/feat)
 
-            // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feat|3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
-
-            val testee = GitLogMiner()
-
-            // When
-            val result = testee.parse(gitLogContent.lineSequence())
-
-            // Then
-            result.branches.size() shouldBe 2
-            result.branches["origin/trunk"] shouldBe aBranch {
-                name("origin/trunk")
-                isCurrent()
-                firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
-                intermediateCommits("1".hash())
-                lastCommitHash("4".hash())
-                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+        // Given
+        val gitLogContent = aGitLog {
+            anEntry("origin/trunk") {
+                subject("initial commit")
+                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                file("trunk.md")
             }
-            result.branches["origin/feat"] shouldBe aBranch {
-                name("origin/feat")
-                isCompleted()
-                firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                lastCommitHash("3".hash())
-                lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+            anEntry("origin/trunk") {
+                subject("main commit")
+                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                file("trunk2.md")
+            }
+            anEntry("origin/feat", "origin/trunk") {
+                subject("feat 1 commit")
+                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                file("feat.md")
+            }
+            anEntry("origin/feat") {
+                subject("feat 2 commit")
+                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                file("feat2.md")
+            }
+            anEntry("origin/trunk", "origin/feat") {
+                refHead("trunk")
+                subject("Merge branch 'origin/feat' into origin/trunk")
+                authorDate("2025-01-01T04:00:00+01:00".zoned())
             }
         }
 
-        @Test
-        fun `should extract branch info from merge commits after branch is deleted and mark it as inferred`() {
-            // trunk: 0───1───────4 (HEAD -> trunk, origin/trunk) [merge feat]
-            //         \         /
-            // feat:    └─2───3─┘ (deleted, inferred from merge message)
+        val testee = GitLogMiner()
 
-            // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
 
-            -----COMMIT_START-----
-            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
+        // Then
+        result.branches.size() shouldBe 2
+        result.branches["origin/trunk"] shouldBe aBranch {
+            name("origin/trunk")
+            isCurrent()
+            firstCommitHash("0".hash())
+            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            intermediateCommits("1".hash())
+            lastCommitHash("4".hash())
+            lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+        }
+        result.branches["origin/feat"] shouldBe aBranch {
+            name("origin/feat")
+            isCompleted()
+            firstCommitHash("2".hash())
+            firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+            lastCommitHash("3".hash())
+            lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
+            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+        }
+    }
 
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat.md
+    @Test
+    fun `should extract branch info from merge commits after branch is deleted and mark it as inferred`() {
+        // trunk: 0───1───────4 (HEAD -> trunk, origin/trunk) [merge feat]
+        //         \         /
+        // feat:    └─2───3─┘ (deleted, inferred from merge message)
 
-            -----COMMIT_START-----
-            |1|0|2025-01-01T00:01:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
-
-            val testee = GitLogMiner()
-
-            // When
-            val result = testee.parse(gitLogContent.lineSequence())
-
-            // Then
-            result.branches.size() shouldBe 2
-            result.branches["origin/trunk"] shouldBe aBranch {
-                name("origin/trunk")
-                isCurrent()
-                firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
-                intermediateCommits("1".hash())
-                lastCommitHash("4".hash())
-                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+        // Given
+        val gitLogContent = aGitLog {
+            isDeletedBranch("origin/feat")
+            anEntry("origin/trunk") {
+                subject("initial commit")
+                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                file("trunk.md")
             }
-            result.branches["origin/feat"] shouldBe aBranch {
-                inferredName("origin/feat")
-                isCompleted()
-                firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                lastCommitHash("3".hash())
-                lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+            anEntry("origin/trunk") {
+                subject("main commit")
+                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                file("trunk2.md")
+            }
+            anEntry("origin/feat", "origin/trunk") {
+                subject("feat 1 commit")
+                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                file("feat.md")
+            }
+            anEntry("origin/feat") {
+                subject("feat 2 commit")
+                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                file("feat2.md")
+            }
+            anEntry("origin/trunk", "origin/feat") {
+                refHead("trunk")
+                subject("Merge branch 'origin/feat' into origin/trunk")
+                authorDate("2025-01-01T04:00:00+01:00".zoned())
             }
         }
 
-        @Test
-        fun `should include branch as unnamed when branch is deleted and name cannot be inferred from merge message`() {
-            // trunk: 0───1───────4 (HEAD -> trunk, origin/trunk) [merge with custom message]
-            //         \         /
-            // ???:     └─2───3─┘ (deleted, cannot infer name)
+        val testee = GitLogMiner()
 
-            // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Squashed feature commits
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
 
-            -----COMMIT_START-----
-            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
+        // Then
+        result.branches.size() shouldBe 2
+        result.branches["origin/trunk"] shouldBe aBranch {
+            name("origin/trunk")
+            isCurrent()
+            firstCommitHash("0".hash())
+            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            intermediateCommits("1".hash())
+            lastCommitHash("4".hash())
+            lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+        }
+        result.branches["origin/feat"] shouldBe aBranch {
+            inferredName("origin/feat")
+            isCompleted()
+            firstCommitHash("2".hash())
+            firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+            lastCommitHash("3".hash())
+            lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
+            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+        }
+    }
 
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat.md
+    @Test
+    fun `should include branch as unnamed when branch is deleted and name cannot be inferred from merge message`() {
+        // trunk: 0───1───────4 (HEAD -> trunk, origin/trunk) [merge with custom message]
+        //         \         /
+        // ???:     └─2───3─┘ (deleted, cannot infer name)
 
-            -----COMMIT_START-----
-            |1|0|2025-01-01T00:01:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
-
-            val testee = GitLogMiner()
-
-            // When
-            val result = testee.parse(gitLogContent.lineSequence())
-
-            // Then
-            result.branches.size() shouldBe 2
-            result.branches["origin/trunk"] shouldBe aBranch {
-                name("origin/trunk")
-                isCurrent()
-                firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
-                intermediateCommits("1".hash())
-                lastCommitHash("4".hash())
-                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+        // Given
+        val gitLogContent = aGitLog {
+            isDeletedBranch("unnamed-branch")
+            anEntry("origin/trunk") {
+                subject("initial commit")
+                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                file("trunk.md")
             }
-            result.branches.unnamed shouldHaveSize 1
-            result.branches.unnamed.first() shouldBe aBranch {
+            anEntry("origin/trunk") {
+                subject("main commit")
+                authorDate("2025-01-01T00:01:00+01:00".zoned())
+                file("trunk2.md")
+            }
+            anEntry("unnamed-branch", "origin/trunk") {
+                subject("feat 1 commit")
+                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                file("feat.md")
+            }
+            anEntry("unnamed-branch") {
+                subject("feat 2 commit")
+                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                file("feat2.md")
+            }
+            anEntry("origin/trunk", "unnamed-branch") {
+                refHead("trunk")
+                subject("Squashed feature commits")
+                authorDate("2025-01-01T04:00:00+01:00".zoned())
+            }
+        }
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.branches.size() shouldBe 2
+        result.branches["origin/trunk"] shouldBe aBranch {
+            name("origin/trunk")
+            isCurrent()
+            firstCommitHash("0".hash())
+            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            intermediateCommits("1".hash())
+            lastCommitHash("4".hash())
+            lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+        }
+        result.branches.unnamed shouldHaveSize 1
+        result.branches.unnamed.first() shouldBe aBranch {
+            unNamed()
+            isCompleted()
+            firstCommitHash("2".hash())
+            firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+            lastCommitHash("3".hash())
+            lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
+            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+        }
+    }
+
+    @Test
+    fun `should extract branch info when main is merged into feat before feat is merged back`() {
+        // trunk: 0───1───2───────────6 (origin/trunk) [merge feat]
+        //         \       \         /
+        // feat:    3───4───5───────┘ (origin/feat)
+        //                   ^
+        //                   merge trunk into feat (parents: 4, 2)
+
+        // Given
+        val gitLogContent = aGitLog {
+            anEntry("origin/trunk") {
+                subject("initial commit")
+                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                file("trunk.md")
+            }
+            anEntry("origin/trunk") {
+                subject("trunk commit 1")
+                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                file("trunk1.md")
+            }
+            anEntry("origin/trunk") {
+                subject("trunk commit 2")
+                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                file("trunk2.md")
+            }
+            anEntry("origin/feat", "origin/trunk") {
+                subject("feat commit 1")
+                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                file("feat1.md")
+            }
+            anEntry("origin/feat") {
+                subject("feat commit 2")
+                authorDate("2025-01-01T04:00:00+01:00".zoned())
+                file("feat2.md")
+            }
+            anEntry("origin/feat", "origin/trunk") {
+                subject("Merge branch 'origin/trunk' into origin/feat")
+                authorDate("2025-01-01T05:00:00+01:00".zoned())
+            }
+            anEntry("origin/trunk", "origin/feat") {
+                refHead("trunk")
+                subject("Merge branch 'origin/feat' into origin/trunk")
+                authorDate("2025-01-01T06:00:00+01:00".zoned())
+            }
+        }
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.branches.size() shouldBe 2
+        result.branches["origin/trunk"] shouldBe aBranch {
+            name("origin/trunk")
+            isCurrent()
+            firstCommitHash("0".hash())
+            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            intermediateCommits("1".hash(), "2".hash())
+            lastCommitHash("6".hash())
+            lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
+        }
+        result.branches["origin/feat"] shouldBe aBranch {
+            name("origin/feat")
+            isCompleted()
+            firstCommitHash("3".hash())
+            firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+            intermediateCommits("4".hash())
+            lastCommitHash("5".hash())
+            lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+            mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
+        }
+    }
+
+    @Test
+    fun `should identify multiple inferred branches`() {
+        // trunk: 0───1───────4───────7 (HEAD -> trunk, origin/trunk)
+        //         \         / \     /
+        // feat-a:  └─2───3─┘   \   / (deleted, inferred from merge message)
+        //                       \ /
+        // feat-b:                5─6 (deleted, inferred from merge message)
+
+        // Given
+        val gitLogContent = aGitLog {
+            isDeletedBranch("origin/feat-a")
+            isDeletedBranch("origin/feat-b")
+            anEntry("origin/trunk") {
+                subject("initial commit")
+                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                file("trunk.md")
+            }
+            anEntry("origin/trunk") {
+                subject("main commit")
+                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                file("trunk2.md")
+            }
+            anEntry("origin/feat-a", "origin/trunk") {
+                subject("feat-a 1 commit")
+                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                file("feat-a1.md")
+            }
+            anEntry("origin/feat-a") {
+                subject("feat-a 2 commit")
+                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                file("feat-a2.md")
+            }
+            anEntry("origin/trunk", "origin/feat-a") {
+                subject("Merge branch 'origin/feat-a' into origin/trunk")
+                authorDate("2025-01-01T04:00:00+01:00".zoned())
+            }
+            anEntry("origin/feat-b", "origin/trunk") {
+                subject("feat-b 1 commit")
+                authorDate("2025-01-01T05:00:00+01:00".zoned())
+                file("feat-b1.md")
+            }
+            anEntry("origin/feat-b") {
+                subject("feat-b 2 commit")
+                authorDate("2025-01-01T06:00:00+01:00".zoned())
+                file("feat-b2.md")
+            }
+            anEntry("origin/trunk", "origin/feat-b") {
+                refHead("trunk")
+                subject("Merge branch 'origin/feat-b' into origin/trunk")
+                authorDate("2025-01-01T07:00:00+01:00".zoned())
+            }
+        }
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.branches.size() shouldBe 3
+        result.branches["origin/trunk"] shouldBe aBranch {
+            name("origin/trunk")
+            isCurrent()
+            firstCommitHash("0".hash())
+            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            intermediateCommits("1".hash(), "4".hash())
+            lastCommitHash("7".hash())
+            lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
+        }
+        result.branches["origin/feat-a"] shouldBe aBranch {
+            inferredName("origin/feat-a")
+            isCompleted()
+            firstCommitHash("2".hash())
+            firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+            lastCommitHash("3".hash())
+            lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
+            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+        }
+        result.branches["origin/feat-b"] shouldBe aBranch {
+            inferredName("origin/feat-b")
+            isCompleted()
+            firstCommitHash("5".hash())
+            firstCommitDate("2025-01-01T05:00:00+01:00".zoned())
+            lastCommitHash("6".hash())
+            lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
+            mergedInto("origin/trunk", "2025-01-01T07:00:00+01:00".zoned(), "7")
+        }
+    }
+
+    @Test
+    fun `should identify multiple unnamed branches`() {
+        // trunk: 0───1───────4───────7 (HEAD -> trunk, origin/trunk)
+        //         \         / \     /
+        // ???:     └─2───3─┘   \   / (deleted, cannot infer name)
+        //                       \ /
+        // ???:                   5─6 (deleted, cannot infer name)
+
+        // Given
+        val gitLogContent = aGitLog {
+            isDeletedBranch("unnamed-branch-a")
+            isDeletedBranch("unnamed-branch-b")
+            anEntry("origin/trunk") {
+                subject("initial commit")
+                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                file("trunk.md")
+            }
+            anEntry("origin/trunk") {
+                subject("main commit")
+                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                file("trunk2.md")
+            }
+            anEntry("unnamed-branch-a", "origin/trunk") {
+                subject("feat-a 1 commit")
+                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                file("feat-a1.md")
+            }
+            anEntry("unnamed-branch-a") {
+                subject("feat-a 2 commit")
+                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                file("feat-a2.md")
+            }
+            anEntry("origin/trunk", "unnamed-branch-a") {
+                subject("Squashed first feature")
+                authorDate("2025-01-01T04:00:00+01:00".zoned())
+            }
+            anEntry("unnamed-branch-b", "origin/trunk") {
+                subject("feat-b 1 commit")
+                authorDate("2025-01-01T05:00:00+01:00".zoned())
+                file("feat-b1.md")
+            }
+            anEntry("unnamed-branch-b") {
+                subject("feat-b 2 commit")
+                authorDate("2025-01-01T06:00:00+01:00".zoned())
+                file("feat-b2.md")
+            }
+            anEntry("origin/trunk", "unnamed-branch-b") {
+                refHead("trunk")
+                subject("Squashed second feature")
+                authorDate("2025-01-01T07:00:00+01:00".zoned())
+            }
+        }
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.branches["origin/trunk"] shouldBe aBranch {
+            name("origin/trunk")
+            isCurrent()
+            firstCommitHash("0".hash())
+            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            intermediateCommits("1".hash(), "4".hash())
+            lastCommitHash("7".hash())
+            lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
+        }
+        result.branches.unnamed.shouldContainExactlyInAnyOrder(
+            aBranch {
                 unNamed()
                 isCompleted()
                 firstCommitHash("2".hash())
@@ -1437,187 +1513,9 @@ class BranchDetectionTest {
                 lastCommitHash("3".hash())
                 lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
                 mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
-            }
-        }
-
-        @Test
-        fun `should extract branch info when main is merged into feat before feat is merged back`() {
-            // trunk: 0───1───2───────────6 (origin/trunk) [merge feat]
-            //         \       \         /
-            // feat:    3───4───5───────┘ (origin/feat)
-            //                   ^
-            //                   merge trunk into feat (parents: 4, 2)
-
-            // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|6|2 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            origin/feat|5|4 2|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/trunk' into origin/feat
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat commit 2
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
-
-            -----COMMIT_START-----
-            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat1.md
-
-            -----COMMIT_START-----
-            |2|1|2025-01-01T02:00:00+01:00|John Doe|john@example.com|trunk commit 2
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk1.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
-
-            val testee = GitLogMiner()
-
-            // When
-            val result = testee.parse(gitLogContent.lineSequence())
-
-            // Then
-            result.branches.size() shouldBe 2
-            result.branches["origin/trunk"] shouldBe aBranch {
-                name("origin/trunk")
-                isCurrent()
-                firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
-                intermediateCommits("1".hash(), "2".hash())
-                lastCommitHash("6".hash())
-                lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
-            }
-            result.branches["origin/feat"] shouldBe aBranch {
-                name("origin/feat")
-                isCompleted()
-                firstCommitHash("3".hash())
-                firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
-                intermediateCommits("4".hash())
-                lastCommitHash("5".hash())
-                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
-            }
-        }
-
-        @Test
-        fun `should identify multiple inferred branches`() {
-            // trunk: 0───1───────4───────7 (HEAD -> trunk, origin/trunk)
-            //         \         / \     /
-            // feat-a:  └─2───3─┘   \   / (deleted, inferred from merge message)
-            //                       \ /
-            // feat-b:                5─6 (deleted, inferred from merge message)
-
-            // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|7|4 6|2025-01-01T07:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat-b' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |6|5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-b2.md
-
-            -----COMMIT_START-----
-            |5|1|2025-01-01T05:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-b1.md
-
-            -----COMMIT_START-----
-            |4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat-a' into origin/trunk
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-a 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-a2.md
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-a1.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
-
-            val testee = GitLogMiner()
-
-            // When
-            val result = testee.parse(gitLogContent.lineSequence())
-
-            // Then
-            result.branches.size() shouldBe 3
-            result.branches["origin/trunk"] shouldBe aBranch {
-                name("origin/trunk")
-                isCurrent()
-                firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
-                intermediateCommits("1".hash(), "4".hash())
-                lastCommitHash("7".hash())
-                lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
-            }
-            result.branches["origin/feat-a"] shouldBe aBranch {
-                inferredName("origin/feat-a")
-                isCompleted()
-                firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                lastCommitHash("3".hash())
-                lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
-            }
-            result.branches["origin/feat-b"] shouldBe aBranch {
-                inferredName("origin/feat-b")
+            },
+            aBranch {
+                unNamed()
                 isCompleted()
                 firstCommitHash("5".hash())
                 firstCommitDate("2025-01-01T05:00:00+01:00".zoned())
@@ -1625,110 +1523,8 @@ class BranchDetectionTest {
                 lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
                 mergedInto("origin/trunk", "2025-01-01T07:00:00+01:00".zoned(), "7")
             }
-        }
-
-        @Test
-        fun `should identify multiple unnamed branches`() {
-            // trunk: 0───1───────4───────7 (HEAD -> trunk, origin/trunk)
-            //         \         / \     /
-            // ???:     └─2───3─┘   \   / (deleted, cannot infer name)
-            //                       \ /
-            // ???:                   5─6 (deleted, cannot infer name)
-
-            // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            HEAD -> trunk, origin/trunk, origin/HEAD|7|4 6|2025-01-01T07:00:00+01:00|John Doe|john@example.com|Squashed second feature
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |6|5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-b2.md
-
-            -----COMMIT_START-----
-            |5|1|2025-01-01T05:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-b1.md
-
-            -----COMMIT_START-----
-            |4|1 3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|Squashed first feature
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-a 2 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-a2.md
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a 1 commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat-a1.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk2.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       trunk.md
-        """.trimIndent()
-
-            val testee = GitLogMiner()
-
-            // When
-            val result = testee.parse(gitLogContent.lineSequence())
-
-            // Then
-            result.branches["origin/trunk"] shouldBe aBranch {
-                name("origin/trunk")
-                isCurrent()
-                firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
-                intermediateCommits("1".hash(), "4".hash())
-                lastCommitHash("7".hash())
-                lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
-            }
-            result.branches.unnamed.shouldContainExactlyInAnyOrder(
-                aBranch {
-                    unNamed()
-                    isCompleted()
-                    firstCommitHash("2".hash())
-                    firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                    lastCommitHash("3".hash())
-                    lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-                    mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
-                },
-                aBranch {
-                    unNamed()
-                    isCompleted()
-                    firstCommitHash("5".hash())
-                    firstCommitDate("2025-01-01T05:00:00+01:00".zoned())
-                    lastCommitHash("6".hash())
-                    lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
-                    mergedInto("origin/trunk", "2025-01-01T07:00:00+01:00".zoned(), "7")
-                }
-            )
-            result.branches.size() shouldBe 3
-        }
+        )
+        result.branches.size() shouldBe 3
     }
 
     @Nested
@@ -1771,41 +1567,33 @@ class BranchDetectionTest {
             //                        ^ commit after merge
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            origin/feat|4|2|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat commit after merge
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
-
-            -----COMMIT_START-----
-            HEAD -> main, origin/main, origin/HEAD|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat1.md
-
-            -----COMMIT_START-----
-            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       main.md
-
-            -----COMMIT_START-----
-            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       initial.md
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    subject("initial commit")
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    file("initial.md")
+                }
+                anEntry("origin/main") {
+                    subject("main commit")
+                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    file("main.md")
+                }
+                anEntry("origin/feat", "origin/main") {
+                    subject("feat commit 1")
+                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    file("feat1.md")
+                }
+                anEntry("origin/main", "origin/feat") {
+                    refHead("main")
+                    subject("Merge branch 'origin/feat' into origin/main")
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat") {
+                    subject("feat commit after merge")
+                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    file("feat2.md")
+                }
+            }
 
             val testee = GitLogMiner()
 
@@ -1907,41 +1695,33 @@ class BranchDetectionTest {
             //                        ^ commit after merge with backdated date
 
             // Given
-            val gitLogContent = """
-            -----COMMIT_START-----
-            origin/feat|4|2|2022-01-01T00:00:00+01:00|John Doe|john@example.com|feat commit after merge with old date
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat2.md
-
-            -----COMMIT_START-----
-            HEAD -> main, origin/main, origin/HEAD|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-
-            -----COMMIT_START-----
-            |2|0|2024-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       feat1.md
-
-            -----COMMIT_START-----
-            |1|0|2023-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       main.md
-
-            -----COMMIT_START-----
-            |0||2022-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
-            -----BODY_START-----
-            -----TRAILERS_START-----
-            -----FILES_START-----
-            0       0       initial.md
-        """.trimIndent()
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    subject("initial commit")
+                    authorDate("2022-01-01T00:00:00+01:00".zoned())
+                    file("initial.md")
+                }
+                anEntry("origin/main") {
+                    subject("main commit")
+                    authorDate("2023-01-01T01:00:00+01:00".zoned())
+                    file("main.md")
+                }
+                anEntry("origin/feat", "origin/main") {
+                    subject("feat commit 1")
+                    authorDate("2024-01-01T02:00:00+01:00".zoned())
+                    file("feat1.md")
+                }
+                anEntry("origin/main", "origin/feat") {
+                    refHead("main")
+                    subject("Merge branch 'origin/feat' into origin/main")
+                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                }
+                anEntry("origin/feat") {
+                    subject("feat commit after merge with old date")
+                    authorDate("2022-01-01T00:00:00+01:00".zoned())
+                    file("feat2.md")
+                }
+            }
 
             val testee = GitLogMiner()
 
