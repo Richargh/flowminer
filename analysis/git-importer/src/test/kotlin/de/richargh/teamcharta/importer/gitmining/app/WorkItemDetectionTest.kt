@@ -246,4 +246,33 @@ class WorkItemDetectionTest {
         val workItem = result.workItems["ABC-123"]!!
         workItem.reworkFiles shouldContainExactlyInAnyOrder setOf(Path.of("src/Feature.kt"))
     }
+
+    @Test
+    fun `commit with multiple WorkKeys should contribute to all referenced work items`() {
+        // Given - One commit referencing two work items
+        val gitLogContent = aGitLog {
+            anEntry("origin/feature") {
+                subject("ABC-123 DEF-456 implement shared feature")
+                file("src/Shared.kt", additions = 20, deletions = 5)
+            }
+        }
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
+
+        // Then - Both work items should exist with same lines
+        result.workItems.size() shouldBe 2
+
+        val workItem1 = result.workItems["ABC-123"]!!
+        workItem1.linesAdded shouldBe 20
+        workItem1.linesRemoved shouldBe 5
+        workItem1.commits shouldBe 1
+
+        val workItem2 = result.workItems["DEF-456"]!!
+        workItem2.linesAdded shouldBe 20
+        workItem2.linesRemoved shouldBe 5
+        workItem2.commits shouldBe 1
+    }
 }
