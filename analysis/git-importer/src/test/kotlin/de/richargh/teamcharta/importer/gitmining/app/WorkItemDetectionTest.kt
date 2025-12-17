@@ -2,12 +2,14 @@ package de.richargh.teamcharta.importer.gitmining.app
 
 import de.richargh.teamcharta.importer.git.app.aGitLog
 import de.richargh.teamcharta.importer.git.app.api.Author
+import de.richargh.teamcharta.importer.git.app.api.CommitType
 import de.richargh.teamcharta.importer.git.app.api.WorkKey
 import de.richargh.teamcharta.importer.gitmining.app.api.AuthorContribution
 import de.richargh.teamcharta.importer.shared.time.app.testNow2025
 import de.richargh.teamcharta.importer.shared.time.app.zoned
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
@@ -124,6 +126,38 @@ class WorkItemDetectionTest {
         workItem.contributions shouldContainExactly listOf(
             AuthorContribution(Author("Bob", "bob@example.com"), linesChanged = 60),
             AuthorContribution(Author("Alice", "alice@example.com"), linesChanged = 7)
+        )
+    }
+
+    @Test
+    fun `WorkItem should track lines changed by commit type`() {
+        // Given - Commits with different types
+        val gitLogContent = aGitLog {
+            anEntry("origin/feature") {
+                subject("feat: ABC-123 add new feature")
+                file("src/Feature.kt", additions = 20, deletions = 5)
+            }
+            anEntry("origin/feature") {
+                subject("fix: ABC-123 fix bug")
+                file("src/BugFix.kt", additions = 10, deletions = 3)
+            }
+            anEntry("origin/feature") {
+                subject("test: ABC-123 add tests")
+                file("src/FeatureTest.kt", additions = 30, deletions = 0)
+            }
+        }
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
+
+        // Then - Lines are aggregated by commit type
+        val workItem = result.workItems["ABC-123"]!!
+        workItem.absoluteChurnByType shouldContainExactly mapOf(
+            CommitType.FEATURE to 25,  // 20 + 5
+            CommitType.FIX to 13,      // 10 + 3
+            CommitType.TEST to 30      // 30 + 0
         )
     }
 }

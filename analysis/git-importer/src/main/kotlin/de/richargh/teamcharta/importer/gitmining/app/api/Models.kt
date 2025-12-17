@@ -4,6 +4,7 @@ import de.richargh.teamcharta.importer.git.app.api.Author
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
+import de.richargh.teamcharta.importer.git.app.api.CommitType
 import de.richargh.teamcharta.importer.git.app.api.BranchNameCertainty
 import de.richargh.teamcharta.importer.git.app.api.NamedBranch
 import de.richargh.teamcharta.importer.git.app.api.NamelessBranch
@@ -80,7 +81,8 @@ data class WorkItem(
     val firstCommitDate: ZonedDateTime,
     val lastCommitDate: ZonedDateTime,
     val filesChanged: Set<Path>,
-    val contributions: List<AuthorContribution>
+    val contributions: List<AuthorContribution>,
+    val absoluteChurnByType: Map<CommitType, Int>
 ) {
     val duration: Duration get() = Duration.between(firstCommitDate, lastCommitDate)
 }
