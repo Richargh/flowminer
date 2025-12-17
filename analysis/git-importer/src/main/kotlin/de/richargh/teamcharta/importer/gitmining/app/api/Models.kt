@@ -6,6 +6,7 @@ import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.git.app.api.BranchNameCertainty
 import de.richargh.teamcharta.importer.git.app.api.NamedBranch
 import de.richargh.teamcharta.importer.git.app.api.NamelessBranch
+import java.time.Duration
 import java.time.ZonedDateTime
 
 enum class BranchStatus {
@@ -36,6 +37,8 @@ data class Branch(
     val isNamed: Boolean get() = branchNameCertainty is NamedBranch
     val isUnnamed: Boolean get() = branchNameCertainty is NamelessBranch
     val isInferred: Boolean get() = branchNameCertainty is NamedBranch.Inferred
+
+    val age: Duration get() = Duration.between(firstCommitDate, lastCommitDate)
 }
 
 class Commits(private val commits: List<Commit>) {
