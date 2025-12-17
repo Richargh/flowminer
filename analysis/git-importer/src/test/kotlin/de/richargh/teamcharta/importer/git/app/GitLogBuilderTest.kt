@@ -8,6 +8,9 @@ class GitLogBuilderTest {
 
     @Test
     fun `should auto-increment hash`(){
+        // main:    0───
+        // develop: 1───
+        // stage:   2───
         // when
         val result = aGitLog {
             anEntry("origin/main"){
@@ -37,6 +40,7 @@ class GitLogBuilderTest {
 
     @Test
     fun `should automatically link a commit to its parent`(){
+        // main:    0───1
         // when
         val result = aGitLog {
             anEntry("origin/main"){
@@ -63,6 +67,9 @@ class GitLogBuilderTest {
 
     @Test
     fun `should allow branching off`(){
+        // main:       0───2     (origin/main)
+        //              \
+        // feature-1:    1     (origin/feature-1)
         // when
         val result = aGitLog {
             anEntry("origin/main"){ }
@@ -93,6 +100,9 @@ class GitLogBuilderTest {
 
     @Test
     fun `should allow branching off when setting the hash values manually`(){
+        // main:       mmm123───mmm456     (origin/main)
+        //              \
+        // feature-1:    fff123     (origin/feature-1)
         // when
         val result = aGitLog {
             anEntry("origin/main"){
@@ -127,6 +137,9 @@ class GitLogBuilderTest {
 
     @Test
     fun `should allow merging back`(){
+        // main:        0───1───2 (origin/main)
+        //               \     /
+        // feature-1:     └─1─┘  (origin/feature-1)
         // when
         val result = aGitLog {
             anEntry("origin/main"){ }
