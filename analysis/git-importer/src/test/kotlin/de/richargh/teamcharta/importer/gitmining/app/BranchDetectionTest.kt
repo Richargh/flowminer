@@ -585,8 +585,7 @@ class BranchDetectionTest {
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
                 lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                // TODO: mergeCommit info is NOT tracked for secondary branches in octopus merge
-                // This is a limitation of the current implementation
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
             }
         }
 
@@ -666,8 +665,7 @@ class BranchDetectionTest {
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
                 lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                // TODO: mergeCommit info is NOT tracked for secondary branches in octopus merge
-                // This is a limitation of the current implementation
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
             }
         }
 
@@ -748,8 +746,7 @@ class BranchDetectionTest {
                     firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                     lastCommitHash("4".hash())
                     lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                    // TODO: mergeCommit info is NOT tracked for secondary branches in octopus merge
-                    // This is a limitation of the current implementation
+                    mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
                 }
             )
         }
@@ -822,8 +819,7 @@ class BranchDetectionTest {
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
                 lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                // TODO: mergeCommit info is NOT tracked for secondary branches in octopus merge
-                // This is a limitation of the current implementation
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
             }
             result.branches.unnamed.shouldContainExactlyInAnyOrder(
                 aBranch {

@@ -75,11 +75,12 @@ private class BranchCollector(private val allCommits: List<Commit>) {
     }
 
     private fun processMerges(commit: Commit) {
-        val featureBranchHash = commit.parents[1]
-        val featureBranchId = branchIdByHash[featureBranchHash]!!
-        val featureBranch = branches[featureBranchId]!!
-        if (featureBranch.mergeCommitHash == null) {
-            featureBranch.mergeCommit(commit.hash, commit.date, commit.branch.name)
+        commit.parents.drop(1).forEach { featureBranchHash ->
+            val featureBranchId = branchIdByHash[featureBranchHash]!!
+            val featureBranch = branches[featureBranchId]!!
+            if (featureBranch.mergeCommitHash == null) {
+                featureBranch.mergeCommit(commit.hash, commit.date, commit.branch.name)
+            }
         }
     }
 
