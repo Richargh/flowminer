@@ -15,6 +15,8 @@ class BranchBuilder {
     private var targetBranch: BranchName? = null
     private var isCompleted: Boolean = false
     private var isCurrent: Boolean = false
+    private var isActive: Boolean = true
+    private var isStale: Boolean = false
 
     fun name(name: String) = apply { this.name = NamedBranch.Certain(BranchName(name)) }
     fun inferredName(name: String) = apply { this.name = NamedBranch.Inferred(BranchName(name)) }
@@ -38,6 +40,8 @@ class BranchBuilder {
 
     fun isCompleted() = apply { this.isCompleted = true }
     fun isCurrent() = apply { this.isCurrent = true }
+    fun isActive() = apply { this.isActive = true; this.isStale = false }
+    fun isStale() = apply { this.isStale = true; this.isActive = false }
 
     fun build(): Branch = Branch(
         branchNameCertainty = name,
@@ -50,7 +54,9 @@ class BranchBuilder {
         mergeDate = mergeDate,
         targetBranch = targetBranch,
         isCompleted = isCompleted,
-        isCurrent = isCurrent
+        isCurrent = isCurrent,
+        isActive = isActive,
+        isStale = isStale
     )
 
     private fun allCommits(): Set<CommitHash>{

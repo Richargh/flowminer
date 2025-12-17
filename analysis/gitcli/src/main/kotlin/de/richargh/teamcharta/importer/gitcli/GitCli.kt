@@ -6,6 +6,7 @@ import picocli.CommandLine.Command
 import picocli.CommandLine.Option
 import picocli.CommandLine.Parameters
 import java.io.File
+import java.time.ZonedDateTime
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
@@ -33,7 +34,7 @@ class GitCli : Callable<Int> {
     private val miner = GitRepositoryMiner()
 
     override fun call(): Int {
-        val result = miner.parse(File(path), since)
+        val result = miner.parse(File(path), since, ZonedDateTime.now())
 
         println("## Branches (max 20)")
         println()

@@ -4,6 +4,7 @@ import de.richargh.teamcharta.importer.git.app.api.FileChange
 import de.richargh.teamcharta.importer.git.app.api.aCommit
 import de.richargh.teamcharta.importer.git.app.api.hash
 import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
+import de.richargh.teamcharta.importer.shared.time.app.testNow2025
 import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
@@ -25,7 +26,7 @@ class GitLogMinerTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.commits.all() shouldContainExactly listOf(aCommit {
@@ -59,12 +60,13 @@ class GitLogMinerTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.all() shouldContainExactly listOf(aBranch {
             name("origin/main")
             isCurrent()
+            isStale()
             firstCommitHash("abc123".hash())
             firstCommitDate(ZonedDateTime.parse("2024-01-15T10:00:00+01:00"))
         })

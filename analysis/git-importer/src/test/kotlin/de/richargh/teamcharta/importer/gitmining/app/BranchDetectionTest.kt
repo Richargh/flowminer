@@ -4,6 +4,7 @@ import de.richargh.teamcharta.importer.git.app.aGitLog
 import de.richargh.teamcharta.importer.git.app.api.hash
 import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
 import de.richargh.teamcharta.importer.shared.time.app.atStartOfYear
+import de.richargh.teamcharta.importer.shared.time.app.testNow2025
 import de.richargh.teamcharta.importer.shared.time.app.zoned
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
@@ -30,11 +31,12 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/main"] shouldBe aBranch {
                 name("origin/main")
+                isStale()
                 firstCommitHash("0".hash())
                 firstCommitDate(atStartOfYear(2024))
                 lastCommitHash("0".hash())
@@ -62,7 +64,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/main"] shouldBe aBranch {
@@ -97,12 +99,13 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/feature-login"] shouldBe aBranch {
                 name("origin/feature-login")
                 isCompleted()
+                isStale()
                 firstCommitHash("1".hash())
                 firstCommitDate(atStartOfYear(2024))
                 lastCommitHash("1".hash())
@@ -139,12 +142,13 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/feat"] shouldBe aBranch {
                 name("origin/feat")
                 isCompleted()
+                isStale()
                 firstCommitHash("2".hash())
                 firstCommitDate(atStartOfYear(2023))
                 lastCommitHash("3".hash())
@@ -192,12 +196,13 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/feat"] shouldBe aBranch {
                 inferredName("origin/feat")
                 isCompleted()
+                isStale()
                 firstCommitHash("2".hash())
                 firstCommitDate(atStartOfYear(2023))
                 lastCommitHash("3".hash())
@@ -245,13 +250,14 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches.unnamed shouldHaveSize 1
             result.branches.unnamed.first() shouldBe aBranch {
                 unNamed()
                 isCompleted()
+                isStale()
                 firstCommitHash("2".hash())
                 firstCommitDate(atStartOfYear(2023))
                 lastCommitHash("3".hash())
@@ -275,12 +281,13 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 1
         result.branches["origin/main"] shouldBe aBranch {
             name("origin/main")
+            isStale()
             firstCommitHash("0".hash())
             firstCommitDate(atStartOfYear(2024))
             lastCommitHash("0".hash())
@@ -308,7 +315,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 1
@@ -344,7 +351,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 2
@@ -358,6 +365,7 @@ class BranchDetectionTest {
         result.branches["origin/feature-login"] shouldBe aBranch {
             name("origin/feature-login")
             isCompleted()
+            isStale()
             firstCommitHash("1".hash())
             firstCommitDate(atStartOfYear(2024))
             lastCommitHash("1".hash())
@@ -393,7 +401,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 3
@@ -407,6 +415,7 @@ class BranchDetectionTest {
         result.branches["origin/feature-login"] shouldBe aBranch {
             name("origin/feature-login")
             isCompleted()
+            isStale()
             firstCommitHash("1".hash())
             firstCommitDate(atStartOfYear(2023))
             lastCommitHash("1".hash())
@@ -415,6 +424,7 @@ class BranchDetectionTest {
         }
         result.branches["origin/feature-user"] shouldBe aBranch {
             name("origin/feature-user")
+            isStale()
             firstCommitHash("2".hash())
             firstCommitDate(atStartOfYear(2024))
             lastCommitHash("2".hash())
@@ -458,7 +468,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 2
@@ -511,7 +521,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches.size() shouldBe 3
@@ -581,7 +591,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches.size() shouldBe 3
@@ -651,7 +661,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches.size() shouldBe 3
@@ -726,7 +736,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches.size() shouldBe 3
@@ -814,7 +824,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches.size() shouldBe 3
@@ -895,7 +905,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches.size() shouldBe 2
@@ -979,7 +989,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches.size() shouldBe 2
@@ -1057,7 +1067,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches.size() shouldBe 2
@@ -1122,7 +1132,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 2
@@ -1185,7 +1195,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 2
@@ -1248,7 +1258,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 2
@@ -1322,7 +1332,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 2
@@ -1403,7 +1413,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches.size() shouldBe 3
@@ -1492,7 +1502,7 @@ class BranchDetectionTest {
         val testee = GitLogMiner()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
         // Then
         result.branches["origin/trunk"] shouldBe aBranch {
@@ -1552,7 +1562,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/feature"]!!.isCompleted shouldBe true
@@ -1598,7 +1608,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/feat"]!!.isCompleted shouldBe false
@@ -1626,7 +1636,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/feature"]!!.isCompleted shouldBe false
@@ -1654,7 +1664,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/main"]!!.isCompleted shouldBe false
@@ -1679,7 +1689,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/main"]!!.isCompleted shouldBe false
@@ -1726,7 +1736,7 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/feat"]!!.isCompleted shouldBe false
@@ -1757,10 +1767,100 @@ class BranchDetectionTest {
             val testee = GitLogMiner()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
 
             // Then
             result.branches["origin/main"]!!.isCompleted shouldBe false
+        }
+    }
+
+    @Nested
+    inner class BranchActivity {
+
+        @Test
+        fun `should mark branch as active when last commit is within 3 months of current date`() {
+            // main: 0 (origin/main)
+
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    authorDate("2025-01-15T10:00:00+01:00".zoned())
+                }
+            }
+            val currentDate = "2025-03-01T00:00:00+01:00".zoned()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence(), currentDate)
+
+            // Then
+            result.branches["origin/main"]!!.isActive shouldBe true
+            result.branches["origin/main"]!!.isStale shouldBe false
+        }
+
+        @Test
+        fun `should mark branch as stale when last commit is older than 3 months`() {
+            // main: 0 (origin/main)
+
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    authorDate("2024-01-15T10:00:00+01:00".zoned())
+                }
+            }
+            val currentDate = "2025-06-01T00:00:00+01:00".zoned()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence(), currentDate)
+
+            // Then
+            result.branches["origin/main"]!!.isActive shouldBe false
+            result.branches["origin/main"]!!.isStale shouldBe true
+        }
+
+        @Test
+        fun `should mark branch as active when last commit is exactly 3 months ago`() {
+            // main: 0 (origin/main)
+
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                }
+            }
+            val currentDate = "2025-04-01T00:00:00+01:00".zoned()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence(), currentDate)
+
+            // Then
+            result.branches["origin/main"]!!.isActive shouldBe true
+        }
+
+        @Test
+        fun `should mark branch as stale when last commit is just over 3 months ago`() {
+            // main: 0 (origin/main)
+
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    authorDate("2024-12-31T23:59:59+01:00".zoned())
+                }
+            }
+            val currentDate = "2025-04-01T00:00:00+01:00".zoned()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence(), currentDate)
+
+            // Then
+            result.branches["origin/main"]!!.isStale shouldBe true
         }
     }
 }

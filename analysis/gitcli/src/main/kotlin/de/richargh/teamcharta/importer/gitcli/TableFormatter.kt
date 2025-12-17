@@ -8,13 +8,14 @@ object TableFormatter {
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     fun formatBranches(branches: List<Branch>): String {
-        val headers = listOf("Name", "First Commit", "Last Commit", "Merged")
+        val headers = listOf("Name", "First Commit", "Last Commit", "Merged", "Status")
         val rows = branches.map { branch ->
             listOf(
                 branch.name?.toString() ?: "(unnamed)",
                 branch.firstCommitDate.format(dateFormatter),
                 branch.lastCommitDate.format(dateFormatter),
-                if (branch.mergeCommitHash != null) "Yes" else "No"
+                if (branch.mergeCommitHash != null) "Yes" else "No",
+                if (branch.isActive) "Active" else "Stale"
             )
         }
         return formatTable(headers, rows)

@@ -2,15 +2,16 @@ package de.richargh.teamcharta.importer.gitmining.app
 
 import de.richargh.teamcharta.importer.gitmining.app.api.GitMiningResult
 import java.io.File
+import java.time.ZonedDateTime
 
 class GitRepositoryMiner(
     private val gitLogParser: GitLogMiner = GitLogMiner()
 ) {
 
-    fun parse(repoPath: File, since: String = "6 months ago"): GitMiningResult {
+    fun parse(repoPath: File, since: String = "6 months ago", currentDate: ZonedDateTime): GitMiningResult {
         val process = startGitLog(repoPath, since)
         return process.inputStream.bufferedReader().useLines { lines ->
-            gitLogParser.parse(lines)
+            gitLogParser.parse(lines, currentDate)
         }
     }
 

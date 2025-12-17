@@ -6,14 +6,14 @@ import de.richargh.teamcharta.importer.gitmining.app.api.Branch
 import de.richargh.teamcharta.importer.gitmining.app.api.Branches
 import java.time.ZonedDateTime
 
-fun extractBranchInfo(commits: List<Commit>): Branches {
-    val collector = BranchCollector(commits)
+fun extractBranchInfo(commits: List<Commit>, currentDate: ZonedDateTime): Branches {
+    val collector = BranchCollector(commits, currentDate)
     collector.processCommits()
 
     return collector.toBranches()
 }
 
-private class BranchCollector(private val allCommits: List<Commit>) {
+private class BranchCollector(private val allCommits: List<Commit>, private val currentDate: ZonedDateTime) {
     private val branchIdByHash = mutableMapOf<CommitHash, BranchId>()
     private val commitByHash = mutableMapOf<CommitHash, Commit>()
 
@@ -84,7 +84,7 @@ private class BranchCollector(private val allCommits: List<Commit>) {
     }
 
     fun toBranches(): Branches {
-        return Branches(branches.values.map(MutableBranch::toBranch))
+        return Branches(branches.values.map { it.toBranch(currentDate) })
     }
 }
 
@@ -138,10 +138,14 @@ private class MutableBranch(
         mergedParentHash = parentHash
     }
 
-    fun toBranch(): Branch {
+    fun toBranch(currentDate: ZonedDateTime): Branch {
         val wasMerged = mergeCommitHash != null
         val noCommitsAfterMerge = mergedParentHash?.let { lastCommitHash == it } ?: false
         val isCompleted = wasMerged && noCommitsAfterMerge && !isCurrent
+
+        val threeMonthsAgo = currentDate.minusMonths(3)
+        val isActive = !lastCommitDate.isBefore(threeMonthsAgo)
+        val isStale = !isActive
 
         return Branch(
             branchNameCertainty = branchNameCertainty,
@@ -154,7 +158,9 @@ private class MutableBranch(
             mergeDate = mergeCommitDate,
             targetBranch = targetBranch,
             isCompleted = isCompleted,
-            isCurrent = isCurrent
+            isCurrent = isCurrent,
+            isActive = isActive,
+            isStale = isStale
         )
     }
 }
