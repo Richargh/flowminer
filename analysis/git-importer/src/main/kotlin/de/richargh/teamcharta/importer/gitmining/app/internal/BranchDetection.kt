@@ -64,16 +64,16 @@ private class BranchCollector(private val allCommits: List<Commit>) {
             is BranchId.LastCommit -> NamelessBranch
         }
         val branch = branches.getOrPut(branchId) {
-            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, name, commit.isOnActiveBranch)
+            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, name, commit.isOnCurrentBranch)
         }
         branch.addCommit(commit.hash, commit.date)
     }
 
     private fun processMerges(commit: Commit) {
         commit.parents.drop(1).forEach { featureBranchHash ->
-            // Don't mark the active branch as merged when main is merged into a feature branch
+            // Don't mark the current branch as merged when main is merged into a feature branch
             val featureBranchCommit = commitByHash[featureBranchHash]
-            if (featureBranchCommit?.isOnActiveBranch == true) return@forEach
+            if (featureBranchCommit?.isOnCurrentBranch == true) return@forEach
 
             val featureBranchId = branchIdByHash[featureBranchHash]!!
             val featureBranch = branches[featureBranchId]!!
@@ -101,7 +101,7 @@ private class MutableBranch(
     lastCommitHash: CommitHash,
     lastCommitDate: ZonedDateTime,
     val branchNameCertainty: BranchNameCertainty,
-    val isActive: Boolean
+    val isCurrent: Boolean
 ) {
     var firstCommitHash: CommitHash = firstCommitHash
         private set
@@ -141,7 +141,7 @@ private class MutableBranch(
     fun toBranch(): Branch {
         val wasMerged = mergeCommitHash != null
         val noCommitsAfterMerge = mergedParentHash?.let { lastCommitHash == it } ?: false
-        val isCompleted = wasMerged && noCommitsAfterMerge && !isActive
+        val isCompleted = wasMerged && noCommitsAfterMerge && !isCurrent
 
         return Branch(
             branchNameCertainty = branchNameCertainty,
@@ -154,7 +154,7 @@ private class MutableBranch(
             mergeDate = mergeCommitDate,
             targetBranch = targetBranch,
             isCompleted = isCompleted,
-            isActive = isActive
+            isCurrent = isCurrent
         )
     }
 }

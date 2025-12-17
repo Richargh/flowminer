@@ -8,12 +8,12 @@ import de.richargh.teamcharta.importer.git.app.api.Ref
 
 data class TrackingResult(
     val branch: BranchNameCertainty,
-    val isOnActiveBranch: Boolean
+    val isOnCurrentBranch: Boolean
 )
 
 class BranchTracker {
     private val branchFor = mutableMapOf<CommitHash, BranchNameCertainty>()
-    private val activeChain = mutableSetOf<CommitHash>()
+    private val currentChain = mutableSetOf<CommitHash>()
 
     fun trackBranch(
         hash: CommitHash,
@@ -23,16 +23,16 @@ class BranchTracker {
     ): TrackingResult {
         val hasHead = refs.any { it is Ref.LocalHead }
         if (hasHead) {
-            activeChain.add(hash)
+            currentChain.add(hash)
         }
 
         val branch = byTipOrHead(hash, refs)
             ?: byRegistry(hash)
             ?: NamelessBranch
 
-        registerParents(branch, parents, message, hash in activeChain)
+        registerParents(branch, parents, message, hash in currentChain)
 
-        return TrackingResult(branch, hash in activeChain)
+        return TrackingResult(branch, hash in currentChain)
     }
 
     private fun registerParents(
@@ -66,9 +66,9 @@ class BranchTracker {
 
     private fun registerFirstParent(parentHash: CommitHash, childBranch: BranchNameCertainty, isChildOnHeadChain: Boolean) {
         if (isChildOnHeadChain) {
-            activeChain.add(parentHash)
+            currentChain.add(parentHash)
             branchFor[parentHash] = childBranch
-        } else if (parentHash !in activeChain && parentHash !in branchFor) {
+        } else if (parentHash !in currentChain && parentHash !in branchFor) {
             branchFor[parentHash] = childBranch
         }
     }
@@ -84,7 +84,7 @@ class BranchTracker {
 
     private fun registerMergedParent(parentHash: CommitHash, branch: NamedBranch.Inferred) {
         // Merged parents never overwrite HEAD chain or existing assignments
-        if (parentHash !in activeChain && parentHash !in branchFor) {
+        if (parentHash !in currentChain && parentHash !in branchFor) {
             branchFor[parentHash] = branch
         }
     }

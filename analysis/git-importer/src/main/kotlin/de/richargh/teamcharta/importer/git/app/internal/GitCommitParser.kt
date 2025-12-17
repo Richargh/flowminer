@@ -44,7 +44,7 @@ private fun parseCommit(raw: RawCommit, tracker: BranchTracker): Commit {
         commitType = commitType,
         workKeys = workKeys,
         branch = tracking.branch,
-        isOnActiveBranch = tracking.isOnActiveBranch
+        isOnCurrentBranch = tracking.isOnCurrentBranch
     )
 }
 

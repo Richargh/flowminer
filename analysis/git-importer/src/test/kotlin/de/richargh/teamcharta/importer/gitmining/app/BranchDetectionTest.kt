@@ -572,7 +572,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -655,7 +655,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -738,7 +738,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -823,7 +823,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -923,7 +923,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -1014,7 +1014,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/main"] shouldBe aBranch {
                 name("origin/main")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "3".hash())
@@ -1114,7 +1114,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/main"] shouldBe aBranch {
                 name("origin/main")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "4".hash())
@@ -1206,7 +1206,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/main"] shouldBe aBranch {
                 name("origin/main")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "4".hash())
@@ -1281,7 +1281,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -1351,7 +1351,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -1421,7 +1421,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -1507,7 +1507,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "2".hash())
@@ -1600,7 +1600,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "4".hash())
@@ -1700,7 +1700,7 @@ class BranchDetectionTest {
             // Then
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
-                isActive()
+                isCurrent()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "4".hash())

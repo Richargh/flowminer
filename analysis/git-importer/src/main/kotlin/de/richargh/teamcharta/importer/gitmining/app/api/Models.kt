@@ -19,7 +19,7 @@ data class Branch(
     val mergeDate: ZonedDateTime?,
     val targetBranch: BranchName?,
     val isCompleted: Boolean,
-    val isActive: Boolean
+    val isCurrent: Boolean
 ) {
     val name: BranchName? get() = when (branchNameCertainty) {
         is NamedBranch.Certain -> branchNameCertainty.name

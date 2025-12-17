@@ -437,7 +437,7 @@ class BranchAssignmentTest {
     }
 
     @Test
-    fun `should mark commits on HEAD chain as isOnActiveBranch`() {
+    fun `should mark commits on HEAD chain as isOnCurrentBranch`() {
         // main:    0───1───2 (HEAD -> main, origin/main)
         //           \
         // feature:   └─3 (origin/feature)
@@ -475,10 +475,10 @@ class BranchAssignmentTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then - commits reachable from HEAD should be marked
-        result[0].isOnActiveBranch shouldBe true  // main commit 2 (HEAD)
-        result[1].isOnActiveBranch shouldBe false // feature commit (not on HEAD chain)
-        result[2].isOnActiveBranch shouldBe true  // main commit 1 (first parent of HEAD)
-        result[3].isOnActiveBranch shouldBe true  // initial commit (ancestor of HEAD)
+        result[0].isOnCurrentBranch shouldBe true  // main commit 2 (HEAD)
+        result[1].isOnCurrentBranch shouldBe false // feature commit (not on HEAD chain)
+        result[2].isOnCurrentBranch shouldBe true  // main commit 1 (first parent of HEAD)
+        result[3].isOnCurrentBranch shouldBe true  // initial commit (ancestor of HEAD)
     }
 
     @Nested

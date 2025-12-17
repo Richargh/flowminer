@@ -36,7 +36,7 @@ class GitLogParserTest {
             fileChanges(
                 FileChange("src/Main.kt", additions = 5, deletions = 2))
             certainBranch("origin/main")
-            isOnActiveBranch()
+            isOnCurrentBranch()
         })
     }
 }
