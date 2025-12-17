@@ -13,7 +13,9 @@ enum class CommitType {
 }
 
 data class WorkKey(val key: String)
-data class CommitHash(val rawValue: String)
+data class CommitHash(val rawValue: String) {
+    override fun toString() = rawValue
+}
 data class BranchName(val value: String) {
     override fun toString() = value
 }
@@ -25,13 +27,18 @@ sealed interface BranchNameCertainty {
 sealed interface NamedBranch: BranchNameCertainty {
     override val name: BranchName
 
-    data class Certain(override val name: BranchName) : NamedBranch
+    data class Certain(override val name: BranchName) : NamedBranch {
+        override fun toString(): String = name.toString()
+    }
 
-    data class Inferred(override val name: BranchName) : NamedBranch
+    data class Inferred(override val name: BranchName) : NamedBranch {
+        override fun toString(): String = name.toString()
+    }
 }
 
 object NamelessBranch: BranchNameCertainty {
     override val name: BranchName? = null
+    override fun toString(): String = javaClass.simpleName
 }
 
 sealed interface Ref {

@@ -10,6 +10,7 @@ import java.time.ZonedDateTime
 
 data class Branch(
     val branchNameCertainty: BranchNameCertainty,
+    val commits: Set<CommitHash>,
     val firstCommitHash: CommitHash,
     val firstCommitDate: ZonedDateTime,
     val lastCommitHash: CommitHash,

@@ -5,6 +5,8 @@ import de.richargh.teamcharta.importer.git.app.api.hash
 import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
 import de.richargh.teamcharta.importer.shared.time.app.atStartOfYear
 import de.richargh.teamcharta.importer.shared.time.app.zoned
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.collections.shouldContainInOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
@@ -68,6 +70,7 @@ class BranchDetectionTest {
                 name("origin/main")
                 firstCommitHash("0".hash())
                 firstCommitDate(atStartOfYear(2023))
+                intermediateCommits("1".hash())
                 lastCommitHash("2".hash())
                 lastCommitDate(atStartOfYear(2025))
             }
@@ -324,6 +327,7 @@ class BranchDetectionTest {
             name("origin/main")
             firstCommitHash("0".hash())
             firstCommitDate(atStartOfYear(2023))
+            intermediateCommits("1".hash())
             lastCommitHash("2".hash())
             lastCommitDate(atStartOfYear(2025))
         }
@@ -484,6 +488,7 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash())
                 lastCommitHash("4".hash())
                 lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
             }
@@ -551,6 +556,7 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash())
                 lastCommitHash("4".hash())
                 lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
             }
@@ -618,6 +624,7 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash())
                 lastCommitHash("4".hash())
                 lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
             }
@@ -701,6 +708,7 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash(), "2".hash())
                 lastCommitHash("6".hash())
                 lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
             }
@@ -708,6 +716,7 @@ class BranchDetectionTest {
                 name("origin/feat")
                 firstCommitHash("3".hash())
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                intermediateCommits("4".hash())
                 lastCommitHash("5".hash())
                 lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
                 mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
@@ -715,7 +724,7 @@ class BranchDetectionTest {
         }
 
         @Test
-        fun `should identify inferred branches`() {
+        fun `should identify multiple inferred branches`() {
             // trunk: 0───1───────4───────7 (HEAD -> trunk, origin/trunk)
             //         \         / \     /
             // feat-a:  └─2───3─┘   \   / (deleted, inferred from merge message)
@@ -790,6 +799,7 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash(), "4".hash())
                 lastCommitHash("7".hash())
                 lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
             }
@@ -812,7 +822,7 @@ class BranchDetectionTest {
         }
 
         @Test
-        fun `should identify unnamed branches`() {
+        fun `should identify multiple unnamed branches`() {
             // trunk: 0───1───────4───────7 (HEAD -> trunk, origin/trunk)
             //         \         / \     /
             // ???:     └─2───3─┘   \   / (deleted, cannot infer name)
@@ -882,27 +892,24 @@ class BranchDetectionTest {
             val result = testee.parse(gitLogContent.lineSequence())
 
             // Then
-            result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash(), "4".hash())
                 lastCommitHash("7".hash())
                 lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
             }
-            result.branches.unnamed shouldHaveSize 2
-            result.branches.unnamed.any { branch ->
-                branch == aBranch {
+            result.branches.unnamed.shouldContainExactlyInAnyOrder(
+                aBranch {
                     unNamed()
                     firstCommitHash("2".hash())
                     firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                     lastCommitHash("3".hash())
                     lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
                     mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
-                }
-            } shouldBe true
-            result.branches.unnamed.any { branch ->
-                branch == aBranch {
+                },
+                aBranch {
                     unNamed()
                     firstCommitHash("5".hash())
                     firstCommitDate("2025-01-01T05:00:00+01:00".zoned())
@@ -910,7 +917,8 @@ class BranchDetectionTest {
                     lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
                     mergedInto("origin/trunk", "2025-01-01T07:00:00+01:00".zoned(), "7")
                 }
-            } shouldBe true
+            )
+            result.branches.size() shouldBe 3
         }
     }
 }
