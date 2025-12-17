@@ -6,7 +6,6 @@ import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
 import de.richargh.teamcharta.importer.shared.time.app.atStartOfYear
 import de.richargh.teamcharta.importer.shared.time.app.zoned
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.collections.shouldContainInOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
@@ -428,6 +427,512 @@ class BranchDetectionTest {
             firstCommitDate(atStartOfYear(2024))
             lastCommitHash("2".hash())
             lastCommitDate(atStartOfYear(2024))
+        }
+    }
+
+    @Test
+    fun `should track first and last commits by date even when branch has many commits`() {
+        // Long-running branch with many commits
+        // trunk:   0─────────────────────6 (origin/trunk) [merge feat]
+        //           \                   /
+        // feat:      └─1───2───3───4───5 (origin/feat)
+
+        // Given
+        val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> trunk, origin/trunk, origin/HEAD|6|0 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/trunk
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feat|5|4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|feat commit 5
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat5.md
+
+            -----COMMIT_START-----
+            |4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat commit 4
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat4.md
+
+            -----COMMIT_START-----
+            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat commit 3
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat3.md
+
+            -----COMMIT_START-----
+            |2|1|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 2
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat2.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|feat commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat1.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk.md
+        """.trimIndent()
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence())
+
+        // Then
+        result.branches.size() shouldBe 2
+        result.branches["origin/feat"] shouldBe aBranch {
+            name("origin/feat")
+            firstCommitHash("1".hash())
+            firstCommitDate("2025-01-01T01:00:00+01:00".zoned())
+            intermediateCommits("2".hash(), "3".hash(), "4".hash())
+            lastCommitHash("5".hash())
+            lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+            mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
+        }
+    }
+
+    @Nested
+    inner class OctopusMerges {
+
+        @Test
+        fun `should handle octopus merge with three parents and branch names from tips`() {
+            // trunk: 0───1───────────5 (HEAD -> trunk, origin/trunk) [octopus merge feat-a and feat-b]
+            //         \    \        /
+            // feat-a:  └─2──\──────/ (deleted, inferred from merge message)
+            //                \    /
+            // feat-b:         └─3-4 (deleted, inferred from merge message)
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> trunk, origin/trunk, origin/HEAD|5|1 2 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat-a' and 'origin/feat-b' into origin/trunk
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feat-b|4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feat-a|2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches.size() shouldBe 3
+            result.branches["origin/trunk"] shouldBe aBranch {
+                name("origin/trunk")
+                firstCommitHash("0".hash())
+                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash())
+                lastCommitHash("5".hash())
+                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+            }
+            result.branches["origin/feat-a"] shouldBe aBranch {
+                name("origin/feat-a")
+                firstCommitHash("2".hash())
+                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                lastCommitHash("2".hash())
+                lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+            }
+            result.branches["origin/feat-b"] shouldBe aBranch {
+                name("origin/feat-b")
+                firstCommitHash("3".hash())
+                firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                lastCommitHash("4".hash())
+                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                // TODO: mergeCommit info is NOT tracked for secondary branches in octopus merge
+                // This is a limitation of the current implementation
+            }
+        }
+
+        @Test
+        fun `should handle octopus merge with three parents and infer branch names from merge message`() {
+            // trunk: 0───1───────────5 (HEAD -> trunk, origin/trunk) [octopus merge feat-a and feat-b]
+            //         \    \        /
+            // feat-a:  └─2──\──────/ (deleted, inferred from merge message)
+            //                \    /
+            // feat-b:         └─3-4 (deleted, inferred from merge message)
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> trunk, origin/trunk, origin/HEAD|5|1 2 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branches 'origin/feat-a' and 'origin/feat-b' into origin/trunk
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches.size() shouldBe 3
+            result.branches["origin/trunk"] shouldBe aBranch {
+                name("origin/trunk")
+                firstCommitHash("0".hash())
+                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash())
+                lastCommitHash("5".hash())
+                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+            }
+            result.branches["origin/feat-a"] shouldBe aBranch {
+                inferredName("origin/feat-a")
+                firstCommitHash("2".hash())
+                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                lastCommitHash("2".hash())
+                lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+            }
+            result.branches["origin/feat-b"] shouldBe aBranch {
+                inferredName("origin/feat-b")
+                firstCommitHash("3".hash())
+                firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                lastCommitHash("4".hash())
+                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                // TODO: mergeCommit info is NOT tracked for secondary branches in octopus merge
+                // This is a limitation of the current implementation
+            }
+        }
+
+        @Test
+        fun `should handle octopus merge with three parents and unnamed branches`() {
+            // trunk: 0───1───────────5 (HEAD -> trunk, origin/trunk) [octopus merge feat-a and feat-b]
+            //         \    \        /
+            // feat-a:  └─2──\──────/ (deleted, inferred from merge message)
+            //                \    /
+            // feat-b:         └─3-4 (deleted, inferred from merge message)
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> trunk, origin/trunk, origin/HEAD|5|1 2 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Octopus merge all the things into origin/trunk
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches.size() shouldBe 3
+            result.branches["origin/trunk"] shouldBe aBranch {
+                name("origin/trunk")
+                firstCommitHash("0".hash())
+                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash())
+                lastCommitHash("5".hash())
+                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+            }
+            result.branches.unnamed.shouldContainExactlyInAnyOrder(
+                aBranch {
+                    unNamed()
+                    firstCommitHash("2".hash())
+                    firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                    lastCommitHash("2".hash())
+                    lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                    mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                },
+                aBranch {
+                    unNamed()
+                    firstCommitHash("3".hash())
+                    firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                    lastCommitHash("4".hash())
+                    lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                    // TODO: mergeCommit info is NOT tracked for secondary branches in octopus merge
+                    // This is a limitation of the current implementation
+                }
+            )
+        }
+
+        @Test
+        fun `should handle octopus merge with three parents, one named, one unnamed`() {
+            // trunk: 0───1───────────5 (HEAD -> trunk, origin/trunk) [octopus merge feat-a and feat-b]
+            //         \    \        /
+            // feat-a:  └─2──\──────/ (deleted, inferred from merge message)
+            //                \    /
+            // feat-b:         └─3-4 (origin/feat-b)
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> trunk, origin/trunk, origin/HEAD|5|1 2 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Octopus merge all the things into origin/trunk
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feat-b|4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b 2 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |3|0|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-b 1 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches.size() shouldBe 3
+            result.branches["origin/trunk"] shouldBe aBranch {
+                name("origin/trunk")
+                firstCommitHash("0".hash())
+                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash())
+                lastCommitHash("5".hash())
+                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+            }
+            result.branches["origin/feat-b"] shouldBe aBranch {
+                name("origin/feat-b")
+                firstCommitHash("3".hash())
+                firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                lastCommitHash("4".hash())
+                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                // TODO: mergeCommit info is NOT tracked for secondary branches in octopus merge
+                // This is a limitation of the current implementation
+            }
+            result.branches.unnamed.shouldContainExactlyInAnyOrder(
+                aBranch {
+                    unNamed()
+                    firstCommitHash("2".hash())
+                    firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                    lastCommitHash("2".hash())
+                    lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                    mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                }
+            )
+        }
+    }
+
+    @Nested
+    inner class NestedBranches {
+
+        @Test
+        fun `should handle feature branch created from another feature branch`() {
+            // trunk:   0───1─────────────────6 (origin/trunk) [merge feat-a]
+            //           \                   /
+            // feat-a:    └─2───3───────5───┘ (origin/feat-a) [merge feat-b]
+            //                   \     /
+            // feat-b:            └─4─┘ (origin/feat-b, branched from feat-a commit 3)
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> trunk, origin/trunk, origin/HEAD|6|1 5|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat-a' into origin/trunk
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feat-a|5|3 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat-b' into origin/feat-a
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feat-b|4|3|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat-b commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat-b.md
+
+            -----COMMIT_START-----
+            |3|2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|feat-a 2 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat-a2.md
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat-a 1 commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat-a1.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|trunk commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk2.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       trunk.md
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches.size() shouldBe 3
+            result.branches["origin/trunk"] shouldBe aBranch {
+                name("origin/trunk")
+                firstCommitHash("0".hash())
+                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash())
+                lastCommitHash("6".hash())
+                lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
+            }
+            result.branches["origin/feat-a"] shouldBe aBranch {
+                name("origin/feat-a")
+                firstCommitHash("2".hash())
+                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                intermediateCommits("3".hash())
+                lastCommitHash("5".hash())
+                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+                mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
+            }
+            result.branches["origin/feat-b"] shouldBe aBranch {
+                name("origin/feat-b")
+                firstCommitHash("4".hash())
+                firstCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                lastCommitHash("4".hash())
+                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                // TODO: mergeCommit info is NOT tracked because feat-b was merged into feat-a,
+                // not into the active branch (trunk). The algorithm only tracks merges into the
+                // active branch (commits with HEAD reference).
+            }
         }
     }
 
