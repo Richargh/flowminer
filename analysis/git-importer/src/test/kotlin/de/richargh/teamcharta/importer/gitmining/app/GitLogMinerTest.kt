@@ -64,6 +64,7 @@ class GitLogMinerTest {
         // Then
         result.branches.all() shouldContainExactly listOf(aBranch {
             name("origin/main")
+            isActive()
             firstCommitHash("abc123".hash())
             firstCommitDate(ZonedDateTime.parse("2024-01-15T10:00:00+01:00"))
         })

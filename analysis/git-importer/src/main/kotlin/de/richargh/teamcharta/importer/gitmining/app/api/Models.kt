@@ -17,7 +17,9 @@ data class Branch(
     val lastCommitDate: ZonedDateTime,
     val mergeCommitHash: CommitHash?,
     val mergeDate: ZonedDateTime?,
-    val targetBranch: BranchName?
+    val targetBranch: BranchName?,
+    val isCompleted: Boolean,
+    val isActive: Boolean
 ) {
     val name: BranchName? get() = when (branchNameCertainty) {
         is NamedBranch.Certain -> branchNameCertainty.name

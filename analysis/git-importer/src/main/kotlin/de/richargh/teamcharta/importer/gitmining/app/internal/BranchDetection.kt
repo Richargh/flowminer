@@ -64,7 +64,7 @@ private class BranchCollector(private val allCommits: List<Commit>) {
             is BranchId.LastCommit -> NamelessBranch
         }
         val branch = branches.getOrPut(branchId) {
-            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, name)
+            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, name, commit.isOnActiveBranch)
         }
         branch.addCommit(commit.hash, commit.date)
     }
@@ -78,7 +78,7 @@ private class BranchCollector(private val allCommits: List<Commit>) {
             val featureBranchId = branchIdByHash[featureBranchHash]!!
             val featureBranch = branches[featureBranchId]!!
             if (featureBranch.mergeCommitHash == null) {
-                featureBranch.mergeCommit(commit.hash, commit.date, commit.branch.name)
+                featureBranch.mergeCommit(commit.hash, commit.date, commit.branch.name, featureBranchHash)
             }
         }
     }
@@ -100,7 +100,8 @@ private class MutableBranch(
     firstCommitDate: ZonedDateTime,
     lastCommitHash: CommitHash,
     lastCommitDate: ZonedDateTime,
-    val branchNameCertainty: BranchNameCertainty
+    val branchNameCertainty: BranchNameCertainty,
+    val isActive: Boolean
 ) {
     var firstCommitHash: CommitHash = firstCommitHash
         private set
@@ -116,6 +117,8 @@ private class MutableBranch(
         private set
     var targetBranch: BranchName? = null
         private set
+    var mergedParentHash: CommitHash? = null
+        private set
 
     private var commits = mutableSetOf(firstCommitHash, lastCommitHash)
 
@@ -128,21 +131,30 @@ private class MutableBranch(
         }
     }
 
-    fun mergeCommit(hash: CommitHash, date: ZonedDateTime, target: BranchName?) {
+    fun mergeCommit(hash: CommitHash, date: ZonedDateTime, target: BranchName?, parentHash: CommitHash) {
         mergeCommitHash = hash
         mergeCommitDate = date
         targetBranch = target
+        mergedParentHash = parentHash
     }
 
-    fun toBranch(): Branch = Branch(
-        branchNameCertainty = branchNameCertainty,
-        commits = commits,
-        firstCommitHash = firstCommitHash,
-        firstCommitDate = firstCommitDate,
-        lastCommitHash = lastCommitHash,
-        lastCommitDate = lastCommitDate,
-        mergeCommitHash = mergeCommitHash,
-        mergeDate = mergeCommitDate,
-        targetBranch = targetBranch
-    )
+    fun toBranch(): Branch {
+        val wasMerged = mergeCommitHash != null
+        val noCommitsAfterMerge = mergedParentHash?.let { lastCommitHash == it } ?: false
+        val isCompleted = wasMerged && noCommitsAfterMerge && !isActive
+
+        return Branch(
+            branchNameCertainty = branchNameCertainty,
+            commits = commits,
+            firstCommitHash = firstCommitHash,
+            firstCommitDate = firstCommitDate,
+            lastCommitHash = lastCommitHash,
+            lastCommitDate = lastCommitDate,
+            mergeCommitHash = mergeCommitHash,
+            mergeDate = mergeCommitDate,
+            targetBranch = targetBranch,
+            isCompleted = isCompleted,
+            isActive = isActive
+        )
+    }
 }

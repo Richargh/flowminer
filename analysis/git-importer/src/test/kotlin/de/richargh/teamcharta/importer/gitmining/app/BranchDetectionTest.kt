@@ -102,6 +102,7 @@ class BranchDetectionTest {
             // Then
             result.branches["origin/feature-login"] shouldBe aBranch {
                 name("origin/feature-login")
+                isCompleted()
                 firstCommitHash("1".hash())
                 firstCommitDate(atStartOfYear(2024))
                 lastCommitHash("1".hash())
@@ -143,6 +144,7 @@ class BranchDetectionTest {
             // Then
             result.branches["origin/feat"] shouldBe aBranch {
                 name("origin/feat")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate(atStartOfYear(2023))
                 lastCommitHash("3".hash())
@@ -202,6 +204,7 @@ class BranchDetectionTest {
             // Then
             result.branches["origin/feat"] shouldBe aBranch {
                 inferredName("origin/feat")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate(atStartOfYear(2023))
                 lastCommitHash("3".hash())
@@ -262,6 +265,7 @@ class BranchDetectionTest {
             result.branches.unnamed shouldHaveSize 1
             result.branches.unnamed.first() shouldBe aBranch {
                 unNamed()
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate(atStartOfYear(2023))
                 lastCommitHash("3".hash())
@@ -367,6 +371,7 @@ class BranchDetectionTest {
         }
         result.branches["origin/feature-login"] shouldBe aBranch {
             name("origin/feature-login")
+            isCompleted()
             firstCommitHash("1".hash())
             firstCommitDate(atStartOfYear(2024))
             lastCommitHash("1".hash())
@@ -415,6 +420,7 @@ class BranchDetectionTest {
         }
         result.branches["origin/feature-login"] shouldBe aBranch {
             name("origin/feature-login")
+            isCompleted()
             firstCommitHash("1".hash())
             firstCommitDate(atStartOfYear(2023))
             lastCommitHash("1".hash())
@@ -497,6 +503,7 @@ class BranchDetectionTest {
         result.branches.size() shouldBe 2
         result.branches["origin/feat"] shouldBe aBranch {
             name("origin/feat")
+            isCompleted()
             firstCommitHash("1".hash())
             firstCommitDate("2025-01-01T01:00:00+01:00".zoned())
             intermediateCommits("2".hash(), "3".hash(), "4".hash())
@@ -565,6 +572,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -573,6 +581,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat-a"] shouldBe aBranch {
                 name("origin/feat-a")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 lastCommitHash("2".hash())
@@ -581,6 +590,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 name("origin/feat-b")
+                isCompleted()
                 firstCommitHash("3".hash())
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
@@ -645,6 +655,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -653,6 +664,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat-a"] shouldBe aBranch {
                 inferredName("origin/feat-a")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 lastCommitHash("2".hash())
@@ -661,6 +673,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 inferredName("origin/feat-b")
+                isCompleted()
                 firstCommitHash("3".hash())
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
@@ -725,6 +738,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -734,6 +748,7 @@ class BranchDetectionTest {
             result.branches.unnamed.shouldContainExactlyInAnyOrder(
                 aBranch {
                     unNamed()
+                    isCompleted()
                     firstCommitHash("2".hash())
                     firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                     lastCommitHash("2".hash())
@@ -742,6 +757,7 @@ class BranchDetectionTest {
                 },
                 aBranch {
                     unNamed()
+                    isCompleted()
                     firstCommitHash("3".hash())
                     firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                     lastCommitHash("4".hash())
@@ -807,6 +823,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -815,6 +832,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 name("origin/feat-b")
+                isCompleted()
                 firstCommitHash("3".hash())
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
@@ -824,6 +842,7 @@ class BranchDetectionTest {
             result.branches.unnamed.shouldContainExactlyInAnyOrder(
                 aBranch {
                     unNamed()
+                    isCompleted()
                     firstCommitHash("2".hash())
                     firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                     lastCommitHash("2".hash())
@@ -904,6 +923,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -912,6 +932,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat-a"] shouldBe aBranch {
                 name("origin/feat-a")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 intermediateCommits("3".hash())
@@ -921,6 +942,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 name("origin/feat-b")
+                isCompleted()
                 firstCommitHash("4".hash())
                 firstCommitDate("2025-01-01T04:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
@@ -992,6 +1014,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/main"] shouldBe aBranch {
                 name("origin/main")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "3".hash())
@@ -1000,6 +1023,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat"] shouldBe aBranch {
                 name("origin/feat")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
@@ -1090,6 +1114,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/main"] shouldBe aBranch {
                 name("origin/main")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "4".hash())
@@ -1181,6 +1206,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/main"] shouldBe aBranch {
                 name("origin/main")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "4".hash())
@@ -1189,6 +1215,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat"] shouldBe aBranch {
                 name("origin/feat")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 intermediateCommits("5".hash(), "3".hash())
@@ -1254,6 +1281,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -1262,6 +1290,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat"] shouldBe aBranch {
                 name("origin/feat")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 lastCommitHash("3".hash())
@@ -1322,6 +1351,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -1330,6 +1360,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat"] shouldBe aBranch {
                 inferredName("origin/feat")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 lastCommitHash("3".hash())
@@ -1390,6 +1421,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash())
@@ -1399,6 +1431,7 @@ class BranchDetectionTest {
             result.branches.unnamed shouldHaveSize 1
             result.branches.unnamed.first() shouldBe aBranch {
                 unNamed()
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 lastCommitHash("3".hash())
@@ -1474,6 +1507,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 2
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "2".hash())
@@ -1482,6 +1516,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat"] shouldBe aBranch {
                 name("origin/feat")
+                isCompleted()
                 firstCommitHash("3".hash())
                 firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
                 intermediateCommits("4".hash())
@@ -1565,6 +1600,7 @@ class BranchDetectionTest {
             result.branches.size() shouldBe 3
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "4".hash())
@@ -1573,6 +1609,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat-a"] shouldBe aBranch {
                 inferredName("origin/feat-a")
+                isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                 lastCommitHash("3".hash())
@@ -1581,6 +1618,7 @@ class BranchDetectionTest {
             }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 inferredName("origin/feat-b")
+                isCompleted()
                 firstCommitHash("5".hash())
                 firstCommitDate("2025-01-01T05:00:00+01:00".zoned())
                 lastCommitHash("6".hash())
@@ -1662,6 +1700,7 @@ class BranchDetectionTest {
             // Then
             result.branches["origin/trunk"] shouldBe aBranch {
                 name("origin/trunk")
+                isActive()
                 firstCommitHash("0".hash())
                 firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
                 intermediateCommits("1".hash(), "4".hash())
@@ -1671,6 +1710,7 @@ class BranchDetectionTest {
             result.branches.unnamed.shouldContainExactlyInAnyOrder(
                 aBranch {
                     unNamed()
+                    isCompleted()
                     firstCommitHash("2".hash())
                     firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
                     lastCommitHash("3".hash())
@@ -1679,6 +1719,7 @@ class BranchDetectionTest {
                 },
                 aBranch {
                     unNamed()
+                    isCompleted()
                     firstCommitHash("5".hash())
                     firstCommitDate("2025-01-01T05:00:00+01:00".zoned())
                     lastCommitHash("6".hash())
@@ -1687,6 +1728,259 @@ class BranchDetectionTest {
                 }
             )
             result.branches.size() shouldBe 3
+        }
+    }
+
+    @Nested
+    inner class BranchCompletion {
+
+        @Test
+        fun `should mark branch as completed when merged with no additional commits`() {
+            // main:    0───2 (origin/main) [merge feature]
+            //           \ /
+            // feature:   1 (origin/feature)
+
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    authorDate(atStartOfYear(2023))
+                }
+                anEntry("origin/feature", "origin/main") {
+                    authorDate(atStartOfYear(2024))
+                }
+                anEntry("origin/main", "origin/feature") {
+                    authorDate(atStartOfYear(2025))
+                }
+            }
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches["origin/feature"]!!.isCompleted shouldBe true
+        }
+
+        @Test
+        fun `should mark branch as not completed when it has commits after merge`() {
+            // Feature branch is merged, then more work is done on it
+            // main:    0───1───────3 (HEAD -> main, origin/main) [merge feat]
+            //           \         /
+            // feat:      └───────2───4 (origin/feat)
+            //                        ^ commit after merge
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            origin/feat|4|2|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat commit after merge
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat2.md
+
+            -----COMMIT_START-----
+            HEAD -> main, origin/main, origin/HEAD|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat1.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       main.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       initial.md
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches["origin/feat"]!!.isCompleted shouldBe false
+        }
+
+        @Test
+        fun `should mark branch as not completed when never merged`() {
+            // main:    0───1 (origin/main)
+            //           \
+            // feature:   2 (origin/feature) - never merged
+
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    authorDate(atStartOfYear(2023))
+                }
+                anEntry("origin/main") {
+                    authorDate(atStartOfYear(2024))
+                }
+                anEntry("origin/feature", "origin/main") {
+                    authorDate(atStartOfYear(2025))
+                }
+            }
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches["origin/feature"]!!.isCompleted shouldBe false
+        }
+
+        @Test
+        fun `should mark main as not completed at all times, here when a feature was merged into main`() {
+            // main:    0───2 (origin/main) [merge feature]
+            //           \ /
+            // feature:   1 (origin/feature)
+
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    authorDate(atStartOfYear(2023))
+                }
+                anEntry("origin/feature", "origin/main") {
+                    authorDate(atStartOfYear(2024))
+                }
+                anEntry("origin/main", "origin/feature") {
+                    authorDate(atStartOfYear(2025))
+                }
+            }
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches["origin/main"]!!.isCompleted shouldBe false
+        }
+
+        @Test
+        fun `should mark main as not completed at all times, here when feature branch is created`() {
+            // main:    0 (origin/main)
+            //           \
+            // feature:   1 (origin/feature) - never merged
+
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    authorDate(atStartOfYear(2024))
+                }
+                anEntry("origin/feature", "origin/main") {
+                    authorDate(atStartOfYear(2025))
+                }
+            }
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches["origin/main"]!!.isCompleted shouldBe false
+        }
+
+        @Test
+        fun `should mark branch as not completed when commit after merge has backdated date`() {
+            // Feature branch is merged, then a commit is added with a date BEFORE the merge
+            // This tests that we use commit graph topology, not dates, to detect post-merge commits
+            // main:    0───1───────3 (HEAD -> main, origin/main) [merge feat]
+            //           \         /
+            // feat:      └───────2───4 (origin/feat)
+            //                        ^ commit after merge with backdated date
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            origin/feat|4|2|2022-01-01T00:00:00+01:00|John Doe|john@example.com|feat commit after merge with old date
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat2.md
+
+            -----COMMIT_START-----
+            HEAD -> main, origin/main, origin/HEAD|3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2024-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat1.md
+
+            -----COMMIT_START-----
+            |1|0|2023-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       main.md
+
+            -----COMMIT_START-----
+            |0||2022-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       initial.md
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches["origin/feat"]!!.isCompleted shouldBe false
+        }
+
+        @Test
+        fun `should mark main as not completed at all times, here when merged into a feature branch`() {
+            // main:    0───2 (origin/main)
+            //           \   \
+            // feature:   1───3 (origin/feature) - never merged
+
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry("origin/main") {
+                    authorDate(atStartOfYear(2022))
+                }
+                anEntry("origin/feature", "origin/main") {
+                    authorDate(atStartOfYear(2023))
+                }
+                anEntry("origin/main") {
+                    authorDate(atStartOfYear(2024))
+                }
+                anEntry("origin/main", "origin/feature") {
+                    authorDate(atStartOfYear(2025))
+                }
+            }
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches["origin/main"]!!.isCompleted shouldBe false
         }
     }
 }
