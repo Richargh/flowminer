@@ -34,12 +34,11 @@ class GitCli : Callable<Int> {
     private val miner = GitRepositoryMiner()
 
     override fun call(): Int {
-        val result = miner.parse(File(path), since, ZonedDateTime.now())
+        val now = ZonedDateTime.now()
+        val result = miner.parse(File(path), since, now)
 
-        println("## Branches (max 20)")
-        println()
-        val branches = result.branches.all().take(20).toList()
-        println(TableFormatter.formatBranches(branches))
+        val branches = result.branches.all().toList()
+        println(TableFormatter.formatBranches(branches, now))
 
         println()
         println("## Commits (max 20)")
