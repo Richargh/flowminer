@@ -126,10 +126,6 @@ private class MutableBranch(
             firstCommitHash = hash
             firstCommitDate = date
         }
-        if (date > lastCommitDate) {
-            lastCommitHash = hash
-            lastCommitDate = date
-        }
     }
 
     fun mergeCommit(hash: CommitHash, date: ZonedDateTime, target: BranchName?) {
