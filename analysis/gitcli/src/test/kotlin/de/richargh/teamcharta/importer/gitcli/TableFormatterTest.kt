@@ -325,7 +325,7 @@ class TableFormatterTest {
     inner class AgeFormatting {
 
         @Test
-        fun `shows age in days for short branches`() {
+        fun `shows age as period from firstCommit to now in days`() {
             // When
             val branch = aBranch {
                 name("feature")
@@ -337,11 +337,11 @@ class TableFormatterTest {
             val result = TableFormatter.formatBranches(listOf(branch), now)
 
             // Then
-            result shouldContain "3 days"
+            result shouldContain "5 days"
         }
 
         @Test
-        fun `shows age in weeks for longer branches`() {
+        fun `shows age as period from firstCommit to now in weeks`() {
             // When
             val branch = aBranch {
                 name("feature")
@@ -353,11 +353,11 @@ class TableFormatterTest {
             val result = TableFormatter.formatBranches(listOf(branch), now)
 
             // Then
-            result shouldContain "2 weeks"
+            result shouldContain "3 weeks"
         }
 
         @Test
-        fun `shows age in months for old branches`() {
+        fun `shows age as period from firstCommit to now in months`() {
             // When
             val branch = aBranch {
                 name("feature")
@@ -369,7 +369,7 @@ class TableFormatterTest {
             val result = TableFormatter.formatBranches(listOf(branch), now)
 
             // Then
-            result shouldContain "2 months"
+            result shouldContain "4 months"
         }
     }
 

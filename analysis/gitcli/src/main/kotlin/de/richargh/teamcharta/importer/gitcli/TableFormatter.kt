@@ -59,7 +59,7 @@ object TableFormatter {
             listOf(
                 formatBranchName(branch),
                 formatRelativeDate(branch.lastCommitDate, now),
-                formatAge(branch.firstCommitDate.toLocalDate(), branch.lastCommitDate.toLocalDate())
+                formatAge(branch.firstCommitDate.toLocalDate(), now.toLocalDate())
             )
         }
 
