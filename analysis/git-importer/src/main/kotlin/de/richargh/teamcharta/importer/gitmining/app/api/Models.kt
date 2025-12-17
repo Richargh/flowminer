@@ -6,6 +6,8 @@ import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.git.app.api.BranchNameCertainty
 import de.richargh.teamcharta.importer.git.app.api.NamedBranch
 import de.richargh.teamcharta.importer.git.app.api.NamelessBranch
+import de.richargh.teamcharta.importer.git.app.api.WorkKey
+import java.nio.file.Path
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -65,7 +67,34 @@ class Branches(branches: List<Branch>) {
     fun size() = namedBranches.size + unnamed.size
 }
 
+data class WorkItem(
+    val workKey: WorkKey,
+    val linesAdded: Int,
+    val linesRemoved: Int,
+    val firstCommitDate: ZonedDateTime,
+    val lastCommitDate: ZonedDateTime,
+    val filesChanged: Set<Path>
+) {
+    val duration: Duration get() = Duration.between(firstCommitDate, lastCommitDate)
+}
+
+class WorkItems(workItems: List<WorkItem>) {
+    private val workItems: Map<WorkKey, WorkItem> = workItems
+        .associateBy { it.workKey }
+
+    fun all(): Collection<WorkItem> = workItems.values
+    fun isEmpty(): Boolean = workItems.isEmpty()
+    fun isNotEmpty(): Boolean = workItems.isNotEmpty()
+    fun size(): Int = workItems.size
+
+    // TODO val unnamed: List<WorkItem> = workItems.filter { it.isUnnamed }
+
+    operator fun get(key: WorkKey): WorkItem? = workItems[key]
+    operator fun get(key: String): WorkItem? = workItems[WorkKey.Known(key)]
+}
+
 data class GitMiningResult(
     val commits: Commits,
-    val branches: Branches = Branches(emptyList())
+    val branches: Branches = Branches(emptyList()),
+    val workItems: WorkItems = WorkItems(emptyList())
 )

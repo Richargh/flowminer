@@ -12,7 +12,14 @@ enum class CommitType {
     UNKNOWN
 }
 
-data class WorkKey(val key: String)
+sealed interface WorkKey {
+    data class Known(val key: String) : WorkKey {
+        override fun toString() = key
+    }
+    data object Unknown : WorkKey {
+        override fun toString() = "(no-workitem)"
+    }
+}
 data class CommitHash(val rawValue: String) {
     override fun toString() = rawValue
 }

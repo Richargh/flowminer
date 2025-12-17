@@ -56,7 +56,7 @@ class WorkKeyDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result[0].workKeys shouldContainExactlyInAnyOrder listOf(WorkKey("#123"))
+        result[0].workKeys shouldContainExactlyInAnyOrder listOf(WorkKey.Known("#123"))
     }
 
     @ParameterizedTest
@@ -81,7 +81,7 @@ class WorkKeyDetectionTest {
         val result = testee.parse(gitLogContent.lineSequence())
 
         // Then
-        result[0].workKeys shouldContainExactlyInAnyOrder listOf(WorkKey("ABC-123"))
+        result[0].workKeys shouldContainExactlyInAnyOrder listOf(WorkKey.Known("ABC-123"))
     }
 
     @ParameterizedTest
@@ -95,7 +95,7 @@ class WorkKeyDetectionTest {
     )
     fun `should detect multiple work keys from same message`(subject: String, expectedKeysStr: String) {
         // Given
-        val expectedKeys = expectedKeysStr.split("|").map { WorkKey(it) }
+        val expectedKeys = expectedKeysStr.split("|").map { WorkKey.Known(it) }
         val gitLogContent = aGitLog {
             anEntry("origin/main") { subject(subject) }
         }

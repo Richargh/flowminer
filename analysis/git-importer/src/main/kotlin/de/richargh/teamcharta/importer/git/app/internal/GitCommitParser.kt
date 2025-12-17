@@ -127,11 +127,11 @@ private fun detectWorkKeys(message: String): List<WorkKey> {
     val workKeys = mutableListOf<WorkKey>()
 
     gitHubWorkKeyPattern.findAll(message).forEach { match ->
-        workKeys.add(WorkKey(match.value))
+        workKeys.add(WorkKey.Known(match.value))
     }
 
     jiraWorkKeyPattern.findAll(message).forEach { match ->
-        workKeys.add(WorkKey(match.value))
+        workKeys.add(WorkKey.Known(match.value))
     }
 
     return workKeys
