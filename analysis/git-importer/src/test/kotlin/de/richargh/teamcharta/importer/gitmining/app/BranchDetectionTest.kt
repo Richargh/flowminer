@@ -925,9 +925,7 @@ class BranchDetectionTest {
                 firstCommitDate("2025-01-01T04:00:00+01:00".zoned())
                 lastCommitHash("4".hash())
                 lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                // TODO: mergeCommit info is NOT tracked because feat-b was merged into feat-a,
-                // not into the active branch (trunk). The algorithm only tracks merges into the
-                // active branch (commits with HEAD reference).
+                mergedInto("origin/feat-a", "2025-01-01T05:00:00+01:00".zoned(), "5")
             }
         }
     }

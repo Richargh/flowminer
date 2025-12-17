@@ -16,7 +16,6 @@ fun extractBranchInfo(commits: List<Commit>): Branches {
 private class BranchCollector(private val allCommits: List<Commit>) {
     private val branchIdByHash = mutableMapOf<CommitHash, BranchId>()
     private val commitByHash = mutableMapOf<CommitHash, Commit>()
-    private var hasNoActiveBranch = true
 
     private val branches = mutableMapOf<BranchId, MutableBranch>()
 
@@ -26,8 +25,6 @@ private class BranchCollector(private val allCommits: List<Commit>) {
         val pendingMerges = mutableListOf<PendingMerge>()
 
         for (commit in allCommits) {
-            if (commit.isOnActiveBranch) hasNoActiveBranch = false
-
             val branchId = lookupBranchId(commit)
             branchIdByHash[commit.hash] = branchId
             commitByHash[commit.hash] = commit
@@ -40,9 +37,7 @@ private class BranchCollector(private val allCommits: List<Commit>) {
         }
 
         for (pending in pendingMerges) {
-            if (hasNoActiveBranch || pending.commit.isOnActiveBranch) {
-                processMerges(pending.commit)
-            }
+            processMerges(pending.commit)
         }
     }
 
@@ -76,6 +71,10 @@ private class BranchCollector(private val allCommits: List<Commit>) {
 
     private fun processMerges(commit: Commit) {
         commit.parents.drop(1).forEach { featureBranchHash ->
+            // Don't mark the active branch as merged when main is merged into a feature branch
+            val featureBranchCommit = commitByHash[featureBranchHash]
+            if (featureBranchCommit?.isOnActiveBranch == true) return@forEach
+
             val featureBranchId = branchIdByHash[featureBranchHash]!!
             val featureBranch = branches[featureBranchId]!!
             if (featureBranch.mergeCommitHash == null) {
