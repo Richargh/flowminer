@@ -1,10 +1,14 @@
 package de.richargh.teamcharta.importer.gitcli
 
+import de.richargh.teamcharta.importer.git.app.api.Author
 import de.richargh.teamcharta.importer.git.app.api.CommitType
 import de.richargh.teamcharta.importer.git.app.api.FileChange
 import de.richargh.teamcharta.importer.git.app.api.WorkKey
 import de.richargh.teamcharta.importer.git.app.api.aCommit
+import de.richargh.teamcharta.importer.gitmining.app.api.AuthorContribution
 import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
+import de.richargh.teamcharta.importer.gitmining.app.api.aWorkItem
+import java.nio.file.Path
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -624,6 +628,82 @@ class TableFormatterTest {
                 |   main         | 2024-01-15 | FIX     | Jane Doe   |          | 0 | 0 | Fix bug                    |
                 |   feature/auth | 2024-01-16 | FEATURE | John Smith |          | 0 | 0 | Add authentication feature |
             """.trimIndent()
+        }
+    }
+
+    @Nested
+    inner class WorkItems {
+
+        @Test
+        fun `shows Work Items header with count`() {
+            // When
+            val workItem = aWorkItem {
+                workKey("ABC-123")
+                linesAdded(100)
+                linesRemoved(20)
+            }
+
+            val result = TableFormatter.formatWorkItems(listOf(workItem))
+
+            // Then
+            result shouldContain "Work Items (1 out of 1)"
+        }
+
+        @Test
+        fun `shows table with all columns`() {
+            // When
+            val workItem = aWorkItem {
+                workKey("ABC-123")
+                linesAdded(100)
+                linesRemoved(20)
+                firstCommitDate(ZonedDateTime.parse("2024-01-10T10:00:00+01:00"))
+                lastCommitDate(ZonedDateTime.parse("2024-01-17T10:00:00+01:00"))
+                filesChanged(setOf(Path.of("src/Main.kt"), Path.of("src/Helper.kt")))
+                contributions(listOf(
+                    AuthorContribution(Author("Alice Smith", "alice@example.com"), 80),
+                    AuthorContribution(Author("Bob Jones", "bob@example.com"), 40)
+                ))
+                commitCount(5)
+                linesByType(mapOf(
+                    CommitType.FEATURE to 70,
+                    CommitType.FIX to 30,
+                    CommitType.TEST to 20
+                ))
+            }
+
+            val result = TableFormatter.formatWorkItems(listOf(workItem))
+
+            // Then
+            result shouldContain "| WorkItem"
+            result shouldContain "| Duration"
+            result shouldContain "| +Lines↓"
+            result shouldContain "| -Lines↓"
+            result shouldContain "| Files"
+            result shouldContain "| Authors"
+            result shouldContain "| Commits"
+            result shouldContain "| ABC-123"
+            result shouldContain "| 1w"      // 7 days = 1 week
+            result shouldContain "| 100"     // lines added
+            result shouldContain "| 20"      // lines removed
+            result shouldContain "| 2"       // files
+            result shouldContain "Alice,Bob" // authors (first names)
+            result shouldContain "| 5"       // commits
+            result shouldContain "| 70"      // Feature lines
+            result shouldContain "| 30"      // Fix lines
+        }
+
+        @Test
+        fun `shows dash for missing commit types`() {
+            // When
+            val workItem = aWorkItem {
+                workKey("ABC-123")
+                linesByType(mapOf(CommitType.FEATURE to 50))
+            }
+
+            val result = TableFormatter.formatWorkItems(listOf(workItem))
+
+            // Then - Other types show as dash
+            result shouldContain "| 50 | - | - | - | - | - |"
         }
     }
 }

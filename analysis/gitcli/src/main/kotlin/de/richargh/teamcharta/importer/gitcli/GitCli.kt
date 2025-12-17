@@ -41,6 +41,12 @@ class GitCli : Callable<Int> {
         println(TableFormatter.formatBranches(branches, now))
 
         println()
+        val allWorkItems = result.workItems.all().toList()
+            .sortedByDescending { it.linesAdded + it.linesRemoved }
+        val displayedWorkItems = allWorkItems.take(20)
+        println(TableFormatter.formatWorkItems(displayedWorkItems, totalCount = allWorkItems.size))
+
+        println()
         val allCommits = result.commits.all().toList()
         val displayedCommits = allCommits.take(20)
         println(TableFormatter.formatCommits(displayedCommits, totalCount = allCommits.size))
