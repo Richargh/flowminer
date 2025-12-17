@@ -8,6 +8,12 @@ import de.richargh.teamcharta.importer.git.app.api.NamedBranch
 import de.richargh.teamcharta.importer.git.app.api.NamelessBranch
 import java.time.ZonedDateTime
 
+enum class BranchStatus {
+    Active,
+    Stale,
+    Completed
+}
+
 data class Branch(
     val branchNameCertainty: BranchNameCertainty,
     val commits: Set<CommitHash>,
@@ -18,10 +24,8 @@ data class Branch(
     val mergeCommitHash: CommitHash?,
     val mergeDate: ZonedDateTime?,
     val targetBranch: BranchName?,
-    val isCompleted: Boolean,
     val isCurrent: Boolean,
-    val isActive: Boolean,
-    val isStale: Boolean
+    val status: BranchStatus
 ) {
     val name: BranchName? get() = when (branchNameCertainty) {
         is NamedBranch.Certain -> branchNameCertainty.name

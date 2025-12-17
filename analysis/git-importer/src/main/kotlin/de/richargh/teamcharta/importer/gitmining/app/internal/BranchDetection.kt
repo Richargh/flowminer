@@ -4,6 +4,7 @@ import de.richargh.teamcharta.importer.git.app.api.*
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.gitmining.app.api.Branch
 import de.richargh.teamcharta.importer.gitmining.app.api.Branches
+import de.richargh.teamcharta.importer.gitmining.app.api.BranchStatus
 import java.time.ZonedDateTime
 
 fun extractBranchInfo(commits: List<Commit>, currentDate: ZonedDateTime): Branches {
@@ -145,7 +146,12 @@ private class MutableBranch(
 
         val threeMonthsAgo = currentDate.minusMonths(3)
         val isActive = !lastCommitDate.isBefore(threeMonthsAgo)
-        val isStale = !isActive
+
+        val status = when {
+            isCompleted -> BranchStatus.Completed
+            isActive -> BranchStatus.Active
+            else -> BranchStatus.Stale
+        }
 
         return Branch(
             branchNameCertainty = branchNameCertainty,
@@ -157,10 +163,8 @@ private class MutableBranch(
             mergeCommitHash = mergeCommitHash,
             mergeDate = mergeCommitDate,
             targetBranch = targetBranch,
-            isCompleted = isCompleted,
             isCurrent = isCurrent,
-            isActive = isActive,
-            isStale = isStale
+            status = status
         )
     }
 }

@@ -13,10 +13,8 @@ class BranchBuilder {
     private var mergeCommitHash: CommitHash? = null
     private var mergeDate: ZonedDateTime? = null
     private var targetBranch: BranchName? = null
-    private var isCompleted: Boolean = false
     private var isCurrent: Boolean = false
-    private var isActive: Boolean = true
-    private var isStale: Boolean = false
+    private var status: BranchStatus = BranchStatus.Active
 
     fun name(name: String) = apply { this.name = NamedBranch.Certain(BranchName(name)) }
     fun inferredName(name: String) = apply { this.name = NamedBranch.Inferred(BranchName(name)) }
@@ -38,10 +36,11 @@ class BranchBuilder {
         this.targetBranch = BranchName(targetBranch)
     }
 
-    fun isCompleted() = apply { this.isCompleted = true }
     fun isCurrent() = apply { this.isCurrent = true }
-    fun isActive() = apply { this.isActive = true; this.isStale = false }
-    fun isStale() = apply { this.isStale = true; this.isActive = false }
+    fun status(status: BranchStatus) = apply { this.status = status }
+    fun isActive() = apply { this.status = BranchStatus.Active }
+    fun isStale() = apply { this.status = BranchStatus.Stale }
+    fun isCompleted() = apply { this.status = BranchStatus.Completed }
 
     fun build(): Branch = Branch(
         branchNameCertainty = name,
@@ -53,10 +52,8 @@ class BranchBuilder {
         mergeCommitHash = mergeCommitHash,
         mergeDate = mergeDate,
         targetBranch = targetBranch,
-        isCompleted = isCompleted,
         isCurrent = isCurrent,
-        isActive = isActive,
-        isStale = isStale
+        status = status
     )
 
     private fun allCommits(): Set<CommitHash>{

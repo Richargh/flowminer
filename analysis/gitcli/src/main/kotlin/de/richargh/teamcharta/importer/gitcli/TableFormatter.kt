@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.gitcli
 
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.gitmining.app.api.Branch
+import de.richargh.teamcharta.importer.gitmining.app.api.BranchStatus
 import java.time.format.DateTimeFormatter
 
 object TableFormatter {
@@ -15,7 +16,11 @@ object TableFormatter {
                 branch.firstCommitDate.format(dateFormatter),
                 branch.lastCommitDate.format(dateFormatter),
                 if (branch.mergeCommitHash != null) "Yes" else "No",
-                if (branch.isActive) "Active" else "Stale"
+                when (branch.status) {
+                    BranchStatus.Active -> "Active"
+                    BranchStatus.Stale -> "Stale"
+                    BranchStatus.Completed -> "Completed"
+                }
             )
         }
         return formatTable(headers, rows)
