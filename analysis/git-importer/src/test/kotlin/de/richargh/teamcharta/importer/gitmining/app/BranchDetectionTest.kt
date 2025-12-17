@@ -937,6 +937,275 @@ class BranchDetectionTest {
     }
 
     @Nested
+    inner class MultipleMerges {
+
+        @Test
+        fun `should track only the last merge of the branch`() {
+            // Feature branch is merged, then more work is done on it, then merged again
+            // main:    0───1───────3───────5 (HEAD -> main, origin/main)
+            //           \         /      /
+            // feat:      └───────2───4───┘ (origin/feat)
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> main, origin/main, origin/HEAD|5|3 4|2025-01-01T05:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            origin/feat|4|2|2025-01-01T04:00:00+01:00|John Doe|john@example.com|feat commit 2
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat2.md
+
+            -----COMMIT_START-----
+            |3|1 2|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat1.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       main.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       initial.md
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches.size() shouldBe 2
+            result.branches["origin/main"] shouldBe aBranch {
+                name("origin/main")
+                firstCommitHash("0".hash())
+                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash(), "3".hash())
+                lastCommitHash("5".hash())
+                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+            }
+            result.branches["origin/feat"] shouldBe aBranch {
+                name("origin/feat")
+                firstCommitHash("2".hash())
+                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                lastCommitHash("4".hash())
+                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                // TODO multiple merges
+                mergedInto("origin/main", "2025-01-01T05:00:00+01:00".zoned(), "5")
+            }
+        }
+
+        @Test
+        fun `should handle main merged twice into feature branch`() {
+            // Main is merged into feature branch twice to keep it up to date
+            // main:    0───1─────────4─────────7 (HEAD -> main, origin/main)
+            //           \   \         \
+            // feat:      └2──3─────5───6───8 (origin/feat)
+            //                 ^         ^
+            //            merge 1    merge 2
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            origin/feat|8|6|2025-01-01T08:00:00+01:00|John Doe|john@example.com|feat commit 5
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            HEAD -> main, origin/main, origin/HEAD|7|4|2025-01-01T07:00:00+01:00|John Doe|john@example.com|main commit 3
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       main3.md
+
+            -----COMMIT_START-----
+            |6|5 4|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/main' into origin/feat
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat3.md
+
+            -----COMMIT_START-----
+            |5|3|2025-01-01T05:00:00+01:00|John Doe|john@example.com|feat commit 3
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |4|1|2025-01-01T04:00:00+01:00|John Doe|john@example.com|main commit 2
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       main2.md
+
+            -----COMMIT_START-----
+            |3|2 1|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/main' into origin/feat
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat1.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       main1.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       initial.md
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches.size() shouldBe 2
+            result.branches["origin/main"] shouldBe aBranch {
+                name("origin/main")
+                firstCommitHash("0".hash())
+                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash(), "4".hash())
+                lastCommitHash("7".hash())
+                lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
+            }
+            result.branches["origin/feat"] shouldBe aBranch {
+                name("origin/feat")
+                firstCommitHash("2".hash())
+                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                intermediateCommits("3".hash(), "5".hash(), "6".hash())
+                lastCommitHash("8".hash())
+                lastCommitDate("2025-01-01T08:00:00+01:00".zoned())
+            }
+        }
+
+        @Test
+        fun `should handle main merged twice into feature branch before merge into main`() {
+            // Main is merged into feature branch twice to keep it up to date
+            // main:    0───1─────────4───7 (HEAD -> main, origin/main)
+            //           \   \         \ /
+            // feat:      └2──3─────5───6 (origin/feat)
+            //                 ^         ^
+            //            merge 1    merge 2
+
+            // Given
+            val gitLogContent = """
+            -----COMMIT_START-----
+            HEAD -> main, origin/main, origin/HEAD|7|4 6|2025-01-01T07:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/feat' into origin/main
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       main3.md
+
+            -----COMMIT_START-----
+            origin/feat|6|5 4|2025-01-01T06:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/main' into origin/feat
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat3.md
+
+            -----COMMIT_START-----
+            |5|3|2025-01-01T05:00:00+01:00|John Doe|john@example.com|feat commit 3
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |4|1|2025-01-01T04:00:00+01:00|John Doe|john@example.com|main commit 2
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       main2.md
+
+            -----COMMIT_START-----
+            |3|2 1|2025-01-01T03:00:00+01:00|John Doe|john@example.com|Merge branch 'origin/main' into origin/feat
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+
+            -----COMMIT_START-----
+            |2|0|2025-01-01T02:00:00+01:00|John Doe|john@example.com|feat commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       feat1.md
+
+            -----COMMIT_START-----
+            |1|0|2025-01-01T01:00:00+01:00|John Doe|john@example.com|main commit 1
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       main1.md
+
+            -----COMMIT_START-----
+            |0||2025-01-01T00:00:00+01:00|John Doe|john@example.com|initial commit
+            -----BODY_START-----
+            -----TRAILERS_START-----
+            -----FILES_START-----
+            0       0       initial.md
+        """.trimIndent()
+
+            val testee = GitLogMiner()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence())
+
+            // Then
+            result.branches.size() shouldBe 2
+            result.branches["origin/main"] shouldBe aBranch {
+                name("origin/main")
+                firstCommitHash("0".hash())
+                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                intermediateCommits("1".hash(), "4".hash())
+                lastCommitHash("7".hash())
+                lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
+            }
+            result.branches["origin/feat"] shouldBe aBranch {
+                name("origin/feat")
+                firstCommitHash("2".hash())
+                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                intermediateCommits("5".hash(), "3".hash())
+                lastCommitHash("6".hash())
+                lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
+                mergedInto("origin/main", "2025-01-01T07:00:00+01:00".zoned(), "7")
+            }
+        }
+    }
+
+    @Nested
     inner class RealData {
 
         @Test

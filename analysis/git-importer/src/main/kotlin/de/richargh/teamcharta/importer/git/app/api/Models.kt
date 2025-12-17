@@ -32,7 +32,7 @@ sealed interface NamedBranch: BranchNameCertainty {
     }
 
     data class Inferred(override val name: BranchName) : NamedBranch {
-        override fun toString(): String = name.toString()
+        override fun toString(): String = "~$name"
     }
 }
 

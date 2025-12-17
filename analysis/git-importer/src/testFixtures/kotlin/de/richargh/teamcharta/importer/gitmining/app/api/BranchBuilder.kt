@@ -5,7 +5,7 @@ import java.time.ZonedDateTime
 
 class BranchBuilder {
     private var name: BranchNameCertainty = NamedBranch.Certain(BranchName("feature-branch"))
-    private var commits = mutableSetOf<CommitHash>()
+    private var intermediateCommits = mutableSetOf<CommitHash>()
     private var firstCommitHash: CommitHash = CommitHash("abc123")
     private var firstCommitDate: ZonedDateTime = ZonedDateTime.parse("2024-01-10T10:00:00+01:00")
     private var lastCommitHash: CommitHash? = null
@@ -18,7 +18,7 @@ class BranchBuilder {
     fun inferredName(name: String) = apply { this.name = NamedBranch.Inferred(BranchName(name)) }
     fun unNamed() = apply { this.name = NamelessBranch }
 
-    fun intermediateCommits(vararg commits: CommitHash) = apply { commits.forEach(this.commits::add) }
+    fun intermediateCommits(vararg commits: CommitHash) = apply { commits.forEach(this.intermediateCommits::add) }
 
     fun firstCommitHash(hash: CommitHash) = apply { this.firstCommitHash = hash }
     fun firstCommitDate(date: ZonedDateTime) = apply { this.firstCommitDate = date }
@@ -36,7 +36,7 @@ class BranchBuilder {
 
     fun build(): Branch = Branch(
         branchNameCertainty = name,
-        commits = this.commits.addRemainingCommits(),
+        commits = allCommits(),
         firstCommitHash = firstCommitHash,
         firstCommitDate = firstCommitDate,
         lastCommitHash = lastCommitHash ?: firstCommitHash,
@@ -46,10 +46,12 @@ class BranchBuilder {
         targetBranch = targetBranch
     )
 
-    private fun MutableSet<CommitHash>.addRemainingCommits(): Set<CommitHash>{
-        add(firstCommitHash)
-        lastCommitHash?.let(::add)
-        return this
+    private fun allCommits(): Set<CommitHash>{
+        val commits = mutableSetOf<CommitHash>()
+        commits.add(firstCommitHash)
+        commits.addAll(intermediateCommits)
+        lastCommitHash?.let(commits::add)
+        return commits
     }
 }
 
