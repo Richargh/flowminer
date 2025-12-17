@@ -108,7 +108,7 @@ object TableFormatter {
                 commit.date.format(dateFormatter),
                 commit.commitType.name,
                 commit.author.name,
-                commit.workKeys.joinToString(",") { it.key },
+                commit.workKeys.joinToString(",") { it.toString() },
                 commit.fileChanges.sumOf { it.additions }.toString(),
                 commit.fileChanges.sumOf { it.deletions }.toString(),
                 commit.message

@@ -488,7 +488,7 @@ class TableFormatterTest {
         fun `shows Workkeys column`() {
             // When
             val commit = aCommit {
-                workKeys(WorkKey("ABC-123"), WorkKey("DEF-456"))
+                workKeys(WorkKey.Known("ABC-123"), WorkKey.Known("DEF-456"))
                 date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
                 author("Jane Doe", "jane@example.com")
                 message("Add login feature")
@@ -578,7 +578,7 @@ class TableFormatterTest {
                 date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
                 commitType(CommitType.FEATURE)
                 author("Jane Doe", "jane@example.com")
-                workKeys(WorkKey("ABC-1"))
+                workKeys(WorkKey.Known("ABC-1"))
                 fileChanges(FileChange("file.kt", additions = 10, deletions = 5))
                 message("Add login feature")
             }

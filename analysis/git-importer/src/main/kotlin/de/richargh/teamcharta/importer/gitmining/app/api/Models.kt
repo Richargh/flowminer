@@ -1,5 +1,6 @@
 package de.richargh.teamcharta.importer.gitmining.app.api
 
+import de.richargh.teamcharta.importer.git.app.api.Author
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
@@ -67,13 +68,19 @@ class Branches(branches: List<Branch>) {
     fun size() = namedBranches.size + unnamed.size
 }
 
+data class AuthorContribution(
+    val author: Author,
+    val linesChanged: Int
+)
+
 data class WorkItem(
     val workKey: WorkKey,
     val linesAdded: Int,
     val linesRemoved: Int,
     val firstCommitDate: ZonedDateTime,
     val lastCommitDate: ZonedDateTime,
-    val filesChanged: Set<Path>
+    val filesChanged: Set<Path>,
+    val contributions: List<AuthorContribution>
 ) {
     val duration: Duration get() = Duration.between(firstCommitDate, lastCommitDate)
 }
