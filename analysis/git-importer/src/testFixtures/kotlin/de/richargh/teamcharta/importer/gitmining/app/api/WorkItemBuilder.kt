@@ -14,6 +14,9 @@ class WorkItemBuilder {
     private var filesChanged: Set<Path> = emptySet()
     private var contributions: List<AuthorContribution> = emptyList()
     private var linesByType: Map<CommitType, Int> = emptyMap()
+    private var commitCount: Int = 0
+    private var collaboratorCount: Int = 0
+    private var reworkFiles: Set<Path> = emptySet()
 
     fun workKey(workKey: WorkKey) = apply { this.workKey = workKey }
     fun workKey(key: String) = apply { this.workKey = WorkKey.Known(key) }
@@ -24,6 +27,9 @@ class WorkItemBuilder {
     fun filesChanged(files: Set<Path>) = apply { this.filesChanged = files }
     fun contributions(contributions: List<AuthorContribution>) = apply { this.contributions = contributions }
     fun linesByType(linesByType: Map<CommitType, Int>) = apply { this.linesByType = linesByType }
+    fun commitCount(count: Int) = apply { this.commitCount = count }
+    fun collaboratorCount(count: Int) = apply { this.collaboratorCount = count }
+    fun reworkFiles(files: Set<Path>) = apply { this.reworkFiles = files }
 
     fun build(): WorkItem = WorkItem(
         workKey = workKey,
@@ -33,7 +39,10 @@ class WorkItemBuilder {
         lastCommitDate = lastCommitDate,
         filesChanged = filesChanged,
         contributions = contributions,
-        absoluteChurnByType = linesByType
+        absoluteChurnByType = linesByType,
+        commits = commitCount,
+        collaborators = collaboratorCount,
+        reworkFiles = reworkFiles
     )
 }
 

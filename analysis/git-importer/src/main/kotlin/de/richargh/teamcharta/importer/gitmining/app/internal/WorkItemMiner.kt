@@ -33,15 +33,24 @@ private class MutableWorkKey(
     private var linesRemoved = 0
     private var lastCommitDate: ZonedDateTime = firstCommitDate
     private val filesChanged = mutableSetOf<Path>()
+    private val fileTouchCount = mutableMapOf<Path, Int>()
     private val absoluteChurnByAuthor = mutableMapOf<Author, Int>()
     private val absoluteChurnByType = mutableMapOf<CommitType, Int>()
+    private var commitCount = 0
+    private val collaborators = mutableSetOf<Author>()
 
     fun add(commit: Commit) {
+        commitCount++
+        collaborators.add(commit.author)
+        collaborators.addAll(commit.coAuthors)
+
         var commitLinesChanged = 0
         for (fileChange in commit.fileChanges) {
             linesAdded += fileChange.additions
             linesRemoved += fileChange.deletions
-            filesChanged.add(Path.of(fileChange.path))
+            val path = Path.of(fileChange.path)
+            filesChanged.add(path)
+            fileTouchCount[path] = fileTouchCount.getOrDefault(path, 0) + 1
             commitLinesChanged += fileChange.additions + fileChange.deletions
         }
 
@@ -67,6 +76,9 @@ private class MutableWorkKey(
         contributions = absoluteChurnByAuthor
             .map { (author, lines) -> AuthorContribution(author, lines) }
             .sortedByDescending { it.linesChanged },
-        absoluteChurnByType = absoluteChurnByType.toMap()
+        absoluteChurnByType = absoluteChurnByType.toMap(),
+        commits = commitCount,
+        collaborators = collaborators.size,
+        reworkFiles = fileTouchCount.filter { it.value > 1 }.keys
     )
 }

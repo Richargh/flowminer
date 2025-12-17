@@ -160,4 +160,90 @@ class WorkItemDetectionTest {
             CommitType.TEST to 30      // 30 + 0
         )
     }
+
+    @Test
+    fun `WorkItem should track commit count`() {
+        // Given - Three commits for same work item
+        val gitLogContent = aGitLog {
+            anEntry("origin/feature") {
+                subject("ABC-123 first commit")
+                file("src/Feature.kt", additions = 10, deletions = 0)
+            }
+            anEntry("origin/feature") {
+                subject("ABC-123 second commit")
+                file("src/Feature.kt", additions = 5, deletions = 0)
+            }
+            anEntry("origin/feature") {
+                subject("ABC-123 third commit")
+                file("src/Feature.kt", additions = 3, deletions = 0)
+            }
+        }
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
+
+        // Then
+        val workItem = result.workItems["ABC-123"]!!
+        workItem.commits shouldBe 3
+    }
+
+    @Test
+    fun `WorkItem should track collaborator count including co-authors`() {
+        // Given - Two commits with authors and co-authors
+        val gitLogContent = aGitLog {
+            anEntry("origin/feature") {
+                subject("ABC-123 first commit")
+                author("Alice", "alice@example.com")
+                // Co-authors come from trailers
+                trailers("Co-authored-by" to "Bob <bob@example.com>")
+                file("src/Feature.kt", additions = 10, deletions = 0)
+            }
+            anEntry("origin/feature") {
+                subject("ABC-123 second commit")
+                author("Charlie", "charlie@example.com")
+                file("src/Feature.kt", additions = 5, deletions = 0)
+            }
+        }
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
+
+        // Then - 3 distinct collaborators: Alice, Bob (co-author), Charlie
+        val workItem = result.workItems["ABC-123"]!!
+        workItem.collaborators shouldBe 3
+    }
+
+    @Test
+    fun `WorkItem should track rework files - files modified in multiple commits`() {
+        // Given - Three commits, some touching same files
+        val gitLogContent = aGitLog {
+            anEntry("origin/feature") {
+                subject("ABC-123 first commit")
+                file("src/Feature.kt", additions = 10, deletions = 0)
+                file("src/Helper.kt", additions = 5, deletions = 0)
+            }
+            anEntry("origin/feature") {
+                subject("ABC-123 second commit")
+                file("src/Feature.kt", additions = 3, deletions = 0)  // rework
+                file("src/Service.kt", additions = 2, deletions = 0)
+            }
+            anEntry("origin/feature") {
+                subject("ABC-123 third commit")
+                file("src/Feature.kt", additions = 1, deletions = 0)  // more rework
+            }
+        }
+
+        val testee = GitLogMiner()
+
+        // When
+        val result = testee.parse(gitLogContent.lineSequence(), testNow2025)
+
+        // Then - Feature.kt touched 3 times = rework
+        val workItem = result.workItems["ABC-123"]!!
+        workItem.reworkFiles shouldContainExactlyInAnyOrder setOf(Path.of("src/Feature.kt"))
+    }
 }

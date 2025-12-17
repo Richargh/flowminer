@@ -82,7 +82,10 @@ data class WorkItem(
     val lastCommitDate: ZonedDateTime,
     val filesChanged: Set<Path>,
     val contributions: List<AuthorContribution>,
-    val absoluteChurnByType: Map<CommitType, Int>
+    val absoluteChurnByType: Map<CommitType, Int>,
+    val commits: Int,
+    val collaborators: Int,
+    val reworkFiles: Set<Path>
 ) {
     val duration: Duration get() = Duration.between(firstCommitDate, lastCommitDate)
 }
