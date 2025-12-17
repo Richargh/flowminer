@@ -98,12 +98,16 @@ object TableFormatter {
     }
 
     fun formatCommits(commits: List<Commit>): String {
-        val headers = listOf("Hash", "Date", "Author", "Message")
+        val headers = listOf("Branch", "Date", "Type", "Author", "Workkeys", "+", "-", "Message")
         val rows = commits.map { commit ->
             listOf(
-                commit.hash.rawValue.take(7),
+                commit.branch.name?.toString() ?: "-",
                 commit.date.format(dateFormatter),
+                commit.commitType.name,
                 commit.author.name,
+                commit.workKeys.joinToString(",") { it.key },
+                commit.fileChanges.sumOf { it.additions }.toString(),
+                commit.fileChanges.sumOf { it.deletions }.toString(),
                 commit.message
             )
         }

@@ -1,5 +1,8 @@
 package de.richargh.teamcharta.importer.gitcli
 
+import de.richargh.teamcharta.importer.git.app.api.CommitType
+import de.richargh.teamcharta.importer.git.app.api.FileChange
+import de.richargh.teamcharta.importer.git.app.api.WorkKey
 import de.richargh.teamcharta.importer.git.app.api.aCommit
 import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
 import io.kotest.matchers.shouldBe
@@ -448,10 +451,10 @@ class TableFormatterTest {
     inner class CommitFormatting {
 
         @Test
-        fun `formats single commit as table with aligned columns`() {
+        fun `shows Branch column with branch name`() {
             // When
             val commit = aCommit {
-                hash("abc123def")
+                certainBranch("main")
                 date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
                 author("Jane Doe", "jane@example.com")
                 message("Add login feature")
@@ -460,10 +463,86 @@ class TableFormatterTest {
             val result = TableFormatter.formatCommits(listOf(commit))
 
             // Then
+            result shouldContain "| Branch"
+            result shouldContain "| main"
+        }
+
+        @Test
+        fun `shows CommitType column`() {
+            // When
+            val commit = aCommit {
+                commitType(CommitType.FEATURE)
+                date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                author("Jane Doe", "jane@example.com")
+                message("Add login feature")
+            }
+
+            val result = TableFormatter.formatCommits(listOf(commit))
+
+            // Then
+            result shouldContain "| Type"
+            result shouldContain "| FEATURE"
+        }
+
+        @Test
+        fun `shows Workkeys column`() {
+            // When
+            val commit = aCommit {
+                workKeys(WorkKey("ABC-123"), WorkKey("DEF-456"))
+                date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                author("Jane Doe", "jane@example.com")
+                message("Add login feature")
+            }
+
+            val result = TableFormatter.formatCommits(listOf(commit))
+
+            // Then
+            result shouldContain "| Workkeys"
+            result shouldContain "ABC-123,DEF-456"
+        }
+
+        @Test
+        fun `shows total additions and deletions columns`() {
+            // When
+            val commit = aCommit {
+                fileChanges(
+                    FileChange("file1.kt", additions = 10, deletions = 5),
+                    FileChange("file2.kt", additions = 20, deletions = 3)
+                )
+                date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                author("Jane Doe", "jane@example.com")
+                message("Add login feature")
+            }
+
+            val result = TableFormatter.formatCommits(listOf(commit))
+
+            // Then
+            result shouldContain "| +"
+            result shouldContain "| -"
+            result shouldContain "| 30"
+            result shouldContain "| 8"
+        }
+
+        @Test
+        fun `formats single commit as table with aligned columns`() {
+            // When
+            val commit = aCommit {
+                certainBranch("main")
+                date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                commitType(CommitType.FEATURE)
+                author("Jane Doe", "jane@example.com")
+                workKeys(WorkKey("ABC-1"))
+                fileChanges(FileChange("file.kt", additions = 10, deletions = 5))
+                message("Add login feature")
+            }
+
+            val result = TableFormatter.formatCommits(listOf(commit))
+
+            // Then
             result shouldBe """
-                | Hash    | Date       | Author   | Message           |
-                |---------|------------|----------|-------------------|
-                | abc123d | 2024-01-15 | Jane Doe | Add login feature |
+                | Branch | Date       | Type    | Author   | Workkeys | +  | - | Message           |
+                |--------|------------|---------|----------|----------|----|---|-------------------|
+                | main   | 2024-01-15 | FEATURE | Jane Doe | ABC-1    | 10 | 5 | Add login feature |
             """.trimIndent()
         }
 
@@ -472,14 +551,16 @@ class TableFormatterTest {
             // When
             val commits = listOf(
                 aCommit {
-                    hash("abc123d")
+                    certainBranch("main")
                     date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                    commitType(CommitType.FIX)
                     author("Jane Doe", "jane@example.com")
                     message("Fix bug")
                 },
                 aCommit {
-                    hash("def456e")
+                    certainBranch("feature/auth")
                     date(ZonedDateTime.parse("2024-01-16T11:00:00+01:00"))
+                    commitType(CommitType.FEATURE)
                     author("John Smith", "john@example.com")
                     message("Add authentication feature")
                 }
@@ -489,10 +570,10 @@ class TableFormatterTest {
 
             // Then
             result shouldBe """
-                | Hash    | Date       | Author     | Message                    |
-                |---------|------------|------------|----------------------------|
-                | abc123d | 2024-01-15 | Jane Doe   | Fix bug                    |
-                | def456e | 2024-01-16 | John Smith | Add authentication feature |
+                | Branch       | Date       | Type    | Author     | Workkeys | + | - | Message                    |
+                |--------------|------------|---------|------------|----------|---|---|----------------------------|
+                | main         | 2024-01-15 | FIX     | Jane Doe   |          | 0 | 0 | Fix bug                    |
+                | feature/auth | 2024-01-16 | FEATURE | John Smith |          | 0 | 0 | Add authentication feature |
             """.trimIndent()
         }
     }
