@@ -1,6 +1,7 @@
 package de.richargh.teamcharta.importer.gitmining.app
 
 import de.richargh.teamcharta.importer.git.app.internal.splitIntoRawCommits
+import de.richargh.teamcharta.importer.gitmining.app.internal.extractAuthorStatistics
 import de.richargh.teamcharta.importer.gitmining.app.internal.extractBranchInfo
 import de.richargh.teamcharta.importer.gitmining.app.internal.extractWorkItems
 import de.richargh.teamcharta.importer.git.app.internal.parseCommits
@@ -15,7 +16,8 @@ class GitLogMiner {
         val commits = parseCommits(rawCommits).toList()
         val branches = extractBranchInfo(commits, currentDate)
         val workItems = extractWorkItems(commits)
-        return GitMiningResult(commits = Commits(commits), branches = branches, workItems = workItems)
+        val authorStatistics = extractAuthorStatistics(commits)
+        return GitMiningResult(commits = Commits(commits), branches = branches, workItems = workItems, authorStatistics = authorStatistics)
     }
 
 }

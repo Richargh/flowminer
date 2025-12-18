@@ -105,8 +105,26 @@ class WorkItems(workItems: List<WorkItem>) {
     operator fun get(key: String): WorkItem? = workItems[WorkKey.Known(key)]
 }
 
+data class AuthorStatistic(
+    val author: Author,
+    val commitCount: Int,
+    val linesAdded: Int,
+    val linesRemoved: Int
+)
+
+class AuthorStatistics(authorStatistics: List<AuthorStatistic>) {
+    private val authorStatistics: Map<Author, AuthorStatistic> = authorStatistics
+        .associateBy { it.author }
+
+    fun all(): Collection<AuthorStatistic> = authorStatistics.values
+    fun size(): Int = authorStatistics.size
+
+    operator fun get(key: Author): AuthorStatistic? = authorStatistics[key]
+}
+
 data class GitMiningResult(
     val commits: Commits,
     val branches: Branches = Branches(emptyList()),
-    val workItems: WorkItems = WorkItems(emptyList())
+    val workItems: WorkItems = WorkItems(emptyList()),
+    val authorStatistics: AuthorStatistics = AuthorStatistics(emptyList())
 )

@@ -1,5 +1,6 @@
 package de.richargh.teamcharta.importer.git.app
 
+import de.richargh.teamcharta.importer.git.app.api.Author
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.git.app.api.hash
@@ -19,6 +20,7 @@ class GitLogEntryBuilder {
 
     fun hash(hash: CommitHash) = apply { this.hash = hash }
     fun hash() = hash
+    fun author(author: Author) = apply { this.author = author.name; this.authorMail = author.email }
     fun author(name: String) = apply { this.author = name }
     fun authorMail(email: String) = apply { this.authorMail = email }
     fun author(name: String, email: String) = apply {
@@ -83,6 +85,7 @@ class GitLogBuilder {
     private val originOfBranch = mutableMapOf<BranchName, BranchName?>()
     private val parentBranchesForEntry = mutableMapOf<CommitHash, List<BranchName>>()
     private val deletedBranches = mutableSetOf<BranchName>()
+
     // Tracks which branches have been merged into which at which commit index
     // Key: merged branch, Value: (target branch, commit index)
     private val mergedInto = mutableMapOf<BranchName, Pair<BranchName, Int>>()
@@ -147,9 +150,9 @@ class GitLogBuilder {
                 mergeInfo != null && mergeInfo.first == parentBranch && mergeInfo.second < currentCommitIndex
             }
             val shouldAddBefore = before != null && !wasAlreadyMergedIntoParent && (
-                parentBranches.isEmpty() ||
-                parentBranches.any { originOfBranch[it] == branch || originOfBranch[branch] == it }
-            )
+                    parentBranches.isEmpty() ||
+                            parentBranches.any { originOfBranch[it] == branch || originOfBranch[branch] == it }
+                    )
             if (shouldAddBefore)
                 entry + before!!.hash()
             if (after == null && branch !in deletedBranches) {
