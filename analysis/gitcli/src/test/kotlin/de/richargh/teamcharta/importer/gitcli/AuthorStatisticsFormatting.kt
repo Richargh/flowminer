@@ -1,5 +1,7 @@
 package de.richargh.teamcharta.importer.gitcli
 
+import de.richargh.teamcharta.importer.git.app.api.Author
+import de.richargh.teamcharta.importer.git.app.api.CommitType
 import de.richargh.teamcharta.importer.gitmining.app.api.aAuthorStatistic
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -72,5 +74,61 @@ class AuthorStatisticsFormatting {
         val aliceIndex = result.indexOf("Alice")
         (bobIndex < charlieIndex) shouldBe true
         (charlieIndex < aliceIndex) shouldBe true
+    }
+
+    @Test
+    fun `shows work items count column`() {
+        // When
+        val authorStat = aAuthorStatistic {
+            author("Alice", "alice@example.com")
+            commitCount(5)
+            workItems("ABC-123", "XYZ-456", "DEF-789")
+        }
+
+        val result = TableFormatter.formatAuthorStatistics(listOf(authorStat))
+
+        // Then
+        result shouldContain "| WorkItems"
+        result shouldContain "| 3"
+    }
+
+    @Test
+    fun `shows churn by commit type columns`() {
+        // When
+        val authorStat = aAuthorStatistic {
+            author("Alice", "alice@example.com")
+            commitCount(5)
+            churn(CommitType.FEATURE, 100, 20)
+            churn(CommitType.FIX, 30, 10)
+            churn(CommitType.REFACTOR, 50, 50)
+        }
+
+        val result = TableFormatter.formatAuthorStatistics(listOf(authorStat))
+
+        // Then - columns F, B, R, T, D, E for each commit type
+        result shouldContain "| F"
+        result shouldContain "| B"
+        result shouldContain "| R"
+        result shouldContain "| 120" // FEATURE: 100+20
+        result shouldContain "| 40"  // FIX: 30+10
+        result shouldContain "| 100" // REFACTOR: 50+50
+    }
+
+    @Test
+    fun `shows collaborators count column`() {
+        // When
+        val bob = Author("Bob", "bob@example.com")
+        val charlie = Author("Charlie", "charlie@example.com")
+        val authorStat = aAuthorStatistic {
+            author("Alice", "alice@example.com")
+            commitCount(5)
+            collaborators(bob, charlie)
+        }
+
+        val result = TableFormatter.formatAuthorStatistics(listOf(authorStat))
+
+        // Then
+        result shouldContain "| Collabs"
+        result shouldContain "| 2"
     }
 }

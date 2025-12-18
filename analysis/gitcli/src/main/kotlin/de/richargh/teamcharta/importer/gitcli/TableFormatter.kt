@@ -154,18 +154,30 @@ object TableFormatter {
 
     fun formatAuthorStatistics(authorStatistics: List<AuthorStatistic>, totalCount: Int = authorStatistics.size): String {
         val sorted = authorStatistics.sortedByDescending { it.commitCount }
-        val headers = listOf("Author", "Commits↓", "+Lines", "-Lines")
+        val headers = listOf("Author", "Commits↓", "+Lines", "-Lines", "WorkItems", "Collabs", "F", "B", "R", "T", "D", "E")
         val rows = sorted.map { stat ->
             listOf(
                 stat.author.name,
                 stat.commitCount.toString(),
                 stat.linesAdded.toString(),
-                stat.linesRemoved.toString()
+                stat.linesRemoved.toString(),
+                stat.workItems.size.toString(),
+                stat.collaborators.size.toString(),
+                formatChurn(stat.churnByCommitType[CommitType.FEATURE]),
+                formatChurn(stat.churnByCommitType[CommitType.FIX]),
+                formatChurn(stat.churnByCommitType[CommitType.REFACTOR]),
+                formatChurn(stat.churnByCommitType[CommitType.TEST]),
+                formatChurn(stat.churnByCommitType[CommitType.DOCS]),
+                formatChurn(stat.churnByCommitType[CommitType.ENVIRONMENT])
             )
         }
         val table = formatTable(headers, rows)
         val header = "Authors (${authorStatistics.size} out of $totalCount)"
         return "$header\n$table"
+    }
+
+    private fun formatChurn(churn: de.richargh.teamcharta.importer.gitmining.app.api.ChurnMetric?): String {
+        return if (churn != null) (churn.additions + churn.deletions).toString() else "-"
     }
 
     private fun formatDuration(duration: Duration): String {
