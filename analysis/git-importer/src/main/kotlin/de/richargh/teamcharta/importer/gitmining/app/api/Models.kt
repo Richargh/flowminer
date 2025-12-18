@@ -105,11 +105,22 @@ class WorkItems(workItems: List<WorkItem>) {
     operator fun get(key: String): WorkItem? = workItems[WorkKey.Known(key)]
 }
 
+data class ChurnMetric(
+    val additions: Int,
+    val deletions: Int
+) {
+    operator fun plus(other: ChurnMetric): ChurnMetric =
+        ChurnMetric(additions + other.additions, deletions + other.deletions)
+}
+
 data class AuthorStatistic(
     val author: Author,
     val commitCount: Int,
     val linesAdded: Int,
-    val linesRemoved: Int
+    val linesRemoved: Int,
+    val workItems: Set<WorkKey> = emptySet(),
+    val churnByCommitType: Map<CommitType, ChurnMetric> = emptyMap(),
+    val collaborators: Set<Author> = emptySet()
 )
 
 class AuthorStatistics(authorStatistics: List<AuthorStatistic>) {
