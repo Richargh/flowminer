@@ -1,4 +1,4 @@
-STARTER_CHARACTER = 🔍
+STARTER_CHARACTER = 1️⃣
 
 ## Core Concepts
 
