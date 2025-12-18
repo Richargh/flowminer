@@ -36,7 +36,13 @@ class GitCli : Callable<Int> {
     override fun call(): Int {
         val now = ZonedDateTime.now()
         val result = miner.parse(File(path), since, now)
+        val allAuthorStats = result.authorStatistics.all().toList()
+        val displayedAuthorStats = allAuthorStats
+            .sortedByDescending { it.commitCount }
+            .take(20)
+        println(TableFormatter.formatAuthorStatistics(displayedAuthorStats, totalCount = allAuthorStats.size))
 
+        println()
         val branches = result.branches.all().toList()
         println(TableFormatter.formatBranches(branches, now))
 

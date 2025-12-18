@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.gitcli
 
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.git.app.api.CommitType
+import de.richargh.teamcharta.importer.gitmining.app.api.AuthorStatistic
 import de.richargh.teamcharta.importer.gitmining.app.api.Branch
 import de.richargh.teamcharta.importer.gitmining.app.api.BranchStatus
 import de.richargh.teamcharta.importer.gitmining.app.api.WorkItem
@@ -148,6 +149,22 @@ object TableFormatter {
         }
         val table = formatTable(headers, rows)
         val header = "Work Items (${workItems.size} out of $totalCount)"
+        return "$header\n$table"
+    }
+
+    fun formatAuthorStatistics(authorStatistics: List<AuthorStatistic>, totalCount: Int = authorStatistics.size): String {
+        val sorted = authorStatistics.sortedByDescending { it.commitCount }
+        val headers = listOf("Author", "Commits↓", "+Lines", "-Lines")
+        val rows = sorted.map { stat ->
+            listOf(
+                stat.author.name,
+                stat.commitCount.toString(),
+                stat.linesAdded.toString(),
+                stat.linesRemoved.toString()
+            )
+        }
+        val table = formatTable(headers, rows)
+        val header = "Authors (${authorStatistics.size} out of $totalCount)"
         return "$header\n$table"
     }
 
