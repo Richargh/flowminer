@@ -12,10 +12,34 @@ export type AuthorStats = Pick<AuthorStatsDtoClass, 'name' | 'commitCount' | 'li
 export type CommitTimeline = Pick<CommitTimelineDtoClass, 'date' | 'cumulativeCount' | 'author'>;
 export type WorkItemDuration = Pick<WorkItemDurationDtoClass, 'key' | 'type' | 'startDate' | 'durationDays'>;
 
+export interface SankeyNode {
+  name: string;
+}
+
+export interface SankeyLink {
+  source: string;
+  target: string;
+  value: number;
+}
+
+export interface SankeyFlow {
+  nodes: SankeyNode[];
+  links: SankeyLink[];
+}
+
+export interface HistogramBucket {
+  range: string;
+  count: number;
+  minValue: number;
+  maxValue: number;
+}
+
 export interface VisualizationData {
   authors: AuthorStats[];
   commitTimeline: CommitTimeline[];
   workItems: WorkItemDuration[];
+  sankeyFlow?: SankeyFlow;
+  histogram?: HistogramBucket[];
 }
 
 interface RawVisualizationData {

@@ -1,10 +1,14 @@
 import './components/author-radar-panel';
 import './components/commit-timeline-panel';
 import './components/work-item-scatter-panel';
+import './components/sankey-panel';
+import './components/histogram-panel';
 import type { AuthorRadarPanel } from './components/author-radar-panel';
 import type { CommitTimelinePanel } from './components/commit-timeline-panel';
 import type { WorkItemScatterPanel } from './components/work-item-scatter-panel';
-import type { AuthorStats, CommitTimeline, WorkItemDuration } from './data-service';
+import type { SankeyPanel } from './components/sankey-panel';
+import type { HistogramPanel } from './components/histogram-panel';
+import type { AuthorStats, CommitTimeline, WorkItemDuration, SankeyFlow, HistogramBucket } from './data-service';
 
 const sampleAuthors: AuthorStats[] = [
   { name: 'Alice', commitCount: 120, linesAdded: 8500, linesDeleted: 3200, avgCommitSize: 97 },
@@ -35,6 +39,53 @@ const sampleWorkItems: WorkItemDuration[] = [
   { key: 'BUG-4', type: 'Bug', startDate: '2024-02-15', durationDays: 4 },
 ];
 
+const sampleSankeyFlow: SankeyFlow = {
+  nodes: [
+    // Layer 1: Authors
+    { name: 'Alice' },
+    { name: 'Bob' },
+    { name: 'Charlie' },
+    { name: 'Diana' },
+    // Layer 2: Modules
+    { name: 'Frontend' },
+    { name: 'Backend' },
+    { name: 'Infrastructure' },
+    // Layer 3: Services
+    { name: 'Database' },
+    { name: 'Cache' },
+    { name: 'API Gateway' },
+    { name: 'Monitoring' },
+  ],
+  links: [
+    // Authors → Modules
+    { source: 'Alice', target: 'Frontend', value: 45 },
+    { source: 'Alice', target: 'Backend', value: 30 },
+    { source: 'Bob', target: 'Backend', value: 50 },
+    { source: 'Bob', target: 'Infrastructure', value: 25 },
+    { source: 'Charlie', target: 'Frontend', value: 35 },
+    { source: 'Charlie', target: 'Backend', value: 20 },
+    { source: 'Diana', target: 'Backend', value: 40 },
+    { source: 'Diana', target: 'Infrastructure', value: 55 },
+    // Modules → Services
+    { source: 'Frontend', target: 'API Gateway', value: 60 },
+    { source: 'Frontend', target: 'Cache', value: 20 },
+    { source: 'Backend', target: 'Database', value: 80 },
+    { source: 'Backend', target: 'Cache', value: 40 },
+    { source: 'Backend', target: 'API Gateway', value: 20 },
+    { source: 'Infrastructure', target: 'Monitoring', value: 50 },
+    { source: 'Infrastructure', target: 'Database', value: 30 },
+  ],
+};
+
+const sampleHistogram: HistogramBucket[] = [
+  { range: '0-2 days', count: 15, minValue: 0, maxValue: 2 },
+  { range: '2-4 days', count: 28, minValue: 2, maxValue: 4 },
+  { range: '4-6 days', count: 22, minValue: 4, maxValue: 6 },
+  { range: '6-8 days', count: 12, minValue: 6, maxValue: 8 },
+  { range: '8-10 days', count: 8, minValue: 8, maxValue: 10 },
+  { range: '10+ days', count: 5, minValue: 10, maxValue: 999 },
+];
+
 const app = document.getElementById('app');
 if (app) {
   app.innerHTML = `
@@ -62,6 +113,20 @@ if (app) {
             <work-item-scatter-panel id="scatter-panel"></work-item-scatter-panel>
           </div>
         </div>
+
+        <div class="card bg-base-100 shadow-xl lg:col-span-2">
+          <div class="card-body">
+            <h2 class="card-title">Author to Module Flow</h2>
+            <sankey-panel id="sankey-panel"></sankey-panel>
+          </div>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl lg:col-span-2">
+          <div class="card-body">
+            <h2 class="card-title">Work Item Duration Distribution</h2>
+            <histogram-panel id="histogram-panel"></histogram-panel>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -79,5 +144,15 @@ if (app) {
   const scatterPanel = document.getElementById('scatter-panel') as WorkItemScatterPanel;
   if (scatterPanel) {
     scatterPanel.workItems = sampleWorkItems;
+  }
+
+  const sankeyPanel = document.getElementById('sankey-panel') as SankeyPanel;
+  if (sankeyPanel) {
+    sankeyPanel.flow = sampleSankeyFlow;
+  }
+
+  const histogramPanel = document.getElementById('histogram-panel') as HistogramPanel;
+  if (histogramPanel) {
+    histogramPanel.buckets = sampleHistogram;
   }
 }
