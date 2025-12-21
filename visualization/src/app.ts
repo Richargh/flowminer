@@ -4,11 +4,6 @@ import './components/work-item-scatter-panel';
 import './components/sankey-panel';
 import './components/histogram-panel';
 import './components/theme-switcher';
-import type { AuthorRadarPanel } from './components/author-radar-panel';
-import type { CommitTimelinePanel } from './components/commit-timeline-panel';
-import type { WorkItemScatterPanel } from './components/work-item-scatter-panel';
-import type { SankeyPanel } from './components/sankey-panel';
-import type { HistogramPanel } from './components/histogram-panel';
 import type { AuthorStats, CommitTimeline, WorkItemDuration, SankeyFlow, HistogramBucket } from './data-service';
 
 const sampleAuthors: AuthorStats[] = [
@@ -82,27 +77,27 @@ const sampleHistogram: HistogramBucket[] = [
   { range: '10+ days', count: 5, minValue: 10, maxValue: 999 },
 ];
 
-const radarPanel = document.getElementById('radar-panel') as AuthorRadarPanel;
+const radarPanel = document.querySelector('author-radar-panel');
 if (radarPanel) {
   radarPanel.authors = sampleAuthors;
 }
 
-const timelinePanel = document.getElementById('timeline-panel') as CommitTimelinePanel;
+const timelinePanel = document.querySelector('commit-timeline-panel');
 if (timelinePanel) {
   timelinePanel.timeline = sampleTimeline;
 }
 
-const scatterPanel = document.getElementById('scatter-panel') as WorkItemScatterPanel;
+const scatterPanel = document.querySelector('work-item-scatter-panel');
 if (scatterPanel) {
   scatterPanel.workItems = sampleWorkItems;
 }
 
-const sankeyPanel = document.getElementById('sankey-panel') as SankeyPanel;
+const sankeyPanel = document.querySelector('sankey-panel');
 if (sankeyPanel) {
   sankeyPanel.flow = sampleSankeyFlow;
 }
 
-const histogramPanel = document.getElementById('histogram-panel') as HistogramPanel;
+const histogramPanel = document.querySelector('histogram-panel');
 if (histogramPanel) {
   histogramPanel.buckets = sampleHistogram;
 }
