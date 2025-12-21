@@ -3,6 +3,7 @@ import './components/commit-timeline-panel';
 import './components/work-item-scatter-panel';
 import './components/sankey-panel';
 import './components/histogram-panel';
+import './components/theme-switcher';
 import type { AuthorRadarPanel } from './components/author-radar-panel';
 import type { CommitTimelinePanel } from './components/commit-timeline-panel';
 import type { WorkItemScatterPanel } from './components/work-item-scatter-panel';
@@ -90,7 +91,10 @@ const app = document.getElementById('app');
 if (app) {
   app.innerHTML = `
     <div class="container mx-auto p-4">
-      <h1 class="text-2xl font-bold mb-6">Git Visualization</h1>
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold">Git Visualization</h1>
+        <theme-switcher></theme-switcher>
+      </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="card bg-base-100 shadow-xl">

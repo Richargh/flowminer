@@ -1,8 +1,21 @@
-import { defineConfig } from 'vite'
+import {defineConfig} from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  plugins: [
-    tailwindcss(),
-  ],
+    plugins: [
+        tailwindcss(),
+    ],
+    build: {
+        target: 'esnext',
+        minify: 'esbuild',
+        rollupOptions: {
+            external: [/\.test\.ts$/],
+            output: {
+                manualChunks: {
+                    'echarts': ['echarts/core', 'echarts/charts', 'echarts/components', 'echarts/renderers'],
+                    'lit': ['lit'],
+                },
+            },
+        },
+    },
 })

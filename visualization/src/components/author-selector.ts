@@ -29,7 +29,7 @@ export class AuthorSelector extends LitElement {
 
   render() {
     return html`
-      <select @change=${this._onSelectionChange}>
+      <select aria-label="Select author" @change=${this._onSelectionChange}>
         ${this.authors.map(
           (author, index) =>
             html`<option value=${author.name} ?selected=${index === this._selectedIndex}>
