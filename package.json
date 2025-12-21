@@ -1,0 +1,15 @@
+{
+  "name": "teamcharta",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "visualization",
+    "shared/build/dist/js/productionLibrary"
+  ],
+  "scripts": {
+    "build:shared": "./gradlew :shared:jsBrowserProductionLibraryDistribution",
+    "start:web": "npm run build:shared && npm --workspace=visualization run dev",
+    "build:web": "npm run build:shared && npm --workspace=visualization run build",
+    "test:web": "npm --workspace=visualization run test"
+  }
+}

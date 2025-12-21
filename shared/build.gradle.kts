@@ -20,6 +20,7 @@ kotlin {
     }
 
     js(IR) {
+        moduleName = "teamcharta-shared"
         browser()
         binaries.library()
         generateTypeScriptDefinitions()

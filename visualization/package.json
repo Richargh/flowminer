@@ -1,0 +1,28 @@
+{
+  "name": "visualization",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "teamcharta-shared": "0.0.0-unspecified",
+    "echarts": "6.0.0",
+    "lit": "3.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.18",
+    "@vitest/browser": "4.0.16",
+    "@vitest/browser-playwright": "4.0.16",
+    "daisyui": "5.5.14",
+    "playwright": "1.57.0",
+    "tailwindcss": "4.1.18",
+    "typescript": "5.9.3",
+    "vite": "7.3.0",
+    "vitest": "4.0.16"
+  }
+}

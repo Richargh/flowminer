@@ -6,9 +6,12 @@ STARTER_CHARACTER = 2️⃣
 ## Tech Stack
 
 * TypeScript
-* Angular
+* Lit (Web Components)
+* Vite (Build Tool)
+* Apache ECharts (Charts)
 * DaisyUI
-* Tailwind
+* Tailwind CSS v4
+* Vitest (Browser Testing with Playwright)
 
 ## Technical Guidelines
 
