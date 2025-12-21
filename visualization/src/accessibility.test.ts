@@ -51,23 +51,6 @@ describe('Accessibility', () => {
     expect(style.height).toBe('400px');
   });
 
-  it('page structure follows accessibility best practices', async () => {
-    document.body.innerHTML = '<div id="app"></div>';
-    await import('./app');
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    const app = document.getElementById('app');
-    const html = app?.innerHTML ?? '';
-
-    // Check for heading hierarchy
-    expect(html).toContain('<h1');
-    expect(html).toContain('<h2');
-
-    // Check for semantic card structure
-    expect(html).toContain('card-title');
-    expect(html).toContain('card-body');
-  });
-
   it('all interactive elements have focus states', async () => {
     await import('./components/theme-switcher');
     const element = document.createElement('theme-switcher');

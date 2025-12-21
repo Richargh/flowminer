@@ -42,23 +42,19 @@ const sampleWorkItems: WorkItemDuration[] = [
 
 const sampleSankeyFlow: SankeyFlow = {
   nodes: [
-    // Layer 1: Authors
     { name: 'Alice' },
     { name: 'Bob' },
     { name: 'Charlie' },
     { name: 'Diana' },
-    // Layer 2: Modules
     { name: 'Frontend' },
     { name: 'Backend' },
     { name: 'Infrastructure' },
-    // Layer 3: Services
     { name: 'Database' },
     { name: 'Cache' },
     { name: 'API Gateway' },
     { name: 'Monitoring' },
   ],
   links: [
-    // Authors → Modules
     { source: 'Alice', target: 'Frontend', value: 45 },
     { source: 'Alice', target: 'Backend', value: 30 },
     { source: 'Bob', target: 'Backend', value: 50 },
@@ -67,7 +63,6 @@ const sampleSankeyFlow: SankeyFlow = {
     { source: 'Charlie', target: 'Backend', value: 20 },
     { source: 'Diana', target: 'Backend', value: 40 },
     { source: 'Diana', target: 'Infrastructure', value: 55 },
-    // Modules → Services
     { source: 'Frontend', target: 'API Gateway', value: 60 },
     { source: 'Frontend', target: 'Cache', value: 20 },
     { source: 'Backend', target: 'Database', value: 80 },
@@ -87,76 +82,27 @@ const sampleHistogram: HistogramBucket[] = [
   { range: '10+ days', count: 5, minValue: 10, maxValue: 999 },
 ];
 
-const app = document.getElementById('app');
-if (app) {
-  app.innerHTML = `
-    <div class="container mx-auto p-4">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Git Visualization</h1>
-        <theme-switcher></theme-switcher>
-      </div>
+const radarPanel = document.getElementById('radar-panel') as AuthorRadarPanel;
+if (radarPanel) {
+  radarPanel.authors = sampleAuthors;
+}
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="card bg-base-100 shadow-xl">
-          <div class="card-body">
-            <h2 class="card-title">Author Statistics</h2>
-            <author-radar-panel id="radar-panel"></author-radar-panel>
-          </div>
-        </div>
+const timelinePanel = document.getElementById('timeline-panel') as CommitTimelinePanel;
+if (timelinePanel) {
+  timelinePanel.timeline = sampleTimeline;
+}
 
-        <div class="card bg-base-100 shadow-xl">
-          <div class="card-body">
-            <h2 class="card-title">Commit Timeline</h2>
-            <commit-timeline-panel id="timeline-panel"></commit-timeline-panel>
-          </div>
-        </div>
+const scatterPanel = document.getElementById('scatter-panel') as WorkItemScatterPanel;
+if (scatterPanel) {
+  scatterPanel.workItems = sampleWorkItems;
+}
 
-        <div class="card bg-base-100 shadow-xl lg:col-span-2">
-          <div class="card-body">
-            <h2 class="card-title">Work Item Duration</h2>
-            <work-item-scatter-panel id="scatter-panel"></work-item-scatter-panel>
-          </div>
-        </div>
+const sankeyPanel = document.getElementById('sankey-panel') as SankeyPanel;
+if (sankeyPanel) {
+  sankeyPanel.flow = sampleSankeyFlow;
+}
 
-        <div class="card bg-base-100 shadow-xl lg:col-span-2">
-          <div class="card-body">
-            <h2 class="card-title">Author to Module Flow</h2>
-            <sankey-panel id="sankey-panel"></sankey-panel>
-          </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-xl lg:col-span-2">
-          <div class="card-body">
-            <h2 class="card-title">Work Item Duration Distribution</h2>
-            <histogram-panel id="histogram-panel"></histogram-panel>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const radarPanel = document.getElementById('radar-panel') as AuthorRadarPanel;
-  if (radarPanel) {
-    radarPanel.authors = sampleAuthors;
-  }
-
-  const timelinePanel = document.getElementById('timeline-panel') as CommitTimelinePanel;
-  if (timelinePanel) {
-    timelinePanel.timeline = sampleTimeline;
-  }
-
-  const scatterPanel = document.getElementById('scatter-panel') as WorkItemScatterPanel;
-  if (scatterPanel) {
-    scatterPanel.workItems = sampleWorkItems;
-  }
-
-  const sankeyPanel = document.getElementById('sankey-panel') as SankeyPanel;
-  if (sankeyPanel) {
-    sankeyPanel.flow = sampleSankeyFlow;
-  }
-
-  const histogramPanel = document.getElementById('histogram-panel') as HistogramPanel;
-  if (histogramPanel) {
-    histogramPanel.buckets = sampleHistogram;
-  }
+const histogramPanel = document.getElementById('histogram-panel') as HistogramPanel;
+if (histogramPanel) {
+  histogramPanel.buckets = sampleHistogram;
 }

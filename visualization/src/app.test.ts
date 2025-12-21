@@ -2,33 +2,42 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 describe('App Shell', () => {
   beforeEach(() => {
-    document.body.innerHTML = '<div id="app"></div>';
+    document.body.innerHTML = `
+      <author-radar-panel id="radar-panel"></author-radar-panel>
+      <commit-timeline-panel id="timeline-panel"></commit-timeline-panel>
+      <work-item-scatter-panel id="scatter-panel"></work-item-scatter-panel>
+      <sankey-panel id="sankey-panel"></sankey-panel>
+      <histogram-panel id="histogram-panel"></histogram-panel>
+    `;
   });
 
   afterEach(() => {
     document.body.innerHTML = '';
   });
 
-  it('renders all five chart panels in a responsive grid layout with DaisyUI cards', async () => {
-    // Import app to trigger rendering
+  it('binds sample data to all chart panels', async () => {
     await import('./app');
-
-    // Wait for custom elements to be defined
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    const app = document.getElementById('app');
-    expect(app).toBeTruthy();
+    const radarPanel = document.getElementById('radar-panel') as any;
+    const timelinePanel = document.getElementById('timeline-panel') as any;
+    const scatterPanel = document.getElementById('scatter-panel') as any;
+    const sankeyPanel = document.getElementById('sankey-panel') as any;
+    const histogramPanel = document.getElementById('histogram-panel') as any;
 
-    // Check for all 5 chart panels
-    expect(app?.querySelector('author-radar-panel')).toBeTruthy();
-    expect(app?.querySelector('commit-timeline-panel')).toBeTruthy();
-    expect(app?.querySelector('work-item-scatter-panel')).toBeTruthy();
-    expect(app?.querySelector('sankey-panel')).toBeTruthy();
-    expect(app?.querySelector('histogram-panel')).toBeTruthy();
+    expect(radarPanel.authors).toBeDefined();
+    expect(radarPanel.authors.length).toBeGreaterThan(0);
 
-    // Check for grid layout and DaisyUI classes in HTML
-    const html = app?.innerHTML ?? '';
-    expect(html).toContain('grid');
-    expect(html).toContain('card');
+    expect(timelinePanel.timeline).toBeDefined();
+    expect(timelinePanel.timeline.length).toBeGreaterThan(0);
+
+    expect(scatterPanel.workItems).toBeDefined();
+    expect(scatterPanel.workItems.length).toBeGreaterThan(0);
+
+    expect(sankeyPanel.flow).toBeDefined();
+    expect(sankeyPanel.flow.nodes.length).toBeGreaterThan(0);
+
+    expect(histogramPanel.buckets).toBeDefined();
+    expect(histogramPanel.buckets.length).toBeGreaterThan(0);
   });
 });
