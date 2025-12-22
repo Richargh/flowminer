@@ -3,7 +3,7 @@ package de.richargh.teamcharta.importer.gitmining.app
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.time.ZonedDateTime
+import kotlin.time.Clock
 
 class GitRepositoryMinerTest {
     private val repoPath = File("../..")
@@ -14,7 +14,7 @@ class GitRepositoryMinerTest {
         val testee = GitRepositoryMiner()
 
         // When
-        val result = testee.parse(repoPath, since = "1 year ago", ZonedDateTime.now())
+        val result = testee.parse(repoPath, since = "1 year ago", Clock.System.now())
 
         // Then
         result.commits.all().shouldNotBeEmpty()

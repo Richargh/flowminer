@@ -7,11 +7,11 @@ import de.richargh.teamcharta.importer.gitmining.app.internal.extractWorkItems
 import de.richargh.teamcharta.importer.git.app.internal.parseCommits
 import de.richargh.teamcharta.importer.gitmining.app.api.Commits
 import de.richargh.teamcharta.importer.gitmining.app.api.GitMiningResult
-import java.time.ZonedDateTime
+import kotlin.time.Instant
 
 class GitLogMiner {
 
-    fun parse(lines: Sequence<String>, currentDate: ZonedDateTime): GitMiningResult {
+    fun parse(lines: Sequence<String>, currentDate: Instant): GitMiningResult {
         val rawCommits = splitIntoRawCommits(lines)
         val commits = parseCommits(rawCommits).toList()
         val branches = extractBranchInfo(commits, currentDate)

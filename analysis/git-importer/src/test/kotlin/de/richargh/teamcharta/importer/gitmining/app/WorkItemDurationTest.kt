@@ -2,10 +2,10 @@ package de.richargh.teamcharta.importer.gitmining.app
 
 import de.richargh.teamcharta.importer.git.app.aGitLog
 import de.richargh.teamcharta.importer.shared.time.app.testNow2025
-import de.richargh.teamcharta.importer.shared.time.app.zoned
+import de.richargh.teamcharta.importer.shared.time.app.toInstant
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import java.time.Duration
+import kotlin.time.Duration.Companion.days
 
 class WorkItemDurationTest {
     @Test
@@ -14,17 +14,17 @@ class WorkItemDurationTest {
         val gitLogContent = aGitLog {
             anEntry("origin/feature") {
                 subject("ABC-123 first commit")
-                authorDate("2024-01-10T10:00:00+01:00".zoned())
+                authorDate("2024-01-10T10:00:00+01:00".toInstant())
                 file("src/Feature.kt", additions = 10, deletions = 0)
             }
             anEntry("origin/feature") {
                 subject("ABC-123 second commit")
-                authorDate("2024-01-12T10:00:00+01:00".zoned())
+                authorDate("2024-01-12T10:00:00+01:00".toInstant())
                 file("src/Feature.kt", additions = 5, deletions = 0)
             }
             anEntry("origin/feature") {
                 subject("ABC-123 third commit")
-                authorDate("2024-01-15T10:00:00+01:00".zoned())
+                authorDate("2024-01-15T10:00:00+01:00".toInstant())
                 file("src/Feature.kt", additions = 3, deletions = 0)
             }
         }
@@ -36,8 +36,8 @@ class WorkItemDurationTest {
 
         // Then
         val workItem = result.workItems["ABC-123"]!!
-        workItem.firstCommitDate shouldBe "2024-01-10T10:00:00+01:00".zoned()
-        workItem.lastCommitDate shouldBe "2024-01-15T10:00:00+01:00".zoned()
-        workItem.duration shouldBe Duration.ofDays(5)
+        workItem.firstCommitDate shouldBe "2024-01-10T10:00:00+01:00".toInstant()
+        workItem.lastCommitDate shouldBe "2024-01-15T10:00:00+01:00".toInstant()
+        workItem.duration shouldBe 5.days
     }
 }

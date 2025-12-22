@@ -3,7 +3,7 @@ package de.richargh.teamcharta.importer.git.app
 import de.richargh.teamcharta.importer.git.app.api.*
 import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.jupiter.api.Test
-import java.time.ZonedDateTime
+import kotlin.time.Instant
 
 class GitLogParserTest {
 
@@ -28,7 +28,7 @@ class GitLogParserTest {
         result shouldContainExactly listOf(aCommit {
             hash("abc123")
             author("John Doe", "john@example.com")
-            date(ZonedDateTime.parse("2024-01-15T10:00:00+01:00"))
+            date(Instant.parse("2024-01-15T10:00:00+01:00"))
             message("Initial commit")
             parents("parent1")
             headRef("main")

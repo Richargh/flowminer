@@ -1,6 +1,6 @@
 package de.richargh.teamcharta.importer.git.app.api
 
-import java.time.ZonedDateTime
+import kotlin.time.Instant
 
 enum class CommitType {
     FEATURE,
@@ -74,7 +74,7 @@ data class FileChange(
 data class Commit(
     val hash: CommitHash,
     val author: Author,
-    val date: ZonedDateTime,
+    val date: Instant,
     val message: String,
     val parents: List<CommitHash>,
     val refs: List<Ref>,

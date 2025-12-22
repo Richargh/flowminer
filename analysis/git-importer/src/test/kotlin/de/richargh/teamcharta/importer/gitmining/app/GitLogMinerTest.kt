@@ -5,9 +5,10 @@ import de.richargh.teamcharta.importer.git.app.api.aCommit
 import de.richargh.teamcharta.importer.git.app.api.hash
 import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
 import de.richargh.teamcharta.importer.shared.time.app.testNow2025
+import de.richargh.teamcharta.importer.shared.time.app.toInstant
 import io.kotest.matchers.collections.shouldContainExactly
 import org.junit.jupiter.api.Test
-import java.time.ZonedDateTime
+import kotlin.time.Instant
 
 class GitLogMinerTest {
 
@@ -32,7 +33,7 @@ class GitLogMinerTest {
         result.commits.all() shouldContainExactly listOf(aCommit {
             hash("abc123")
             author("John Doe", "john@example.com")
-            date(ZonedDateTime.parse("2024-01-15T10:00:00+01:00"))
+            date("2024-01-15T10:00:00+01:00".toInstant())
             message("Initial commit")
             parents("parent1")
             headRef("main")
@@ -68,7 +69,7 @@ class GitLogMinerTest {
             isCurrent()
             isStale()
             firstCommitHash("abc123".hash())
-            firstCommitDate(ZonedDateTime.parse("2024-01-15T10:00:00+01:00"))
+            firstCommitDate("2024-01-15T10:00:00+01:00".toInstant())
         })
     }
 }

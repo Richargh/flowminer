@@ -14,11 +14,12 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.ZonedDateTime
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Instant
 
 class TableFormatterTest {
 
-    private val now = ZonedDateTime.parse("2024-01-20T10:00:00+01:00")
+    private val now = Instant.parse("2024-01-20T10:00:00+01:00")
 
     @Nested
     inner class ActiveBranches {
@@ -29,7 +30,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("feature-login")
                 isActive()
-                lastCommitDate(now.minusDays(2))
+                lastCommitDate(now - 2.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -45,7 +46,7 @@ class TableFormatterTest {
                 aBranch {
                     name("branch-$i")
                     isActive()
-                    lastCommitDate(now.minusDays(i.toLong()))
+                    lastCommitDate(now - i.days)
                 }
             }
 
@@ -62,7 +63,7 @@ class TableFormatterTest {
                 name("feature-login")
                 isActive()
                 isCurrent()
-                lastCommitDate(now.minusDays(2))
+                lastCommitDate(now - 2.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -77,7 +78,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("feature-login")
                 isActive()
-                lastCommitDate(now.minusDays(2))
+                lastCommitDate(now - 2.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -93,12 +94,12 @@ class TableFormatterTest {
             val older = aBranch {
                 name("older-branch")
                 isActive()
-                lastCommitDate(now.minusDays(5))
+                lastCommitDate(now - 5.days)
             }
             val newer = aBranch {
                 name("newer-branch")
                 isActive()
-                lastCommitDate(now.minusDays(1))
+                lastCommitDate(now - 1.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(older, newer), now)
@@ -116,7 +117,7 @@ class TableFormatterTest {
                 aBranch {
                     name("branch-$i")
                     isActive()
-                    lastCommitDate(now.minusDays(i.toLong()))
+                    lastCommitDate(now - i.days)
                 }
             }
 
@@ -138,7 +139,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("stale-feature")
                 isStale()
-                lastCommitDate(now.minusMonths(3))
+                lastCommitDate(now - 90.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -154,7 +155,7 @@ class TableFormatterTest {
                 aBranch {
                     name("stale-$i")
                     isStale()
-                    lastCommitDate(now.minusMonths(i.toLong()))
+                    lastCommitDate(now - (i * 30).days)
                 }
             }
 
@@ -170,12 +171,12 @@ class TableFormatterTest {
             val older = aBranch {
                 name("oldest-stale")
                 isStale()
-                lastCommitDate(now.minusMonths(6))
+                lastCommitDate(now - 180.days)
             }
             val newer = aBranch {
                 name("newer-stale")
                 isStale()
-                lastCommitDate(now.minusMonths(3))
+                lastCommitDate(now - 90.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(newer, older), now)
@@ -193,7 +194,7 @@ class TableFormatterTest {
                 aBranch {
                     name("stale-$i")
                     isStale()
-                    lastCommitDate(now.minusMonths(i.toLong()))
+                    lastCommitDate(now - (i * 30).days)
                 }
             }
 
@@ -213,7 +214,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("completed-feature")
                 isCompleted()
-                lastCommitDate(now.minusWeeks(2))
+                lastCommitDate(now - 14.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -229,7 +230,7 @@ class TableFormatterTest {
                 aBranch {
                     name("completed-$i")
                     isCompleted()
-                    lastCommitDate(now.minusWeeks(i.toLong()))
+                    lastCommitDate(now - (i * 7).days)
                 }
             }
 
@@ -245,12 +246,12 @@ class TableFormatterTest {
             val older = aBranch {
                 name("older-completed")
                 isCompleted()
-                lastCommitDate(now.minusMonths(2))
+                lastCommitDate(now - 60.days)
             }
             val newer = aBranch {
                 name("newer-completed")
                 isCompleted()
-                lastCommitDate(now.minusWeeks(1))
+                lastCommitDate(now - 7.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(older, newer), now)
@@ -268,7 +269,7 @@ class TableFormatterTest {
                 aBranch {
                     name("completed-$i")
                     isCompleted()
-                    lastCommitDate(now.minusWeeks(i.toLong()))
+                    lastCommitDate(now - (i * 7).days)
                 }
             }
 
@@ -288,7 +289,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("feature")
                 isActive()
-                lastCommitDate(now.minusDays(3))
+                lastCommitDate(now - 3.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -303,7 +304,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("feature")
                 isActive()
-                lastCommitDate(now.minusWeeks(2))
+                lastCommitDate(now - 14.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -318,7 +319,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("feature")
                 isStale()
-                lastCommitDate(now.minusMonths(3))
+                lastCommitDate(now - 90.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -337,8 +338,8 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("feature")
                 isActive()
-                firstCommitDate(now.minusDays(5))
-                lastCommitDate(now.minusDays(2))
+                firstCommitDate(now - 5.days)
+                lastCommitDate(now - 2.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -353,8 +354,8 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("feature")
                 isActive()
-                firstCommitDate(now.minusWeeks(3))
-                lastCommitDate(now.minusDays(2))
+                firstCommitDate(now - 21.days)
+                lastCommitDate(now - 2.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -369,8 +370,8 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("feature")
                 isStale()
-                firstCommitDate(now.minusMonths(4))
-                lastCommitDate(now.minusMonths(2))
+                firstCommitDate(now - 120.days)
+                lastCommitDate(now - 60.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -389,8 +390,8 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("feature")
                 isActive()
-                firstCommitDate(now.minusDays(5))
-                lastCommitDate(now.minusDays(2))
+                firstCommitDate(now - 5.days)
+                lastCommitDate(now - 2.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -411,7 +412,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("stale-feature")
                 isStale()
-                lastCommitDate(now.minusMonths(3))
+                lastCommitDate(now - 90.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -426,7 +427,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("active-feature")
                 isActive()
-                lastCommitDate(now.minusDays(2))
+                lastCommitDate(now - 2.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -441,7 +442,7 @@ class TableFormatterTest {
             val branch = aBranch {
                 name("active-feature")
                 isActive()
-                lastCommitDate(now.minusDays(2))
+                lastCommitDate(now - 2.days)
             }
 
             val result = TableFormatter.formatBranches(listOf(branch), now)
@@ -459,7 +460,7 @@ class TableFormatterTest {
             // When
             val commit = aCommit {
                 certainBranch("main")
-                date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                date(Instant.parse("2024-01-15T10:30:00+01:00"))
                 author("Jane Doe", "jane@example.com")
                 message("Add login feature")
             }
@@ -476,7 +477,7 @@ class TableFormatterTest {
             // When
             val commit = aCommit {
                 commitType(CommitType.FEATURE)
-                date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                date(Instant.parse("2024-01-15T10:30:00+01:00"))
                 author("Jane Doe", "jane@example.com")
                 message("Add login feature")
             }
@@ -493,7 +494,7 @@ class TableFormatterTest {
             // When
             val commit = aCommit {
                 workKeys(WorkKey.Known("ABC-123"), WorkKey.Known("DEF-456"))
-                date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                date(Instant.parse("2024-01-15T10:30:00+01:00"))
                 author("Jane Doe", "jane@example.com")
                 message("Add login feature")
             }
@@ -526,18 +527,18 @@ class TableFormatterTest {
                 aCommit {
                     certainBranch("main")
                     isOnCurrentBranch()
-                    date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                    date(Instant.parse("2024-01-15T10:30:00+01:00"))
                     message("HEAD commit")
                 },
                 aCommit {
                     certainBranch("main")
                     isOnCurrentBranch()
-                    date(ZonedDateTime.parse("2024-01-14T10:30:00+01:00"))
+                    date(Instant.parse("2024-01-14T10:30:00+01:00"))
                     message("Second commit on current branch")
                 },
                 aCommit {
                     certainBranch("feature")
-                    date(ZonedDateTime.parse("2024-01-13T10:30:00+01:00"))
+                    date(Instant.parse("2024-01-13T10:30:00+01:00"))
                     message("Other branch commit")
                 }
             )
@@ -560,7 +561,7 @@ class TableFormatterTest {
                     FileChange("file1.kt", additions = 10, deletions = 5),
                     FileChange("file2.kt", additions = 20, deletions = 3)
                 )
-                date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                date(Instant.parse("2024-01-15T10:30:00+01:00"))
                 author("Jane Doe", "jane@example.com")
                 message("Add login feature")
             }
@@ -579,7 +580,7 @@ class TableFormatterTest {
             // When
             val commit = aCommit {
                 certainBranch("main")
-                date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                date(Instant.parse("2024-01-15T10:30:00+01:00"))
                 commitType(CommitType.FEATURE)
                 author("Jane Doe", "jane@example.com")
                 workKeys(WorkKey.Known("ABC-1"))
@@ -604,14 +605,14 @@ class TableFormatterTest {
             val commits = listOf(
                 aCommit {
                     certainBranch("main")
-                    date(ZonedDateTime.parse("2024-01-15T10:30:00+01:00"))
+                    date(Instant.parse("2024-01-15T10:30:00+01:00"))
                     commitType(CommitType.FIX)
                     author("Jane Doe", "jane@example.com")
                     message("Fix bug")
                 },
                 aCommit {
                     certainBranch("feature/auth")
-                    date(ZonedDateTime.parse("2024-01-16T11:00:00+01:00"))
+                    date(Instant.parse("2024-01-16T11:00:00+01:00"))
                     commitType(CommitType.FEATURE)
                     author("John Smith", "john@example.com")
                     message("Add authentication feature")
@@ -656,8 +657,8 @@ class TableFormatterTest {
                 workKey("ABC-123")
                 linesAdded(100)
                 linesRemoved(20)
-                firstCommitDate(ZonedDateTime.parse("2024-01-10T10:00:00+01:00"))
-                lastCommitDate(ZonedDateTime.parse("2024-01-17T10:00:00+01:00"))
+                firstCommitDate(Instant.parse("2024-01-10T10:00:00+01:00"))
+                lastCommitDate(Instant.parse("2024-01-17T10:00:00+01:00"))
                 filesChanged(setOf(Path.of("src/Main.kt"), Path.of("src/Helper.kt")))
                 contributions(listOf(
                     AuthorContribution(Author("Alice Smith", "alice@example.com"), 80),

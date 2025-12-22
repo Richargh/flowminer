@@ -1,17 +1,17 @@
 package de.richargh.teamcharta.importer.gitmining.app.api
 
 import de.richargh.teamcharta.importer.git.app.api.*
-import java.time.ZonedDateTime
+import kotlin.time.Instant
 
 class BranchBuilder {
     private var name: BranchId = NamedBranchId.Certain(BranchName("feature-branch"))
     private var intermediateCommits = mutableSetOf<CommitHash>()
     private var firstCommitHash: CommitHash = CommitHash("abc123")
-    private var firstCommitDate: ZonedDateTime = ZonedDateTime.parse("2024-01-10T10:00:00+01:00")
+    private var firstCommitDate: Instant = Instant.parse("2024-01-10T10:00:00+01:00")
     private var lastCommitHash: CommitHash? = null
-    private var lastCommitDate: ZonedDateTime? = null
+    private var lastCommitDate: Instant? = null
     private var mergeCommitHash: CommitHash? = null
-    private var mergeDate: ZonedDateTime? = null
+    private var mergeDate: Instant? = null
     private var targetBranch: BranchName? = null
     private var isCurrent: Boolean = false
     private var status: BranchStatus = BranchStatus.Active
@@ -23,14 +23,14 @@ class BranchBuilder {
     fun intermediateCommits(vararg commits: CommitHash) = apply { commits.forEach(this.intermediateCommits::add) }
 
     fun firstCommitHash(hash: CommitHash) = apply { this.firstCommitHash = hash }
-    fun firstCommitDate(date: ZonedDateTime) = apply { this.firstCommitDate = date }
+    fun firstCommitDate(date: Instant) = apply { this.firstCommitDate = date }
     fun lastCommitHash(hash: CommitHash) = apply { this.lastCommitHash = hash }
-    fun lastCommitDate(date: ZonedDateTime) = apply { this.lastCommitDate = date }
+    fun lastCommitDate(date: Instant) = apply { this.lastCommitDate = date }
     fun mergeCommitHash(hash: CommitHash) = apply { this.mergeCommitHash = hash }
-    fun mergeDate(date: ZonedDateTime) = apply { this.mergeDate = date }
+    fun mergeDate(date: Instant) = apply { this.mergeDate = date }
     fun targetBranch(branch: String) = apply { this.targetBranch = BranchName(branch) }
 
-    fun mergedInto(targetBranch: String, mergeDate: ZonedDateTime, mergeCommitHash: String) = apply {
+    fun mergedInto(targetBranch: String, mergeDate: Instant, mergeCommitHash: String) = apply {
         this.mergeCommitHash = CommitHash(mergeCommitHash)
         this.mergeDate = mergeDate
         this.targetBranch = BranchName(targetBranch)

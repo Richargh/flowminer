@@ -4,13 +4,13 @@ import de.richargh.teamcharta.importer.git.app.api.Author
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.git.app.api.hash
-import java.time.ZonedDateTime
+import kotlin.time.Instant
 
 class GitLogEntryBuilder {
     private var hash: CommitHash = CommitHash("abc123")
     private var author: String = "John Doe"
     private var authorMail: String = "john@example.com"
-    private var authorDate: ZonedDateTime = ZonedDateTime.parse("2024-01-15T10:00:00+01:00")
+    private var authorDate: Instant = Instant.parse("2024-01-15T10:00:00+01:00")
     private var subject: String = "Initial commit"
     private var parents: MutableList<CommitHash> = mutableListOf()
     private var refs: List<String> = emptyList()
@@ -28,7 +28,7 @@ class GitLogEntryBuilder {
         this.authorMail = email
     }
 
-    fun authorDate(date: ZonedDateTime) = apply { this.authorDate = date }
+    fun authorDate(date: Instant) = apply { this.authorDate = date }
     fun subject(subject: String) = apply { this.subject = subject }
     fun parents(vararg parents: CommitHash) = apply { this.parents = parents.toMutableList() }
     fun parents() = parents

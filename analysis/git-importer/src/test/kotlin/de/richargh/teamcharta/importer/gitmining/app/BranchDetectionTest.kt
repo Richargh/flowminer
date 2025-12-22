@@ -6,7 +6,7 @@ import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
 import de.richargh.teamcharta.importer.gitmining.app.api.BranchStatus
 import de.richargh.teamcharta.importer.shared.time.app.atStartOfYear
 import de.richargh.teamcharta.importer.shared.time.app.testNow2025
-import de.richargh.teamcharta.importer.shared.time.app.zoned
+import de.richargh.teamcharta.importer.shared.time.app.toInstant
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -437,26 +437,26 @@ class BranchDetectionTest {
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/trunk") {
-                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                authorDate("2025-01-01T00:00:00+01:00".toInstant())
             }
             anEntry("origin/feat", "origin/trunk") {
-                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                authorDate("2025-01-01T01:00:00+01:00".toInstant())
             }
             anEntry("origin/feat") {
-                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                authorDate("2025-01-01T02:00:00+01:00".toInstant())
             }
             anEntry("origin/feat") {
-                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                authorDate("2025-01-01T03:00:00+01:00".toInstant())
             }
             anEntry("origin/feat") {
-                authorDate("2025-01-01T04:00:00+01:00".zoned())
+                authorDate("2025-01-01T04:00:00+01:00".toInstant())
             }
             anEntry("origin/feat") {
-                authorDate("2025-01-01T05:00:00+01:00".zoned())
+                authorDate("2025-01-01T05:00:00+01:00".toInstant())
             }
             anEntry("origin/trunk", "origin/feat") {
                 refHead("trunk")
-                authorDate("2025-01-01T06:00:00+01:00".zoned())
+                authorDate("2025-01-01T06:00:00+01:00".toInstant())
             }
         }
 
@@ -471,11 +471,11 @@ class BranchDetectionTest {
             name("origin/feat")
             isCompleted()
             firstCommitHash("1".hash())
-            firstCommitDate("2025-01-01T01:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T01:00:00+01:00".toInstant())
             intermediateCommits("2".hash(), "3".hash(), "4".hash())
             lastCommitHash("5".hash())
-            lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
-            mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
+            lastCommitDate("2025-01-01T05:00:00+01:00".toInstant())
+            mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".toInstant(), "6")
         }
     }
 
@@ -493,23 +493,23 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = aGitLog {
                 anEntry("origin/trunk") {
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 }
                 anEntry("origin/trunk") {
-                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    authorDate("2025-01-01T01:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-a", "origin/trunk") {
-                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-b", "origin/trunk") {
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-b") {
-                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    authorDate("2025-01-01T04:00:00+01:00".toInstant())
                 }
                 anEntry("origin/trunk", "origin/feat-b", "origin/feat-a") {
                     refHead("trunk")
-                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                    authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 }
             }
 
@@ -524,28 +524,28 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 isCurrent()
                 firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
                 intermediateCommits("1".hash())
                 lastCommitHash("5".hash())
-                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T05:00:00+01:00".toInstant())
             }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 name("origin/feat-b")
                 isCompleted()
                 firstCommitHash("3".hash())
-                firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T03:00:00+01:00".toInstant())
                 lastCommitHash("4".hash())
-                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                lastCommitDate("2025-01-01T04:00:00+01:00".toInstant())
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".toInstant(), "5")
             }
             result.branches["origin/feat-a"] shouldBe aBranch {
                 name("origin/feat-a")
                 isCompleted()
                 firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
                 lastCommitHash("2".hash())
-                lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                lastCommitDate("2025-01-01T02:00:00+01:00".toInstant())
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".toInstant(), "5")
             }
         }
 
@@ -562,24 +562,24 @@ class BranchDetectionTest {
                 isDeletedBranch("origin/feat-a")
                 isDeletedBranch("origin/feat-b")
                 anEntry("origin/trunk") {
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 }
                 anEntry("origin/trunk") {
-                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    authorDate("2025-01-01T01:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-a", "origin/trunk") {
-                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-b", "origin/trunk") {
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-b") {
-                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    authorDate("2025-01-01T04:00:00+01:00".toInstant())
                 }
                 anEntry("origin/trunk", "origin/feat-a", "origin/feat-b") {
                     refHead("trunk")
                     subject("Merge branches 'origin/feat-a' and 'origin/feat-b' into origin/trunk")
-                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                    authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 }
             }
 
@@ -594,28 +594,28 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 isCurrent()
                 firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
                 intermediateCommits("1".hash())
                 lastCommitHash("5".hash())
-                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T05:00:00+01:00".toInstant())
             }
             result.branches["origin/feat-a"] shouldBe aBranch {
                 inferredName("origin/feat-a")
                 isCompleted()
                 firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
                 lastCommitHash("2".hash())
-                lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                lastCommitDate("2025-01-01T02:00:00+01:00".toInstant())
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".toInstant(), "5")
             }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 inferredName("origin/feat-b")
                 isCompleted()
                 firstCommitHash("3".hash())
-                firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T03:00:00+01:00".toInstant())
                 lastCommitHash("4".hash())
-                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                lastCommitDate("2025-01-01T04:00:00+01:00".toInstant())
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".toInstant(), "5")
             }
         }
 
@@ -632,24 +632,24 @@ class BranchDetectionTest {
                 isDeletedBranch("origin/feat-a")
                 isDeletedBranch("origin/feat-b")
                 anEntry("origin/trunk") {
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 }
                 anEntry("origin/trunk") {
-                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    authorDate("2025-01-01T01:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-a", "origin/trunk") {
-                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-b", "origin/trunk") {
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-b") {
-                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    authorDate("2025-01-01T04:00:00+01:00".toInstant())
                 }
                 anEntry("origin/trunk", "origin/feat-b", "origin/feat-a") {
                     refHead("trunk")
                     subject("Octopus merge all the things into origin/trunk")
-                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                    authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 }
             }
 
@@ -664,29 +664,29 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 isCurrent()
                 firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
                 intermediateCommits("1".hash())
                 lastCommitHash("5".hash())
-                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T05:00:00+01:00".toInstant())
             }
             result.branches.unnamed.shouldContainExactlyInAnyOrder(
                 aBranch {
                     unNamed("2")  // tipCommit = first commit seen on this branch
                     isCompleted()
                     firstCommitHash("2".hash())
-                    firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                    firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
                     lastCommitHash("2".hash())
-                    lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                    mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                    lastCommitDate("2025-01-01T02:00:00+01:00".toInstant())
+                    mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".toInstant(), "5")
                 },
                 aBranch {
                     unNamed("4")  // tipCommit = first commit seen (last commit of feature branch)
                     isCompleted()
                     firstCommitHash("3".hash())
-                    firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                    firstCommitDate("2025-01-01T03:00:00+01:00".toInstant())
                     lastCommitHash("4".hash())
-                    lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                    mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                    lastCommitDate("2025-01-01T04:00:00+01:00".toInstant())
+                    mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".toInstant(), "5")
                 }
             )
         }
@@ -703,28 +703,28 @@ class BranchDetectionTest {
             val gitLogContent = aGitLog {
                 isDeletedBranch("origin/feat-a")
                 anEntry("origin/trunk") {
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 }
                 anEntry("origin/trunk") {
                     subject("trunk commit")
-                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    authorDate("2025-01-01T01:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-a", "origin/trunk") {
                     subject("feat-a commit")
-                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-b", "origin/trunk") {
                     subject("feat-b 1 commit")
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat-b") {
                     subject("feat-b 2 commit")
-                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    authorDate("2025-01-01T04:00:00+01:00".toInstant())
                 }
                 anEntry("origin/trunk", "origin/feat-b", "origin/feat-a") {
                     refHead("trunk")
                     subject("Octopus merge all the things into origin/trunk")
-                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                    authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 }
             }
 
@@ -739,29 +739,29 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 isCurrent()
                 firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
                 intermediateCommits("1".hash())
                 lastCommitHash("5".hash())
-                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T05:00:00+01:00".toInstant())
             }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 name("origin/feat-b")
                 isCompleted()
                 firstCommitHash("3".hash())
-                firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T03:00:00+01:00".toInstant())
                 lastCommitHash("4".hash())
-                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                lastCommitDate("2025-01-01T04:00:00+01:00".toInstant())
+                mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".toInstant(), "5")
             }
             result.branches.unnamed.shouldContainExactlyInAnyOrder(
                 aBranch {
                     unNamed("2")  // tipCommit = first commit seen on this branch
                     isCompleted()
                     firstCommitHash("2".hash())
-                    firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                    firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
                     lastCommitHash("2".hash())
-                    lastCommitDate("2025-01-01T02:00:00+01:00".zoned())
-                    mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                    lastCommitDate("2025-01-01T02:00:00+01:00".toInstant())
+                    mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".toInstant(), "5")
                 }
             )
         }
@@ -782,37 +782,37 @@ class BranchDetectionTest {
             val gitLogContent = aGitLog {
                 anEntry("origin/trunk") {
                     subject("initial commit")
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                     file("trunk.md")
                 }
                 anEntry("origin/trunk") {
                     subject("trunk commit")
-                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    authorDate("2025-01-01T01:00:00+01:00".toInstant())
                     file("trunk2.md")
                 }
                 anEntry("origin/feat-a", "origin/trunk") {
                     subject("feat-a 1 commit")
-                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    authorDate("2025-01-01T02:00:00+01:00".toInstant())
                     file("feat-a1.md")
                 }
                 anEntry("origin/feat-a") {
                     subject("feat-a 2 commit")
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                     file("feat-a2.md")
                 }
                 anEntry("origin/feat-b", "origin/feat-a") {
                     subject("feat-b commit")
-                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    authorDate("2025-01-01T04:00:00+01:00".toInstant())
                     file("feat-b.md")
                 }
                 anEntry("origin/feat-a", "origin/feat-b") {
                     subject("Merge branch 'origin/feat-b' into origin/feat-a")
-                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                    authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 }
                 anEntry("origin/trunk", "origin/feat-a") {
                     refHead("trunk")
                     subject("Merge branch 'origin/feat-a' into origin/trunk")
-                    authorDate("2025-01-01T06:00:00+01:00".zoned())
+                    authorDate("2025-01-01T06:00:00+01:00".toInstant())
                 }
             }
 
@@ -827,29 +827,29 @@ class BranchDetectionTest {
                 name("origin/trunk")
                 isCurrent()
                 firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
                 intermediateCommits("1".hash())
                 lastCommitHash("6".hash())
-                lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T06:00:00+01:00".toInstant())
             }
             result.branches["origin/feat-a"] shouldBe aBranch {
                 name("origin/feat-a")
                 isCompleted()
                 firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
                 intermediateCommits("3".hash())
                 lastCommitHash("5".hash())
-                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
+                lastCommitDate("2025-01-01T05:00:00+01:00".toInstant())
+                mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".toInstant(), "6")
             }
             result.branches["origin/feat-b"] shouldBe aBranch {
                 name("origin/feat-b")
                 isCompleted()
                 firstCommitHash("4".hash())
-                firstCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T04:00:00+01:00".toInstant())
                 lastCommitHash("4".hash())
-                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
-                mergedInto("origin/feat-a", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                lastCommitDate("2025-01-01T04:00:00+01:00".toInstant())
+                mergedInto("origin/feat-a", "2025-01-01T05:00:00+01:00".toInstant(), "5")
             }
         }
     }
@@ -868,32 +868,32 @@ class BranchDetectionTest {
             val gitLogContent = aGitLog {
                 anEntry("origin/main") {
                     subject("initial commit")
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                     file("initial.md")
                 }
                 anEntry("origin/main") {
                     subject("main commit")
-                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    authorDate("2025-01-01T01:00:00+01:00".toInstant())
                     file("main.md")
                 }
                 anEntry("origin/feat", "origin/main") {
                     subject("feat commit 1")
-                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    authorDate("2025-01-01T02:00:00+01:00".toInstant())
                     file("feat1.md")
                 }
                 anEntry("origin/main", "origin/feat") {
                     subject("Merge branch 'origin/feat' into origin/main")
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat") {
                     subject("feat commit 2")
-                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    authorDate("2025-01-01T04:00:00+01:00".toInstant())
                     file("feat2.md")
                 }
                 anEntry("origin/main", "origin/feat") {
                     refHead("main")
                     subject("Merge branch 'origin/feat' into origin/main")
-                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                    authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 }
             }
 
@@ -908,20 +908,20 @@ class BranchDetectionTest {
                 name("origin/main")
                 isCurrent()
                 firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
                 intermediateCommits("1".hash(), "3".hash())
                 lastCommitHash("5".hash())
-                lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T05:00:00+01:00".toInstant())
             }
             result.branches["origin/feat"] shouldBe aBranch {
                 name("origin/feat")
                 isCompleted()
                 firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
                 lastCommitHash("4".hash())
-                lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T04:00:00+01:00".toInstant())
                 // TODO multiple merges
-                mergedInto("origin/main", "2025-01-01T05:00:00+01:00".zoned(), "5")
+                mergedInto("origin/main", "2025-01-01T05:00:00+01:00".toInstant(), "5")
             }
         }
 
@@ -938,46 +938,46 @@ class BranchDetectionTest {
             val gitLogContent = aGitLog {
                 anEntry("origin/main") {
                     subject("initial commit")
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                     file("initial.md")
                 }
                 anEntry("origin/main") {
                     subject("main commit 1")
-                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    authorDate("2025-01-01T01:00:00+01:00".toInstant())
                     file("main1.md")
                 }
                 anEntry("origin/feat", "origin/main") {
                     subject("feat commit 1")
-                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    authorDate("2025-01-01T02:00:00+01:00".toInstant())
                     file("feat1.md")
                 }
                 anEntry("origin/feat", "origin/main") {
                     subject("Merge branch 'origin/main' into origin/feat")
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 }
                 anEntry("origin/main") {
                     subject("main commit 2")
-                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    authorDate("2025-01-01T04:00:00+01:00".toInstant())
                     file("main2.md")
                 }
                 anEntry("origin/feat") {
                     subject("feat commit 3")
-                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                    authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat", "origin/main") {
                     subject("Merge branch 'origin/main' into origin/feat")
-                    authorDate("2025-01-01T06:00:00+01:00".zoned())
+                    authorDate("2025-01-01T06:00:00+01:00".toInstant())
                     file("feat3.md")
                 }
                 anEntry("origin/main") {
                     refHead("main")
                     subject("main commit 3")
-                    authorDate("2025-01-01T07:00:00+01:00".zoned())
+                    authorDate("2025-01-01T07:00:00+01:00".toInstant())
                     file("main3.md")
                 }
                 anEntry("origin/feat") {
                     subject("feat commit 5")
-                    authorDate("2025-01-01T08:00:00+01:00".zoned())
+                    authorDate("2025-01-01T08:00:00+01:00".toInstant())
                 }
             }
 
@@ -992,18 +992,18 @@ class BranchDetectionTest {
                 name("origin/main")
                 isCurrent()
                 firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
                 intermediateCommits("1".hash(), "4".hash())
                 lastCommitHash("7".hash())
-                lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T07:00:00+01:00".toInstant())
             }
             result.branches["origin/feat"] shouldBe aBranch {
                 name("origin/feat")
                 firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
                 intermediateCommits("3".hash(), "5".hash(), "6".hash())
                 lastCommitHash("8".hash())
-                lastCommitDate("2025-01-01T08:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T08:00:00+01:00".toInstant())
             }
         }
 
@@ -1020,41 +1020,41 @@ class BranchDetectionTest {
             val gitLogContent = aGitLog {
                 anEntry("origin/main") {
                     subject("initial commit")
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                     file("initial.md")
                 }
                 anEntry("origin/main") {
                     subject("main commit 1")
-                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    authorDate("2025-01-01T01:00:00+01:00".toInstant())
                     file("main1.md")
                 }
                 anEntry("origin/feat", "origin/main") {
                     subject("feat commit 1")
-                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    authorDate("2025-01-01T02:00:00+01:00".toInstant())
                     file("feat1.md")
                 }
                 anEntry("origin/feat", "origin/main") {
                     subject("Merge branch 'origin/main' into origin/feat")
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 }
                 anEntry("origin/main") {
                     subject("main commit 2")
-                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    authorDate("2025-01-01T04:00:00+01:00".toInstant())
                     file("main2.md")
                 }
                 anEntry("origin/feat") {
                     subject("feat commit 3")
-                    authorDate("2025-01-01T05:00:00+01:00".zoned())
+                    authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat", "origin/main") {
                     subject("Merge branch 'origin/main' into origin/feat")
-                    authorDate("2025-01-01T06:00:00+01:00".zoned())
+                    authorDate("2025-01-01T06:00:00+01:00".toInstant())
                     file("feat3.md")
                 }
                 anEntry("origin/main", "origin/feat") {
                     refHead("main")
                     subject("Merge branch 'origin/feat' into origin/main")
-                    authorDate("2025-01-01T07:00:00+01:00".zoned())
+                    authorDate("2025-01-01T07:00:00+01:00".toInstant())
                     file("main3.md")
                 }
             }
@@ -1070,20 +1070,20 @@ class BranchDetectionTest {
                 name("origin/main")
                 isCurrent()
                 firstCommitHash("0".hash())
-                firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
                 intermediateCommits("1".hash(), "4".hash())
                 lastCommitHash("7".hash())
-                lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
+                lastCommitDate("2025-01-01T07:00:00+01:00".toInstant())
             }
             result.branches["origin/feat"] shouldBe aBranch {
                 name("origin/feat")
                 isCompleted()
                 firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
                 intermediateCommits("5".hash(), "3".hash())
                 lastCommitHash("6".hash())
-                lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
-                mergedInto("origin/main", "2025-01-01T07:00:00+01:00".zoned(), "7")
+                lastCommitDate("2025-01-01T06:00:00+01:00".toInstant())
+                mergedInto("origin/main", "2025-01-01T07:00:00+01:00".toInstant(), "7")
             }
         }
     }
@@ -1099,28 +1099,28 @@ class BranchDetectionTest {
         val gitLogContent = aGitLog {
             anEntry("origin/trunk") {
                 subject("initial commit")
-                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 file("trunk.md")
             }
             anEntry("origin/trunk") {
                 subject("main commit")
-                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                authorDate("2025-01-01T01:00:00+01:00".toInstant())
                 file("trunk2.md")
             }
             anEntry("origin/feat", "origin/trunk") {
                 subject("feat 1 commit")
-                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 file("feat.md")
             }
             anEntry("origin/feat") {
                 subject("feat 2 commit")
-                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 file("feat2.md")
             }
             anEntry("origin/trunk", "origin/feat") {
                 refHead("trunk")
                 subject("Merge branch 'origin/feat' into origin/trunk")
-                authorDate("2025-01-01T04:00:00+01:00".zoned())
+                authorDate("2025-01-01T04:00:00+01:00".toInstant())
             }
         }
 
@@ -1135,19 +1135,19 @@ class BranchDetectionTest {
             name("origin/trunk")
             isCurrent()
             firstCommitHash("0".hash())
-            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
             intermediateCommits("1".hash())
             lastCommitHash("4".hash())
-            lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+            lastCommitDate("2025-01-01T04:00:00+01:00".toInstant())
         }
         result.branches["origin/feat"] shouldBe aBranch {
             name("origin/feat")
             isCompleted()
             firstCommitHash("2".hash())
-            firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
             lastCommitHash("3".hash())
-            lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+            lastCommitDate("2025-01-01T03:00:00+01:00".toInstant())
+            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".toInstant(), "4")
         }
     }
 
@@ -1162,28 +1162,28 @@ class BranchDetectionTest {
             isDeletedBranch("origin/feat")
             anEntry("origin/trunk") {
                 subject("initial commit")
-                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 file("trunk.md")
             }
             anEntry("origin/trunk") {
                 subject("main commit")
-                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                authorDate("2025-01-01T01:00:00+01:00".toInstant())
                 file("trunk2.md")
             }
             anEntry("origin/feat", "origin/trunk") {
                 subject("feat 1 commit")
-                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 file("feat.md")
             }
             anEntry("origin/feat") {
                 subject("feat 2 commit")
-                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 file("feat2.md")
             }
             anEntry("origin/trunk", "origin/feat") {
                 refHead("trunk")
                 subject("Merge branch 'origin/feat' into origin/trunk")
-                authorDate("2025-01-01T04:00:00+01:00".zoned())
+                authorDate("2025-01-01T04:00:00+01:00".toInstant())
             }
         }
 
@@ -1198,19 +1198,19 @@ class BranchDetectionTest {
             name("origin/trunk")
             isCurrent()
             firstCommitHash("0".hash())
-            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
             intermediateCommits("1".hash())
             lastCommitHash("4".hash())
-            lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+            lastCommitDate("2025-01-01T04:00:00+01:00".toInstant())
         }
         result.branches["origin/feat"] shouldBe aBranch {
             inferredName("origin/feat")
             isCompleted()
             firstCommitHash("2".hash())
-            firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
             lastCommitHash("3".hash())
-            lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+            lastCommitDate("2025-01-01T03:00:00+01:00".toInstant())
+            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".toInstant(), "4")
         }
     }
 
@@ -1225,28 +1225,28 @@ class BranchDetectionTest {
             isDeletedBranch("unnamed-branch")
             anEntry("origin/trunk") {
                 subject("initial commit")
-                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 file("trunk.md")
             }
             anEntry("origin/trunk") {
                 subject("main commit")
-                authorDate("2025-01-01T00:01:00+01:00".zoned())
+                authorDate("2025-01-01T00:01:00+01:00".toInstant())
                 file("trunk2.md")
             }
             anEntry("unnamed-branch", "origin/trunk") {
                 subject("feat 1 commit")
-                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 file("feat.md")
             }
             anEntry("unnamed-branch") {
                 subject("feat 2 commit")
-                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 file("feat2.md")
             }
             anEntry("origin/trunk", "unnamed-branch") {
                 refHead("trunk")
                 subject("Squashed feature commits")
-                authorDate("2025-01-01T04:00:00+01:00".zoned())
+                authorDate("2025-01-01T04:00:00+01:00".toInstant())
             }
         }
 
@@ -1261,20 +1261,20 @@ class BranchDetectionTest {
             name("origin/trunk")
             isCurrent()
             firstCommitHash("0".hash())
-            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
             intermediateCommits("1".hash())
             lastCommitHash("4".hash())
-            lastCommitDate("2025-01-01T04:00:00+01:00".zoned())
+            lastCommitDate("2025-01-01T04:00:00+01:00".toInstant())
         }
         result.branches.unnamed shouldHaveSize 1
         result.branches.unnamed.first() shouldBe aBranch {
             unNamed("3")  // tipCommit = first commit seen (last commit of feature branch)
             isCompleted()
             firstCommitHash("2".hash())
-            firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
             lastCommitHash("3".hash())
-            lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+            lastCommitDate("2025-01-01T03:00:00+01:00".toInstant())
+            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".toInstant(), "4")
         }
     }
 
@@ -1290,37 +1290,37 @@ class BranchDetectionTest {
         val gitLogContent = aGitLog {
             anEntry("origin/trunk") {
                 subject("initial commit")
-                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 file("trunk.md")
             }
             anEntry("origin/trunk") {
                 subject("trunk commit 1")
-                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                authorDate("2025-01-01T01:00:00+01:00".toInstant())
                 file("trunk1.md")
             }
             anEntry("origin/trunk") {
                 subject("trunk commit 2")
-                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 file("trunk2.md")
             }
             anEntry("origin/feat", "origin/trunk") {
                 subject("feat commit 1")
-                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 file("feat1.md")
             }
             anEntry("origin/feat") {
                 subject("feat commit 2")
-                authorDate("2025-01-01T04:00:00+01:00".zoned())
+                authorDate("2025-01-01T04:00:00+01:00".toInstant())
                 file("feat2.md")
             }
             anEntry("origin/feat", "origin/trunk") {
                 subject("Merge branch 'origin/trunk' into origin/feat")
-                authorDate("2025-01-01T05:00:00+01:00".zoned())
+                authorDate("2025-01-01T05:00:00+01:00".toInstant())
             }
             anEntry("origin/trunk", "origin/feat") {
                 refHead("trunk")
                 subject("Merge branch 'origin/feat' into origin/trunk")
-                authorDate("2025-01-01T06:00:00+01:00".zoned())
+                authorDate("2025-01-01T06:00:00+01:00".toInstant())
             }
         }
 
@@ -1335,20 +1335,20 @@ class BranchDetectionTest {
             name("origin/trunk")
             isCurrent()
             firstCommitHash("0".hash())
-            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
             intermediateCommits("1".hash(), "2".hash())
             lastCommitHash("6".hash())
-            lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
+            lastCommitDate("2025-01-01T06:00:00+01:00".toInstant())
         }
         result.branches["origin/feat"] shouldBe aBranch {
             name("origin/feat")
             isCompleted()
             firstCommitHash("3".hash())
-            firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T03:00:00+01:00".toInstant())
             intermediateCommits("4".hash())
             lastCommitHash("5".hash())
-            lastCommitDate("2025-01-01T05:00:00+01:00".zoned())
-            mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".zoned(), "6")
+            lastCommitDate("2025-01-01T05:00:00+01:00".toInstant())
+            mergedInto("origin/trunk", "2025-01-01T06:00:00+01:00".toInstant(), "6")
         }
     }
 
@@ -1366,42 +1366,42 @@ class BranchDetectionTest {
             isDeletedBranch("origin/feat-b")
             anEntry("origin/trunk") {
                 subject("initial commit")
-                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 file("trunk.md")
             }
             anEntry("origin/trunk") {
                 subject("main commit")
-                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                authorDate("2025-01-01T01:00:00+01:00".toInstant())
                 file("trunk2.md")
             }
             anEntry("origin/feat-a", "origin/trunk") {
                 subject("feat-a 1 commit")
-                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 file("feat-a1.md")
             }
             anEntry("origin/feat-a") {
                 subject("feat-a 2 commit")
-                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 file("feat-a2.md")
             }
             anEntry("origin/trunk", "origin/feat-a") {
                 subject("Merge branch 'origin/feat-a' into origin/trunk")
-                authorDate("2025-01-01T04:00:00+01:00".zoned())
+                authorDate("2025-01-01T04:00:00+01:00".toInstant())
             }
             anEntry("origin/feat-b", "origin/trunk") {
                 subject("feat-b 1 commit")
-                authorDate("2025-01-01T05:00:00+01:00".zoned())
+                authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 file("feat-b1.md")
             }
             anEntry("origin/feat-b") {
                 subject("feat-b 2 commit")
-                authorDate("2025-01-01T06:00:00+01:00".zoned())
+                authorDate("2025-01-01T06:00:00+01:00".toInstant())
                 file("feat-b2.md")
             }
             anEntry("origin/trunk", "origin/feat-b") {
                 refHead("trunk")
                 subject("Merge branch 'origin/feat-b' into origin/trunk")
-                authorDate("2025-01-01T07:00:00+01:00".zoned())
+                authorDate("2025-01-01T07:00:00+01:00".toInstant())
             }
         }
 
@@ -1416,28 +1416,28 @@ class BranchDetectionTest {
             name("origin/trunk")
             isCurrent()
             firstCommitHash("0".hash())
-            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
             intermediateCommits("1".hash(), "4".hash())
             lastCommitHash("7".hash())
-            lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
+            lastCommitDate("2025-01-01T07:00:00+01:00".toInstant())
         }
         result.branches["origin/feat-a"] shouldBe aBranch {
             inferredName("origin/feat-a")
             isCompleted()
             firstCommitHash("2".hash())
-            firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
             lastCommitHash("3".hash())
-            lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+            lastCommitDate("2025-01-01T03:00:00+01:00".toInstant())
+            mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".toInstant(), "4")
         }
         result.branches["origin/feat-b"] shouldBe aBranch {
             inferredName("origin/feat-b")
             isCompleted()
             firstCommitHash("5".hash())
-            firstCommitDate("2025-01-01T05:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T05:00:00+01:00".toInstant())
             lastCommitHash("6".hash())
-            lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
-            mergedInto("origin/trunk", "2025-01-01T07:00:00+01:00".zoned(), "7")
+            lastCommitDate("2025-01-01T06:00:00+01:00".toInstant())
+            mergedInto("origin/trunk", "2025-01-01T07:00:00+01:00".toInstant(), "7")
         }
     }
 
@@ -1455,42 +1455,42 @@ class BranchDetectionTest {
             isDeletedBranch("unnamed-branch-b")
             anEntry("origin/trunk") {
                 subject("initial commit")
-                authorDate("2025-01-01T00:00:00+01:00".zoned())
+                authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 file("trunk.md")
             }
             anEntry("origin/trunk") {
                 subject("main commit")
-                authorDate("2025-01-01T01:00:00+01:00".zoned())
+                authorDate("2025-01-01T01:00:00+01:00".toInstant())
                 file("trunk2.md")
             }
             anEntry("unnamed-branch-a", "origin/trunk") {
                 subject("feat-a 1 commit")
-                authorDate("2025-01-01T02:00:00+01:00".zoned())
+                authorDate("2025-01-01T02:00:00+01:00".toInstant())
                 file("feat-a1.md")
             }
             anEntry("unnamed-branch-a") {
                 subject("feat-a 2 commit")
-                authorDate("2025-01-01T03:00:00+01:00".zoned())
+                authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 file("feat-a2.md")
             }
             anEntry("origin/trunk", "unnamed-branch-a") {
                 subject("Squashed first feature")
-                authorDate("2025-01-01T04:00:00+01:00".zoned())
+                authorDate("2025-01-01T04:00:00+01:00".toInstant())
             }
             anEntry("unnamed-branch-b", "origin/trunk") {
                 subject("feat-b 1 commit")
-                authorDate("2025-01-01T05:00:00+01:00".zoned())
+                authorDate("2025-01-01T05:00:00+01:00".toInstant())
                 file("feat-b1.md")
             }
             anEntry("unnamed-branch-b") {
                 subject("feat-b 2 commit")
-                authorDate("2025-01-01T06:00:00+01:00".zoned())
+                authorDate("2025-01-01T06:00:00+01:00".toInstant())
                 file("feat-b2.md")
             }
             anEntry("origin/trunk", "unnamed-branch-b") {
                 refHead("trunk")
                 subject("Squashed second feature")
-                authorDate("2025-01-01T07:00:00+01:00".zoned())
+                authorDate("2025-01-01T07:00:00+01:00".toInstant())
             }
         }
 
@@ -1504,29 +1504,29 @@ class BranchDetectionTest {
             name("origin/trunk")
             isCurrent()
             firstCommitHash("0".hash())
-            firstCommitDate("2025-01-01T00:00:00+01:00".zoned())
+            firstCommitDate("2025-01-01T00:00:00+01:00".toInstant())
             intermediateCommits("1".hash(), "4".hash())
             lastCommitHash("7".hash())
-            lastCommitDate("2025-01-01T07:00:00+01:00".zoned())
+            lastCommitDate("2025-01-01T07:00:00+01:00".toInstant())
         }
         result.branches.unnamed.shouldContainExactlyInAnyOrder(
             aBranch {
                 unNamed("3")  // tipCommit = first commit seen (last commit of feature branch)
                 isCompleted()
                 firstCommitHash("2".hash())
-                firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T02:00:00+01:00".toInstant())
                 lastCommitHash("3".hash())
-                lastCommitDate("2025-01-01T03:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
+                lastCommitDate("2025-01-01T03:00:00+01:00".toInstant())
+                mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".toInstant(), "4")
             },
             aBranch {
                 unNamed("6")  // tipCommit = first commit seen (last commit of feature branch)
                 isCompleted()
                 firstCommitHash("5".hash())
-                firstCommitDate("2025-01-01T05:00:00+01:00".zoned())
+                firstCommitDate("2025-01-01T05:00:00+01:00".toInstant())
                 lastCommitHash("6".hash())
-                lastCommitDate("2025-01-01T06:00:00+01:00".zoned())
-                mergedInto("origin/trunk", "2025-01-01T07:00:00+01:00".zoned(), "7")
+                lastCommitDate("2025-01-01T06:00:00+01:00".toInstant())
+                mergedInto("origin/trunk", "2025-01-01T07:00:00+01:00".toInstant(), "7")
             }
         )
         result.branches.size() shouldBe 3
@@ -1575,27 +1575,27 @@ class BranchDetectionTest {
             val gitLogContent = aGitLog {
                 anEntry("origin/main") {
                     subject("initial commit")
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                     file("initial.md")
                 }
                 anEntry("origin/main") {
                     subject("main commit")
-                    authorDate("2025-01-01T01:00:00+01:00".zoned())
+                    authorDate("2025-01-01T01:00:00+01:00".toInstant())
                     file("main.md")
                 }
                 anEntry("origin/feat", "origin/main") {
                     subject("feat commit 1")
-                    authorDate("2025-01-01T02:00:00+01:00".zoned())
+                    authorDate("2025-01-01T02:00:00+01:00".toInstant())
                     file("feat1.md")
                 }
                 anEntry("origin/main", "origin/feat") {
                     refHead("main")
                     subject("Merge branch 'origin/feat' into origin/main")
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat") {
                     subject("feat commit after merge")
-                    authorDate("2025-01-01T04:00:00+01:00".zoned())
+                    authorDate("2025-01-01T04:00:00+01:00".toInstant())
                     file("feat2.md")
                 }
             }
@@ -1703,27 +1703,27 @@ class BranchDetectionTest {
             val gitLogContent = aGitLog {
                 anEntry("origin/main") {
                     subject("initial commit")
-                    authorDate("2022-01-01T00:00:00+01:00".zoned())
+                    authorDate("2022-01-01T00:00:00+01:00".toInstant())
                     file("initial.md")
                 }
                 anEntry("origin/main") {
                     subject("main commit")
-                    authorDate("2023-01-01T01:00:00+01:00".zoned())
+                    authorDate("2023-01-01T01:00:00+01:00".toInstant())
                     file("main.md")
                 }
                 anEntry("origin/feat", "origin/main") {
                     subject("feat commit 1")
-                    authorDate("2024-01-01T02:00:00+01:00".zoned())
+                    authorDate("2024-01-01T02:00:00+01:00".toInstant())
                     file("feat1.md")
                 }
                 anEntry("origin/main", "origin/feat") {
                     refHead("main")
                     subject("Merge branch 'origin/feat' into origin/main")
-                    authorDate("2025-01-01T03:00:00+01:00".zoned())
+                    authorDate("2025-01-01T03:00:00+01:00".toInstant())
                 }
                 anEntry("origin/feat") {
                     subject("feat commit after merge with old date")
-                    authorDate("2022-01-01T00:00:00+01:00".zoned())
+                    authorDate("2022-01-01T00:00:00+01:00".toInstant())
                     file("feat2.md")
                 }
             }
@@ -1779,10 +1779,10 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = aGitLog {
                 anEntry("origin/main") {
-                    authorDate("2025-01-15T10:00:00+01:00".zoned())
+                    authorDate("2025-01-15T10:00:00+01:00".toInstant())
                 }
             }
-            val currentDate = "2025-03-01T00:00:00+01:00".zoned()
+            val currentDate = "2025-03-01T00:00:00+01:00".toInstant()
 
             val testee = GitLogMiner()
 
@@ -1800,10 +1800,10 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = aGitLog {
                 anEntry("origin/main") {
-                    authorDate("2024-01-15T10:00:00+01:00".zoned())
+                    authorDate("2024-01-15T10:00:00+01:00".toInstant())
                 }
             }
-            val currentDate = "2025-06-01T00:00:00+01:00".zoned()
+            val currentDate = "2025-06-01T00:00:00+01:00".toInstant()
 
             val testee = GitLogMiner()
 
@@ -1821,10 +1821,10 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = aGitLog {
                 anEntry("origin/main") {
-                    authorDate("2025-01-01T00:00:00+01:00".zoned())
+                    authorDate("2025-01-01T00:00:00+01:00".toInstant())
                 }
             }
-            val currentDate = "2025-04-01T00:00:00+01:00".zoned()
+            val currentDate = "2025-04-01T00:00:00+01:00".toInstant()
 
             val testee = GitLogMiner()
 
@@ -1842,10 +1842,10 @@ class BranchDetectionTest {
             // Given
             val gitLogContent = aGitLog {
                 anEntry("origin/main") {
-                    authorDate("2024-12-31T23:59:59+01:00".zoned())
+                    authorDate("2024-12-31T23:59:59+01:00".toInstant())
                 }
             }
-            val currentDate = "2025-04-01T00:00:00+01:00".zoned()
+            val currentDate = "2025-04-01T00:00:00+01:00".toInstant()
 
             val testee = GitLogMiner()
 

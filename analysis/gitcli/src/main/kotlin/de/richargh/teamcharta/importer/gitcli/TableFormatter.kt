@@ -6,18 +6,16 @@ import de.richargh.teamcharta.importer.gitmining.app.api.AuthorStatistic
 import de.richargh.teamcharta.importer.gitmining.app.api.Branch
 import de.richargh.teamcharta.importer.gitmining.app.api.BranchStatus
 import de.richargh.teamcharta.importer.gitmining.app.api.WorkItem
-import java.time.Duration
-import java.time.LocalDate
-import java.time.Period
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import de.richargh.teamcharta.importer.shared.time.app.toIsoDateString
+import de.richargh.teamcharta.importer.shared.time.app.toRelativeString
+import kotlin.time.Duration
+import kotlin.time.Instant
 
 object TableFormatter {
-    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     private const val STALE_LIMIT = 10
     private const val COMPLETED_LIMIT = 10
 
-    fun formatBranches(branches: List<Branch>, now: ZonedDateTime): String {
+    fun formatBranches(branches: List<Branch>, now: Instant): String {
         val active = branches.filter { it.status == BranchStatus.Active }
             .sortedByDescending { it.lastCommitDate }
         val stale = branches.filter { it.status == BranchStatus.Stale }
@@ -51,7 +49,7 @@ object TableFormatter {
     private fun formatBranchSection(
         title: String,
         branches: List<Branch>,
-        now: ZonedDateTime,
+        now: Instant,
         limit: Int?,
         hiddenLabel: String? = null
     ): String {
@@ -63,7 +61,7 @@ object TableFormatter {
             listOf(
                 formatBranchName(branch),
                 formatRelativeDate(branch.lastCommitDate, now),
-                formatAge(branch.firstCommitDate.toLocalDate(), now.toLocalDate())
+                formatAge(branch.firstCommitDate, now)
             )
         }
 
@@ -82,23 +80,14 @@ object TableFormatter {
         return prefix + (branch.name?.toString() ?: "(unnamed)")
     }
 
-    private fun formatRelativeDate(date: ZonedDateTime, now: ZonedDateTime): String {
-        val period = Period.between(date.toLocalDate(), now.toLocalDate())
-        return formatPeriod(period) + " ago"
+    private fun formatRelativeDate(date: Instant, now: Instant): String {
+        val duration = now - date
+        return duration.toRelativeString() + " ago"
     }
 
-    private fun formatAge(from: LocalDate, to: LocalDate): String {
-        val period = Period.between(from, to)
-        return formatPeriod(period)
-    }
-
-    private fun formatPeriod(period: Period): String {
-        return when {
-            period.years > 0 -> "${period.years} years"
-            period.months > 0 -> "${period.months} months"
-            period.days >= 7 -> "${period.days / 7} weeks"
-            else -> "${period.days} days"
-        }
+    private fun formatAge(from: Instant, to: Instant): String {
+        val duration = to - from
+        return duration.toRelativeString()
     }
 
     fun formatCommits(commits: List<Commit>, totalCount: Int = commits.size): String {
@@ -109,7 +98,7 @@ object TableFormatter {
             if (isHead) headMarked = true
             listOf(
                 formatCommitBranch(commit, isHead),
-                commit.date.format(dateFormatter),
+                commit.date.toIsoDateString(),
                 commit.commitType.name,
                 commit.author.name,
                 commit.workKeys.joinToString(",") { it.toString() },
@@ -181,7 +170,7 @@ object TableFormatter {
     }
 
     private fun formatDuration(duration: Duration): String {
-        val days = duration.toDays()
+        val days = duration.inWholeDays
         return when {
             days >= 365 -> "${days / 365}y"
             days >= 30 -> "${days / 30}mo"

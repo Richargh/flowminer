@@ -1,8 +1,8 @@
 package de.richargh.teamcharta.importer.git.app.internal
 
 import de.richargh.teamcharta.importer.git.app.api.*
-import java.time.ZonedDateTime
 import kotlin.collections.map
+import kotlin.time.Instant
 
 fun parseCommits(rawCommits: Sequence<RawCommit>): Sequence<Commit> {
     val tracker = BranchTracker()
@@ -12,7 +12,7 @@ fun parseCommits(rawCommits: Sequence<RawCommit>): Sequence<Commit> {
 private fun parseCommit(raw: RawCommit, tracker: BranchTracker): Commit {
     val hash = raw.headerFields["hash"]?.let(::CommitHash)
         ?: throw IllegalArgumentException("Commit has no hash")
-    val date = raw.headerFields["authorDate"]?.let(ZonedDateTime::parse)
+    val date = raw.headerFields["authorDate"]?.let(Instant::parse)
         ?: throw IllegalArgumentException("Commit has no hash")
     val author = Author(
         name = raw.headerFields["author"] ?: "",

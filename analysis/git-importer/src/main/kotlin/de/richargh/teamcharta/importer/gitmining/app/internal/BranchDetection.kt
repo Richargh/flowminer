@@ -5,16 +5,17 @@ import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.gitmining.app.api.Branch
 import de.richargh.teamcharta.importer.gitmining.app.api.Branches
 import de.richargh.teamcharta.importer.gitmining.app.api.BranchStatus
-import java.time.ZonedDateTime
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Instant
 
-fun extractBranchInfo(commits: List<Commit>, currentDate: ZonedDateTime): Branches {
+fun extractBranchInfo(commits: List<Commit>, currentDate: Instant): Branches {
     val collector = BranchCollector(commits, currentDate)
     collector.processCommits()
 
     return collector.toBranches()
 }
 
-private class BranchCollector(private val allCommits: List<Commit>, private val currentDate: ZonedDateTime) {
+private class BranchCollector(private val allCommits: List<Commit>, private val currentDate: Instant) {
     private val commitByHash = mutableMapOf<CommitHash, Commit>()
     private val branches = mutableMapOf<BranchId, MutableBranch>()
 
@@ -63,23 +64,23 @@ private class BranchCollector(private val allCommits: List<Commit>, private val 
 
 private class MutableBranch(
     firstCommitHash: CommitHash,
-    firstCommitDate: ZonedDateTime,
+    firstCommitDate: Instant,
     lastCommitHash: CommitHash,
-    lastCommitDate: ZonedDateTime,
+    lastCommitDate: Instant,
     val branchId: BranchId,
     val isCurrent: Boolean
 ) {
     var firstCommitHash: CommitHash = firstCommitHash
         private set
-    var firstCommitDate: ZonedDateTime = firstCommitDate
+    var firstCommitDate: Instant = firstCommitDate
         private set
     var lastCommitHash: CommitHash = lastCommitHash
         private set
-    var lastCommitDate: ZonedDateTime = lastCommitDate
+    var lastCommitDate: Instant = lastCommitDate
         private set
     var mergeCommitHash: CommitHash? = null
         private set
-    var mergeCommitDate: ZonedDateTime? = null
+    var mergeCommitDate: Instant? = null
         private set
     var targetBranch: BranchName? = null
         private set
@@ -88,7 +89,7 @@ private class MutableBranch(
 
     private var commits = mutableSetOf(firstCommitHash, lastCommitHash)
 
-    fun addCommit(hash: CommitHash, date: ZonedDateTime) {
+    fun addCommit(hash: CommitHash, date: Instant) {
         commits.add(hash)
 
         if (date < firstCommitDate) {
@@ -97,20 +98,20 @@ private class MutableBranch(
         }
     }
 
-    fun mergeCommit(hash: CommitHash, date: ZonedDateTime, target: BranchName?, parentHash: CommitHash) {
+    fun mergeCommit(hash: CommitHash, date: Instant, target: BranchName?, parentHash: CommitHash) {
         mergeCommitHash = hash
         mergeCommitDate = date
         targetBranch = target
         mergedParentHash = parentHash
     }
 
-    fun toBranch(currentDate: ZonedDateTime): Branch {
+    fun toBranch(currentDate: Instant): Branch {
         val wasMerged = mergeCommitHash != null
         val noCommitsAfterMerge = mergedParentHash?.let { lastCommitHash == it } ?: false
         val isCompleted = wasMerged && noCommitsAfterMerge && !isCurrent
 
-        val threeMonthsAgo = currentDate.minusMonths(3)
-        val isActive = !lastCommitDate.isBefore(threeMonthsAgo)
+        val threeMonthsAgo = currentDate - 90.days
+        val isActive = lastCommitDate >= threeMonthsAgo
 
         val status = when {
             isCompleted -> BranchStatus.Completed

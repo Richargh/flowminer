@@ -8,7 +8,7 @@ import de.richargh.teamcharta.importer.gitmining.app.api.AuthorContribution
 import de.richargh.teamcharta.importer.gitmining.app.api.WorkItem
 import de.richargh.teamcharta.importer.gitmining.app.api.WorkItems
 import java.nio.file.Path
-import java.time.ZonedDateTime
+import kotlin.time.Instant
 
 fun extractWorkItems(commits: List<Commit>): WorkItems {
     val workItems = mutableMapOf<WorkKey, MutableWorkKey>()
@@ -27,11 +27,11 @@ fun extractWorkItems(commits: List<Commit>): WorkItems {
 
 private class MutableWorkKey(
     private val workKey: WorkKey,
-    private var firstCommitDate: ZonedDateTime
+    private var firstCommitDate: Instant
 ) {
     private var linesAdded = 0
     private var linesRemoved = 0
-    private var lastCommitDate: ZonedDateTime = firstCommitDate
+    private var lastCommitDate: Instant = firstCommitDate
     private val filesChanged = mutableSetOf<Path>()
     private val fileTouchCount = mutableMapOf<Path, Int>()
     private val absoluteChurnByAuthor = mutableMapOf<Author, Int>()
@@ -58,10 +58,10 @@ private class MutableWorkKey(
         absoluteChurnByType[commit.commitType] = absoluteChurnByType.getOrDefault(commit.commitType, 0) + commitLinesChanged
 
         val commitDate = commit.date
-        if (commitDate.isBefore(firstCommitDate)) {
+        if (commitDate < firstCommitDate) {
             firstCommitDate = commitDate
         }
-        if (commitDate.isAfter(lastCommitDate)) {
+        if (commitDate > lastCommitDate) {
             lastCommitDate = commitDate
         }
     }

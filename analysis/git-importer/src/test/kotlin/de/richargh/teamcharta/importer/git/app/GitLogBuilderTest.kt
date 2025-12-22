@@ -23,15 +23,15 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            origin/stage|2||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            origin/stage|2||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            origin/develop|1||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            origin/develop|1||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            origin/main|0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            origin/main|0||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 
@@ -54,11 +54,11 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            origin/main|1|0|2024-01-15T10:00+01:00|John Min|min@example.com|Later commit
+            origin/main|1|0|2024-01-15T09:00:00Z|John Min|min@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            |0||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 
@@ -83,15 +83,15 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            origin/main|2|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
+            origin/main|2|0|2024-01-15T09:00:00Z|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            origin/feature-1|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
+            origin/feature-1|1|0|2024-01-15T09:00:00Z|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            |0||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 
@@ -120,15 +120,15 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            origin/main|mmm456|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
+            origin/main|mmm456|mmm123|2024-01-15T09:00:00Z|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            origin/feature-1|fff123|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
+            origin/feature-1|fff123|mmm123|2024-01-15T09:00:00Z|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            |mmm123||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            |mmm123||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 
@@ -153,15 +153,15 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            origin/main|2|0 1|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
+            origin/main|2|0 1|2024-01-15T09:00:00Z|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            origin/feature-1|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
+            origin/feature-1|1|0|2024-01-15T09:00:00Z|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            |0||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 
@@ -187,15 +187,15 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            origin/main|mmm456|mmm123 fff123|2024-01-15T10:00+01:00|John Doe|john@example.com|Latest commit
+            origin/main|mmm456|mmm123 fff123|2024-01-15T09:00:00Z|John Doe|john@example.com|Latest commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            origin/feature-1|fff123|mmm123|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit
+            origin/feature-1|fff123|mmm123|2024-01-15T09:00:00Z|John Doe|john@example.com|Feature commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            |mmm123||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            |mmm123||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 
@@ -220,19 +220,19 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            origin/feature-1|3|2|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit 2
+            origin/feature-1|3|2|2024-01-15T09:00:00Z|John Doe|john@example.com|Feature commit 2
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            origin/main|2|0 1|2024-01-15T10:00+01:00|John Doe|john@example.com|Merge commit
+            origin/main|2|0 1|2024-01-15T09:00:00Z|John Doe|john@example.com|Merge commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            |1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Feature commit 1
+            |1|0|2024-01-15T09:00:00Z|John Doe|john@example.com|Feature commit 1
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            |0||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 
@@ -252,11 +252,11 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            HEAD -> main, origin/main, origin/HEAD|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
+            HEAD -> main, origin/main, origin/HEAD|1|0|2024-01-15T09:00:00Z|John Doe|john@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            |0||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 
@@ -276,11 +276,11 @@ class GitLogBuilderTest {
         // then
         result shouldBe """
             -----COMMIT_START-----
-            tag: v1.1.0, origin/main|1|0|2024-01-15T10:00+01:00|John Doe|john@example.com|Later commit
+            tag: v1.1.0, origin/main|1|0|2024-01-15T09:00:00Z|John Doe|john@example.com|Later commit
             -----BODY_START-----
             -----FILES_START-----
             -----COMMIT_START-----
-            |0||2024-01-15T10:00+01:00|John Doe|john@example.com|Initial commit
+            |0||2024-01-15T09:00:00Z|John Doe|john@example.com|Initial commit
             -----BODY_START-----
             -----FILES_START-----
 

@@ -1,11 +1,11 @@
 package de.richargh.teamcharta.importer.git.app.api
 
-import java.time.ZonedDateTime
+import kotlin.time.Instant
 
 class CommitBuilder {
     private var hash: CommitHash = CommitHash("abc123")
     private var author: Author = Author("John Doe", "john@example.com")
-    private var date: ZonedDateTime = ZonedDateTime.parse("2024-01-15T10:00:00+01:00")
+    private var date: Instant = Instant.parse("2024-01-15T10:00:00+01:00")
     private var message: String = "Initial commit"
     private var parents: List<CommitHash> = emptyList()
     private var refs: List<Ref> = emptyList()
@@ -20,7 +20,7 @@ class CommitBuilder {
     fun hash(hash: String) = apply { this.hash = CommitHash(hash) }
     fun author(name: String, email: String) = apply { this.author = Author(name, email) }
     fun author(author: Author) = apply { this.author = author }
-    fun date(date: ZonedDateTime) = apply { this.date = date }
+    fun date(date: Instant) = apply { this.date = date }
     fun message(message: String) = apply { this.message = message }
     fun parents(vararg parents: String) = apply { this.parents = parents.toList().map(::CommitHash) }
     fun refs(vararg refs: Ref) = apply { this.refs = refs.toList() }

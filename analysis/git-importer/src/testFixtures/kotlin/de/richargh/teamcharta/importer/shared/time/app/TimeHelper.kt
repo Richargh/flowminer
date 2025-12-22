@@ -1,19 +1,10 @@
 package de.richargh.teamcharta.importer.shared.time.app
 
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
+import kotlin.time.Instant
 
-fun String.zoned(): ZonedDateTime = ZonedDateTime.parse(this)
+fun String.toInstant(): Instant = Instant.parse(this)
 
-fun atStartOfYear(year: Int) = ZonedDateTime.of(
-    LocalDate.of(year, 1, 1),
-    LocalTime.of(0, 0),
-    ZoneOffset.ofHours(1))
+fun atStartOfYear(year: Int): Instant = Instant.parse("$year-01-01T00:00:00+01:00")
 
 /** A fixed "now" for tests using 2025 dates - ensures all branches are active */
-val testNow2025: ZonedDateTime = ZonedDateTime.of(
-    LocalDate.of(2025, 2, 1),
-    LocalTime.of(0, 0),
-    ZoneOffset.ofHours(1))
+val testNow2025: Instant = Instant.parse("2025-02-01T00:00:00+01:00")

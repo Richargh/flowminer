@@ -3,7 +3,8 @@ package de.richargh.teamcharta.importer.gitmining.app.api
 import de.richargh.teamcharta.importer.shared.time.app.atStartOfYear
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import java.time.Duration
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 
 class BranchTest {
 
@@ -24,10 +25,10 @@ class BranchTest {
         // When
         val branch = aBranch {
             firstCommitDate(atStartOfYear(2024))
-            lastCommitDate(atStartOfYear(2024).plusDays(5))
+            lastCommitDate(atStartOfYear(2024) + 5.days)
         }
 
         // Then
-        branch.age shouldBe Duration.ofDays(5)
+        branch.age shouldBe 5.days
     }
 }

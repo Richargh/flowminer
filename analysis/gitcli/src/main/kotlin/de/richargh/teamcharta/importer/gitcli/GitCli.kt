@@ -6,9 +6,9 @@ import picocli.CommandLine.Command
 import picocli.CommandLine.Option
 import picocli.CommandLine.Parameters
 import java.io.File
-import java.time.ZonedDateTime
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
+import kotlin.time.Clock
 
 enum class OutputFormat {
     table
@@ -34,7 +34,7 @@ class GitCli : Callable<Int> {
     private val miner = GitRepositoryMiner()
 
     override fun call(): Int {
-        val now = ZonedDateTime.now()
+        val now = Clock.System.now()
         val result = miner.parse(File(path), since, now)
         val allAuthorStats = result.authorStatistics.all().toList()
         val displayedAuthorStats = allAuthorStats

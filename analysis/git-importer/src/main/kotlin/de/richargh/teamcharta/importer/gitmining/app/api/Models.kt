@@ -10,8 +10,8 @@ import de.richargh.teamcharta.importer.git.app.api.NamedBranchId
 import de.richargh.teamcharta.importer.git.app.api.NamelessBranchId
 import de.richargh.teamcharta.importer.git.app.api.WorkKey
 import java.nio.file.Path
-import java.time.Duration
-import java.time.ZonedDateTime
+import kotlin.time.Duration
+import kotlin.time.Instant
 
 enum class BranchStatus {
     Active,
@@ -23,11 +23,11 @@ data class Branch(
     val branchId: BranchId,
     val commits: Set<CommitHash>,
     val firstCommitHash: CommitHash,
-    val firstCommitDate: ZonedDateTime,
+    val firstCommitDate: Instant,
     val lastCommitHash: CommitHash,
-    val lastCommitDate: ZonedDateTime,
+    val lastCommitDate: Instant,
     val mergeCommitHash: CommitHash?,
-    val mergeDate: ZonedDateTime?,
+    val mergeDate: Instant?,
     val targetBranch: BranchName?,
     val isCurrent: Boolean,
     val status: BranchStatus
@@ -42,7 +42,7 @@ data class Branch(
     val isUnnamed: Boolean get() = branchId is NamelessBranchId
     val isInferred: Boolean get() = branchId is NamedBranchId.Inferred
 
-    val age: Duration get() = Duration.between(firstCommitDate, lastCommitDate)
+    val age: Duration get() = lastCommitDate - firstCommitDate
 }
 
 class Commits(private val commits: List<Commit>) {
@@ -78,8 +78,8 @@ data class WorkItem(
     val workKey: WorkKey,
     val linesAdded: Int,
     val linesRemoved: Int,
-    val firstCommitDate: ZonedDateTime,
-    val lastCommitDate: ZonedDateTime,
+    val firstCommitDate: Instant,
+    val lastCommitDate: Instant,
     val filesChanged: Set<Path>,
     val contributions: List<AuthorContribution>,
     val absoluteChurnByType: Map<CommitType, Int>,
@@ -87,7 +87,7 @@ data class WorkItem(
     val collaborators: Int,
     val reworkFiles: Set<Path>
 ) {
-    val duration: Duration get() = Duration.between(firstCommitDate, lastCommitDate)
+    val duration: Duration get() = lastCommitDate - firstCommitDate
 }
 
 class WorkItems(workItems: List<WorkItem>) {
