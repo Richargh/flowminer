@@ -24,6 +24,13 @@ kotlin {
         browser()
         binaries.library()
         generateTypeScriptDefinitions()
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
+        }
     }
 
     sourceSets {
