@@ -14,7 +14,7 @@ class CommitBuilder {
     private var coAuthors: Set<Author> = emptySet()
     private var commitType: CommitType = CommitType.UNKNOWN
     private var workKeys: List<WorkKey> = emptyList()
-    private var branch: BranchNameCertainty = NamelessBranch
+    private var branch: BranchId = NamelessBranchId(CommitHash("unknown"))
     private var isOnCurrentBranch: Boolean = false
 
     fun hash(hash: String) = apply { this.hash = CommitHash(hash) }
@@ -32,10 +32,11 @@ class CommitBuilder {
     fun coAuthors(vararg coAuthors: Author) = apply { this.coAuthors = coAuthors.toSet() }
     fun workKeys(vararg workKeys: WorkKey) = apply { this.workKeys = workKeys.toList() }
     fun commitType(type: CommitType) = apply { this.commitType = type }
-    fun nobranch() = apply { this.branch = NamelessBranch }
-    fun branch(branch: NamedBranch) = apply { this.branch = branch }
-    fun certainBranch(name: String) = apply { this.branch = NamedBranch.Certain(BranchName(name)) }
-    fun inferredBranch(name: String) = apply { this.branch = NamedBranch.Inferred(BranchName(name)) }
+    fun nobranch() = apply { this.branch = NamelessBranchId(this.hash) }
+    fun namelessBranch(tipCommit: String) = apply { this.branch = NamelessBranchId(CommitHash(tipCommit)) }
+    fun branch(branch: NamedBranchId) = apply { this.branch = branch }
+    fun certainBranch(name: String) = apply { this.branch = NamedBranchId.Certain(BranchName(name)) }
+    fun inferredBranch(name: String) = apply { this.branch = NamedBranchId.Inferred(BranchName(name)) }
     fun isOnCurrentBranch() = apply { this.isOnCurrentBranch = true }
 
     fun build(): Commit = Commit(
@@ -50,7 +51,7 @@ class CommitBuilder {
         coAuthors = coAuthors,
         commitType = commitType,
         workKeys = workKeys,
-        branch = branch,
+        branchId = branch,
         isOnCurrentBranch = isOnCurrentBranch
     )
 }

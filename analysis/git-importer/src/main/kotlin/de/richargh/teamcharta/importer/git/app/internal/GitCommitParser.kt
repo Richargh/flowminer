@@ -43,7 +43,7 @@ private fun parseCommit(raw: RawCommit, tracker: BranchTracker): Commit {
         coAuthors = coAuthors,
         commitType = commitType,
         workKeys = workKeys,
-        branch = tracking.branch,
+        branchId = tracking.branch,
         isOnCurrentBranch = tracking.isOnCurrentBranch
     )
 }

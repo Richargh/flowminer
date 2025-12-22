@@ -15,57 +15,29 @@ fun extractBranchInfo(commits: List<Commit>, currentDate: ZonedDateTime): Branch
 }
 
 private class BranchCollector(private val allCommits: List<Commit>, private val currentDate: ZonedDateTime) {
-    private val branchIdByHash = mutableMapOf<CommitHash, BranchId>()
     private val commitByHash = mutableMapOf<CommitHash, Commit>()
-
     private val branches = mutableMapOf<BranchId, MutableBranch>()
 
-    private val upcomingBranch = mutableMapOf<CommitHash, BranchId>()
-
     fun processCommits() {
-        val pendingMerges = mutableListOf<PendingMerge>()
+        val pendingMerges = mutableListOf<Commit>()
 
         for (commit in allCommits) {
-            val branchId = lookupBranchId(commit)
-            branchIdByHash[commit.hash] = branchId
             commitByHash[commit.hash] = commit
-
-            addToBranch(commit, branchId)
+            addToBranch(commit)
 
             if (commit.isMerge) {
-                pendingMerges.add(PendingMerge(commit, branchId))
+                pendingMerges.add(commit)
             }
         }
 
-        for (pending in pendingMerges) {
-            processMerges(pending.commit)
+        for (mergeCommit in pendingMerges) {
+            processMerges(mergeCommit)
         }
     }
 
-    private fun lookupBranchId(commit: Commit): BranchId {
-        var branchId: BranchId = upcomingBranch.remove(commit.hash)
-            ?: BranchId.LastCommit(commit.hash)
-        if (commit.branch is NamedBranch)
-            branchId = BranchId.Name(commit.branch)
-
-        if(commit.parents.isNotEmpty()){
-            upcomingBranch[commit.parents[0]] = branchId
-        }
-        if (commit.isMerge) {
-            commit.parents.drop(1).forEach { parentHash ->
-                upcomingBranch[parentHash] = BranchId.LastCommit(parentHash)
-            }
-        }
-        return branchId
-    }
-
-    private fun addToBranch(commit: Commit, branchId: BranchId) {
-        val name = when (branchId) {
-            is BranchId.Name -> branchId.name
-            is BranchId.LastCommit -> NamelessBranch
-        }
-        val branch = branches.getOrPut(branchId) {
-            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, name, commit.isOnCurrentBranch)
+    private fun addToBranch(commit: Commit) {
+        val branch = branches.getOrPut(commit.branchId) {
+            MutableBranch(commit.hash, commit.date, commit.hash, commit.date, commit.branchId, commit.isOnCurrentBranch)
         }
         branch.addCommit(commit.hash, commit.date)
     }
@@ -76,10 +48,10 @@ private class BranchCollector(private val allCommits: List<Commit>, private val 
             val featureBranchCommit = commitByHash[featureBranchHash]
             if (featureBranchCommit?.isOnCurrentBranch == true) return@forEach
 
-            val featureBranchId = branchIdByHash[featureBranchHash]!!
+            val featureBranchId = featureBranchCommit!!.branchId
             val featureBranch = branches[featureBranchId]!!
             if (featureBranch.mergeCommitHash == null) {
-                featureBranch.mergeCommit(commit.hash, commit.date, commit.branch.name, featureBranchHash)
+                featureBranch.mergeCommit(commit.hash, commit.date, commit.branchId.name, featureBranchHash)
             }
         }
     }
@@ -89,19 +61,12 @@ private class BranchCollector(private val allCommits: List<Commit>, private val 
     }
 }
 
-private sealed interface BranchId {
-    data class Name(val name: BranchNameCertainty) : BranchId
-    data class LastCommit(val lastCommitHash: CommitHash) : BranchId
-}
-
-private data class PendingMerge(val commit: Commit, val branchId: BranchId)
-
 private class MutableBranch(
     firstCommitHash: CommitHash,
     firstCommitDate: ZonedDateTime,
     lastCommitHash: CommitHash,
     lastCommitDate: ZonedDateTime,
-    val branchNameCertainty: BranchNameCertainty,
+    val branchId: BranchId,
     val isCurrent: Boolean
 ) {
     var firstCommitHash: CommitHash = firstCommitHash
@@ -154,7 +119,7 @@ private class MutableBranch(
         }
 
         return Branch(
-            branchNameCertainty = branchNameCertainty,
+            branchId = branchId,
             commits = commits,
             firstCommitHash = firstCommitHash,
             firstCommitDate = firstCommitDate,

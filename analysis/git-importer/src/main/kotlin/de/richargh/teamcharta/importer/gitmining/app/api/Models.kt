@@ -5,9 +5,9 @@ import de.richargh.teamcharta.importer.git.app.api.BranchName
 import de.richargh.teamcharta.importer.git.app.api.Commit
 import de.richargh.teamcharta.importer.git.app.api.CommitHash
 import de.richargh.teamcharta.importer.git.app.api.CommitType
-import de.richargh.teamcharta.importer.git.app.api.BranchNameCertainty
-import de.richargh.teamcharta.importer.git.app.api.NamedBranch
-import de.richargh.teamcharta.importer.git.app.api.NamelessBranch
+import de.richargh.teamcharta.importer.git.app.api.BranchId
+import de.richargh.teamcharta.importer.git.app.api.NamedBranchId
+import de.richargh.teamcharta.importer.git.app.api.NamelessBranchId
 import de.richargh.teamcharta.importer.git.app.api.WorkKey
 import java.nio.file.Path
 import java.time.Duration
@@ -20,7 +20,7 @@ enum class BranchStatus {
 }
 
 data class Branch(
-    val branchNameCertainty: BranchNameCertainty,
+    val branchId: BranchId,
     val commits: Set<CommitHash>,
     val firstCommitHash: CommitHash,
     val firstCommitDate: ZonedDateTime,
@@ -32,15 +32,15 @@ data class Branch(
     val isCurrent: Boolean,
     val status: BranchStatus
 ) {
-    val name: BranchName? get() = when (branchNameCertainty) {
-        is NamedBranch.Certain -> branchNameCertainty.name
-        is NamedBranch.Inferred -> branchNameCertainty.name
-        is NamelessBranch -> null
+    val name: BranchName? get() = when (branchId) {
+        is NamedBranchId.Certain -> branchId.name
+        is NamedBranchId.Inferred -> branchId.name
+        is NamelessBranchId -> null
     }
 
-    val isNamed: Boolean get() = branchNameCertainty is NamedBranch
-    val isUnnamed: Boolean get() = branchNameCertainty is NamelessBranch
-    val isInferred: Boolean get() = branchNameCertainty is NamedBranch.Inferred
+    val isNamed: Boolean get() = branchId is NamedBranchId
+    val isUnnamed: Boolean get() = branchId is NamelessBranchId
+    val isInferred: Boolean get() = branchId is NamedBranchId.Inferred
 
     val age: Duration get() = Duration.between(firstCommitDate, lastCommitDate)
 }

@@ -4,7 +4,7 @@ import de.richargh.teamcharta.importer.git.app.api.*
 import java.time.ZonedDateTime
 
 class BranchBuilder {
-    private var name: BranchNameCertainty = NamedBranch.Certain(BranchName("feature-branch"))
+    private var name: BranchId = NamedBranchId.Certain(BranchName("feature-branch"))
     private var intermediateCommits = mutableSetOf<CommitHash>()
     private var firstCommitHash: CommitHash = CommitHash("abc123")
     private var firstCommitDate: ZonedDateTime = ZonedDateTime.parse("2024-01-10T10:00:00+01:00")
@@ -16,9 +16,9 @@ class BranchBuilder {
     private var isCurrent: Boolean = false
     private var status: BranchStatus = BranchStatus.Active
 
-    fun name(name: String) = apply { this.name = NamedBranch.Certain(BranchName(name)) }
-    fun inferredName(name: String) = apply { this.name = NamedBranch.Inferred(BranchName(name)) }
-    fun unNamed() = apply { this.name = NamelessBranch }
+    fun name(name: String) = apply { this.name = NamedBranchId.Certain(BranchName(name)) }
+    fun inferredName(name: String) = apply { this.name = NamedBranchId.Inferred(BranchName(name)) }
+    fun unNamed(tipCommit: String = "unknown") = apply { this.name = NamelessBranchId(CommitHash(tipCommit)) }
 
     fun intermediateCommits(vararg commits: CommitHash) = apply { commits.forEach(this.intermediateCommits::add) }
 
@@ -43,7 +43,7 @@ class BranchBuilder {
     fun isCompleted() = apply { this.status = BranchStatus.Completed }
 
     fun build(): Branch = Branch(
-        branchNameCertainty = name,
+        branchId = name,
         commits = allCommits(),
         firstCommitHash = firstCommitHash,
         firstCommitDate = firstCommitDate,

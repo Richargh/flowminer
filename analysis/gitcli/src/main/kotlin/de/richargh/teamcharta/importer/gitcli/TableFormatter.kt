@@ -125,7 +125,7 @@ object TableFormatter {
 
     private fun formatCommitBranch(commit: Commit, isHead: Boolean): String {
         val prefix = if (isHead) "* " else "  "
-        return prefix + (commit.branch.name?.toString() ?: "-")
+        return prefix + (commit.branchId.name?.toString() ?: "-")
     }
 
     fun formatWorkItems(workItems: List<WorkItem>, totalCount: Int = workItems.size): String {

@@ -27,25 +27,25 @@ data class BranchName(val value: String) {
     override fun toString() = value
 }
 
-sealed interface BranchNameCertainty {
+sealed interface BranchId {
     val name: BranchName?
 }
 
-sealed interface NamedBranch: BranchNameCertainty {
+sealed interface NamedBranchId: BranchId {
     override val name: BranchName
 
-    data class Certain(override val name: BranchName) : NamedBranch {
+    data class Certain(override val name: BranchName) : NamedBranchId {
         override fun toString(): String = name.toString()
     }
 
-    data class Inferred(override val name: BranchName) : NamedBranch {
+    data class Inferred(override val name: BranchName) : NamedBranchId {
         override fun toString(): String = "~$name"
     }
 }
 
-object NamelessBranch: BranchNameCertainty {
+data class NamelessBranchId(val tipCommit: CommitHash): BranchId {
     override val name: BranchName? = null
-    override fun toString(): String = javaClass.simpleName
+    override fun toString(): String = "NamelessBranch($tipCommit)"
 }
 
 sealed interface Ref {
@@ -83,7 +83,7 @@ data class Commit(
     val coAuthors: Set<Author>,
     val commitType: CommitType,
     val workKeys: List<WorkKey>,
-    val branch: BranchNameCertainty,
+    val branchId: BranchId,
     val isOnCurrentBranch: Boolean = false
 ) {
     val isNotOnCurrentBranch = !isOnCurrentBranch

@@ -253,7 +253,7 @@ class BranchDetectionTest {
             // Then
             result.branches.unnamed shouldHaveSize 1
             result.branches.unnamed.first() shouldBe aBranch {
-                unNamed()
+                unNamed("3")  // tipCommit = first commit seen (last commit of feature branch)
                 isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate(atStartOfYear(2023))
@@ -671,7 +671,7 @@ class BranchDetectionTest {
             }
             result.branches.unnamed.shouldContainExactlyInAnyOrder(
                 aBranch {
-                    unNamed()
+                    unNamed("2")  // tipCommit = first commit seen on this branch
                     isCompleted()
                     firstCommitHash("2".hash())
                     firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
@@ -680,7 +680,7 @@ class BranchDetectionTest {
                     mergedInto("origin/trunk", "2025-01-01T05:00:00+01:00".zoned(), "5")
                 },
                 aBranch {
-                    unNamed()
+                    unNamed("4")  // tipCommit = first commit seen (last commit of feature branch)
                     isCompleted()
                     firstCommitHash("3".hash())
                     firstCommitDate("2025-01-01T03:00:00+01:00".zoned())
@@ -755,7 +755,7 @@ class BranchDetectionTest {
             }
             result.branches.unnamed.shouldContainExactlyInAnyOrder(
                 aBranch {
-                    unNamed()
+                    unNamed("2")  // tipCommit = first commit seen on this branch
                     isCompleted()
                     firstCommitHash("2".hash())
                     firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
@@ -1268,7 +1268,7 @@ class BranchDetectionTest {
         }
         result.branches.unnamed shouldHaveSize 1
         result.branches.unnamed.first() shouldBe aBranch {
-            unNamed()
+            unNamed("3")  // tipCommit = first commit seen (last commit of feature branch)
             isCompleted()
             firstCommitHash("2".hash())
             firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
@@ -1511,7 +1511,7 @@ class BranchDetectionTest {
         }
         result.branches.unnamed.shouldContainExactlyInAnyOrder(
             aBranch {
-                unNamed()
+                unNamed("3")  // tipCommit = first commit seen (last commit of feature branch)
                 isCompleted()
                 firstCommitHash("2".hash())
                 firstCommitDate("2025-01-01T02:00:00+01:00".zoned())
@@ -1520,7 +1520,7 @@ class BranchDetectionTest {
                 mergedInto("origin/trunk", "2025-01-01T04:00:00+01:00".zoned(), "4")
             },
             aBranch {
-                unNamed()
+                unNamed("6")  // tipCommit = first commit seen (last commit of feature branch)
                 isCompleted()
                 firstCommitHash("5".hash())
                 firstCommitDate("2025-01-01T05:00:00+01:00".zoned())

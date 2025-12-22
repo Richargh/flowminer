@@ -6,8 +6,8 @@ import io.kotest.matchers.MatcherResult
 
 fun haveSameBranchAs(expected: Commit) = Matcher<Commit> { actual ->
     val diffs = buildList {
-        if (actual.branch != expected.branch) {
-            add("branch:\n    actual:   ${actual.branch}\n    expected: ${expected.branch}")
+        if (actual.branchId != expected.branchId) {
+            add("branch:\n    actual:   ${actual.branchId}\n    expected: ${expected.branchId}")
         }
         if (actual.author != expected.author) {
             add("author:\n    actual:   ${actual.author}\n    expected: ${expected.author}")
