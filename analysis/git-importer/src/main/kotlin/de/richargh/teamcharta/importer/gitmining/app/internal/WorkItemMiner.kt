@@ -7,7 +7,7 @@ import de.richargh.teamcharta.importer.git.app.api.WorkKey
 import de.richargh.teamcharta.importer.gitmining.app.api.AuthorContribution
 import de.richargh.teamcharta.importer.gitmining.app.api.WorkItem
 import de.richargh.teamcharta.importer.gitmining.app.api.WorkItems
-import java.nio.file.Path
+import de.richargh.teamcharta.importer.gitmining.app.api.FilePath
 import kotlin.time.Instant
 
 fun extractWorkItems(commits: List<Commit>): WorkItems {
@@ -32,8 +32,8 @@ private class MutableWorkKey(
     private var linesAdded = 0
     private var linesRemoved = 0
     private var lastCommitDate: Instant = firstCommitDate
-    private val filesChanged = mutableSetOf<Path>()
-    private val fileTouchCount = mutableMapOf<Path, Int>()
+    private val filesChanged = mutableSetOf<FilePath>()
+    private val fileTouchCount = mutableMapOf<FilePath, Int>()
     private val absoluteChurnByAuthor = mutableMapOf<Author, Int>()
     private val absoluteChurnByType = mutableMapOf<CommitType, Int>()
     private var commitCount = 0
@@ -48,7 +48,7 @@ private class MutableWorkKey(
         for (fileChange in commit.fileChanges) {
             linesAdded += fileChange.additions
             linesRemoved += fileChange.deletions
-            val path = Path.of(fileChange.path)
+            val path = FilePath.of(fileChange.path)
             filesChanged.add(path)
             fileTouchCount[path] = fileTouchCount.getOrDefault(path, 0) + 1
             commitLinesChanged += fileChange.additions + fileChange.deletions

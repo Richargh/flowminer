@@ -9,7 +9,7 @@ import de.richargh.teamcharta.importer.git.app.api.BranchId
 import de.richargh.teamcharta.importer.git.app.api.NamedBranchId
 import de.richargh.teamcharta.importer.git.app.api.NamelessBranchId
 import de.richargh.teamcharta.importer.git.app.api.WorkKey
-import java.nio.file.Path
+import de.richargh.teamcharta.importer.gitmining.app.api.FilePath
 import kotlin.time.Duration
 import kotlin.time.Instant
 
@@ -80,12 +80,12 @@ data class WorkItem(
     val linesRemoved: Int,
     val firstCommitDate: Instant,
     val lastCommitDate: Instant,
-    val filesChanged: Set<Path>,
+    val filesChanged: Set<FilePath>,
     val contributions: List<AuthorContribution>,
     val absoluteChurnByType: Map<CommitType, Int>,
     val commits: Int,
     val collaborators: Int,
-    val reworkFiles: Set<Path>
+    val reworkFiles: Set<FilePath>
 ) {
     val duration: Duration get() = lastCommitDate - firstCommitDate
 }

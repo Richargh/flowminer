@@ -7,12 +7,12 @@ import de.richargh.teamcharta.importer.git.app.api.WorkKey
 import de.richargh.teamcharta.importer.gitmining.app.api.AuthorContribution
 import de.richargh.teamcharta.importer.shared.time.app.testNow2025
 import de.richargh.teamcharta.importer.shared.time.app.toInstant
+import de.richargh.teamcharta.importer.gitmining.app.api.FilePath
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.maps.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import java.nio.file.Path
 
 class WorkItemDetectionTest {
 
@@ -93,9 +93,9 @@ class WorkItemDetectionTest {
         // Then
         val workItem = result.workItems["ABC-123"]!!
         workItem.filesChanged shouldContainExactlyInAnyOrder setOf(
-            Path.of("src/Feature.kt"),
-            Path.of("src/Helper.kt"),
-            Path.of("src/Service.kt")
+            FilePath.of("src/Feature.kt"),
+            FilePath.of("src/Helper.kt"),
+            FilePath.of("src/Service.kt")
         )
     }
 
@@ -244,7 +244,7 @@ class WorkItemDetectionTest {
 
         // Then - Feature.kt touched 3 times = rework
         val workItem = result.workItems["ABC-123"]!!
-        workItem.reworkFiles shouldContainExactlyInAnyOrder setOf(Path.of("src/Feature.kt"))
+        workItem.reworkFiles shouldContainExactlyInAnyOrder setOf(FilePath.of("src/Feature.kt"))
     }
 
     @Test
