@@ -58,10 +58,10 @@ private class MutableWorkKey(
         absoluteChurnByType[commit.commitType] = absoluteChurnByType.getOrDefault(commit.commitType, 0) + commitLinesChanged
 
         val commitDate = commit.date
-        if (commitDate < firstCommitDate) {
+        if (commitDate.isBefore(firstCommitDate)) {
             firstCommitDate = commitDate
         }
-        if (commitDate > lastCommitDate) {
+        if (commitDate.isAfter(lastCommitDate)) {
             lastCommitDate = commitDate
         }
     }
