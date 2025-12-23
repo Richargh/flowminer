@@ -2,6 +2,27 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
 }
 
+// TODO make KMP-native
+// Create a jar of JVM test classes for sharing test fixtures with other projects
+val jvmTestJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("jvm-test")
+    from(kotlin.jvm().compilations["test"].output.allOutputs)
+}
+
+// Create a configuration for consuming the test jar
+val jvmTestElements by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = false
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, Category.LIBRARY))
+    }
+}
+
+artifacts {
+    add("jvmTestElements", jvmTestJar)
+}
+
 kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
@@ -26,7 +47,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                // No additional dependencies needed - using kotlin stdlib
+                implementation(project(":analysis:model"))
             }
         }
         val commonTest by getting {

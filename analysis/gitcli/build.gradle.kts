@@ -11,9 +11,25 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation(libs.picocli)
     implementation(project(":analysis:git-importer"))
+    implementation(project(":analysis:model"))
+    implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.assertions)
-    testImplementation(testFixtures(project(":analysis:git-importer")))
+}
+
+// Add git-importer test classes to the test compile and runtime classpath
+// This is needed because git-importer is a KMP project and test fixtures need special handling
+val gitImporterTestClasses = files(
+    project(":analysis:git-importer").layout.buildDirectory.dir("classes/kotlin/jvm/test")
+)
+
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
+    dependsOn(":analysis:git-importer:compileTestKotlinJvm")
+    libraries.from(gitImporterTestClasses)
+}
+
+tasks.named<Test>("test") {
+    classpath += gitImporterTestClasses
 }
 
 application {
@@ -35,6 +51,10 @@ kotlin {
 
 tasks.test {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+        showStandardStreams = true
+    }
 }
 
 tasks.named<JavaExec>("run") {

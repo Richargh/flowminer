@@ -2,7 +2,7 @@ package de.richargh.teamcharta.importer.gitcli
 
 import de.richargh.teamcharta.importer.git.app.api.Author
 import de.richargh.teamcharta.importer.git.app.api.CommitType
-import de.richargh.teamcharta.importer.gitmining.app.api.aAuthorStatistic
+import de.richargh.teamcharta.importer.gitminingfixtures.app.api.aAuthorStatistic
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import org.junit.jupiter.api.Nested
