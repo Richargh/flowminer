@@ -6,9 +6,9 @@ import de.richargh.teamcharta.importer.git.app.internal.parseCommits
 
 class GitLogParser {
 
-    fun parse(lines: Sequence<String>): List<Commit> {
+    fun parse(lines: Sequence<String>): Sequence<Commit> {
         val rawCommits = splitIntoRawCommits(lines)
-        return parseCommits(rawCommits).toList()
+        return parseCommits(rawCommits)
     }
 
 }

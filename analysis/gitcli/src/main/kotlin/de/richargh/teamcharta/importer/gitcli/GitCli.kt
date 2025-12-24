@@ -1,7 +1,8 @@
 package de.richargh.teamcharta.importer.gitcli
 
-import de.richargh.teamcharta.importer.gitmining.app.GitRepositoryMiner
-import de.richargh.teamcharta.importer.gitmining.app.api.GitMiningResult
+import de.richargh.teamcharta.importer.git.app.api.Commit
+import de.richargh.teamcharta.importer.gitmining.app.GitLogMiner
+import de.richargh.teamcharta.importer.gitmining.app.GitRepositoryParser
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
@@ -37,28 +38,39 @@ class GitCli : Callable<Int> {
     @Option(names = ["--output", "-o"], description = ["Output file path (default: stdout)"])
     var output: String? = null
 
-    private val miner = GitRepositoryMiner()
+    private val parser = GitRepositoryParser()
+    private val miner = GitLogMiner()
+    private val now = Clock.System.now()
 
     override fun call(): Int {
-        val now = Clock.System.now()
-        val result = miner.parse(File(path), since, now)
-
-        val content = when (format) {
-            OutputFormat.table -> formatTable(result, now)
-            OutputFormat.jsonl -> formatJsonl(result)
-        }
-
-        if (output != null) {
-            File(output!!).writeText(content)
-            println("Written to $output")
-        } else {
-            println(content)
-        }
-
+        val commits = parser.parse(File(path), since, ::consume)
         return 0
     }
 
-    private fun formatTable(result: GitMiningResult, now: Instant): String {
+    private fun consume(commits: Sequence<Commit>) {
+        val content = when (format) {
+            OutputFormat.table -> formatTable(commits, now)
+            OutputFormat.jsonl -> formatJsonl(commits)
+        }
+
+        val out = output
+        if (out != null) {
+            File(out).bufferedWriter().use { file ->
+                content.forEach { line ->
+                    file.write(line)
+                    file.newLine()
+                }
+            }
+            println("Written to $out")
+        } else {
+            content.forEach { line ->
+                println(line)
+            }
+        }
+    }
+
+    private fun formatTable(commits: Sequence<Commit>, now: Instant): Sequence<String> {
+        val result = miner.mine(commits, now)
         val allAuthorStats = result.authorStatistics.all().toList()
         val displayedAuthorStats = allAuthorStats
             .sortedByDescending { it.commitCount }
@@ -73,20 +85,19 @@ class GitCli : Callable<Int> {
         val allCommits = result.commits.all().toList()
         val displayedCommits = allCommits.take(20)
 
-        return buildString {
-            appendLine(TableFormatter.formatAuthorStatistics(displayedAuthorStats, totalCount = allAuthorStats.size))
-            appendLine()
-            appendLine(TableFormatter.formatBranches(branches, now))
-            appendLine()
-            appendLine(TableFormatter.formatWorkItems(displayedWorkItems, totalCount = allWorkItems.size))
-            appendLine()
-            append(TableFormatter.formatCommits(displayedCommits, totalCount = allCommits.size))
+        return sequence {
+            yield(TableFormatter.formatAuthorStatistics(displayedAuthorStats, totalCount = allAuthorStats.size))
+            yield("")
+            yield(TableFormatter.formatBranches(branches, now))
+            yield("")
+            yield(TableFormatter.formatWorkItems(displayedWorkItems, totalCount = allWorkItems.size))
+            yield("")
+            yield(TableFormatter.formatCommits(displayedCommits, totalCount = allCommits.size))
         }
     }
 
-    private fun formatJsonl(result: GitMiningResult): String {
-        val allCommits = result.commits.all().toList()
-        return JsonlFormatter.format(allCommits)
+    private fun formatJsonl(commits: Sequence<Commit>): Sequence<String> {
+        return JsonlFormatter.format(commits)
     }
 }
 

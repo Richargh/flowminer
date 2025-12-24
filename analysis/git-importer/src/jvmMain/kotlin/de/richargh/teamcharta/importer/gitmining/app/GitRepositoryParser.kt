@@ -1,17 +1,18 @@
 package de.richargh.teamcharta.importer.gitmining.app
 
-import de.richargh.teamcharta.importer.gitmining.app.api.GitMiningResult
+import de.richargh.teamcharta.importer.git.app.GitLogParser
+import de.richargh.teamcharta.importer.git.app.api.Commit
 import java.io.File
 import kotlin.time.Instant
 
-class GitRepositoryMiner(
-    private val gitLogParser: GitLogMiner = GitLogMiner()
+class GitRepositoryParser(
+    private val gitLogParser: GitLogParser = GitLogParser()
 ) {
 
-    fun parse(repoPath: File, since: String = "6 months ago", currentDate: Instant): GitMiningResult {
+    fun parse(repoPath: File, since: String = "6 months ago", consume: (commits: Sequence<Commit>) -> Unit) {
         val process = startGitLog(repoPath, since)
         return process.inputStream.bufferedReader().useLines { lines ->
-            gitLogParser.parse(lines, currentDate)
+            gitLogParser.parse(lines).let(consume)
         }
     }
 

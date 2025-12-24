@@ -26,7 +26,7 @@ class CommitTypeDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].commitType shouldBe CommitType.UNKNOWN
@@ -88,7 +88,7 @@ class CommitTypeDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].commitType shouldBe CommitType.FEATURE
@@ -156,7 +156,7 @@ class CommitTypeDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].commitType shouldBe CommitType.FIX
@@ -218,7 +218,7 @@ class CommitTypeDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].commitType shouldBe CommitType.REFACTOR
@@ -280,7 +280,7 @@ class CommitTypeDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].commitType shouldBe CommitType.TEST
@@ -348,7 +348,7 @@ class CommitTypeDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].commitType shouldBe CommitType.ENVIRONMENT
@@ -417,7 +417,7 @@ class CommitTypeDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].commitType shouldBe CommitType.DOCS

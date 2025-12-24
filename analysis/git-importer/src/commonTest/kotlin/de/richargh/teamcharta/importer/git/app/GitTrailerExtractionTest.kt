@@ -22,7 +22,7 @@ class GitTrailerExtractionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].trailers shouldContainExactly listOf(

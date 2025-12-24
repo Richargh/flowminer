@@ -27,7 +27,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result.first().branchId shouldBe NamedBranchId.Certain(BranchName("origin/main"))
@@ -50,7 +50,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then - both commits should be on main
         result[0] should haveSameBranchAs(aCommit {
@@ -86,7 +86,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then - both commits should be on main
         result[0] should haveSameBranchAs(aCommit {
@@ -145,7 +145,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
@@ -204,7 +204,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
@@ -263,7 +263,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
@@ -316,7 +316,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
@@ -363,7 +363,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then - commit 0 has branch ref, should stay Certain
         result[2] should haveSameBranchAs(aCommit {
@@ -414,7 +414,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0] should haveSameBranchAs(aCommit {
@@ -475,7 +475,7 @@ class BranchAssignmentTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then - commits reachable from HEAD should be marked
         result[0].isOnCurrentBranch shouldBe true  // main commit 2 (HEAD)
@@ -501,7 +501,7 @@ class BranchAssignmentTest {
             val testee = GitLogParser()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence()).toList()
 
             // Then - branch should be NamelessBranch with tipCommit = commit's own hash
             val branch = result.first().branchId as NamelessBranchId
@@ -528,7 +528,7 @@ class BranchAssignmentTest {
             val testee = GitLogParser()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence()).toList()
 
             // Then - both commits should have same NamelessBranch with tipCommit = "1" (child's hash)
             val childBranch = result[0].branchId as NamelessBranchId  // hash "1"
@@ -576,7 +576,7 @@ class BranchAssignmentTest {
             val testee = GitLogParser()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence()).toList()
 
             // Then:
             // - main commit (0) is first parent, gets origin/main via propagation
@@ -646,7 +646,7 @@ class BranchAssignmentTest {
             val testee = GitLogParser()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence()).toList()
 
             // Then
             result[0] should haveSameBranchAs(aCommit {
@@ -715,7 +715,7 @@ class BranchAssignmentTest {
             val testee = GitLogParser()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence()).toList()
 
             // Then - all branches have refs, so all are Certain
             result[1] should haveSameBranchAs(aCommit {
@@ -776,7 +776,7 @@ class BranchAssignmentTest {
             val testee = GitLogParser()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence()).toList()
 
             // Then - feat1 has ref (Certain), feat2 and feat3 from message (Inferred)
             result[1] should haveSameBranchAs(aCommit {
@@ -837,7 +837,7 @@ class BranchAssignmentTest {
             val testee = GitLogParser()
 
             // When
-            val result = testee.parse(gitLogContent.lineSequence())
+            val result = testee.parse(gitLogContent.lineSequence()).toList()
 
             // Then - no branch refs, non-standard message = nameless branch with tipCommit
             result[1] should haveSameBranchAs(aCommit {

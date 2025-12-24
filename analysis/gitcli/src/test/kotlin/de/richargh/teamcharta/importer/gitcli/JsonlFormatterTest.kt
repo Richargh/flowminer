@@ -1,9 +1,9 @@
 package de.richargh.teamcharta.importer.gitcli
 
 import de.richargh.teamcharta.importer.git.app.api.*
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.Test
 import kotlin.time.Instant
 
@@ -38,13 +38,13 @@ class JsonlFormatterTest {
         )
 
         // When
-        val jsonl = JsonlFormatter.format(listOf(commit))
+        val result = JsonlFormatter.format(sequenceOf(commit)).toList()
 
         // Then - single line, valid JSON object
-        jsonl.lines().size shouldBe 1
-        jsonl shouldContain "\"hash\":\"abc123\""
-        jsonl shouldContain "\"authorName\":\"Jane Doe\""
-        jsonl shouldContain "\"branchId\":{\"type\":\"certain\",\"name\":\"main\",\"tipCommit\":null}"
+        result.size shouldBe 1
+        result[0] shouldContain "\"hash\":\"abc123\""
+        result[0] shouldContain "\"authorName\":\"Jane Doe\""
+        result[0] shouldContain "\"branchId\":{\"type\":\"certain\",\"name\":\"main\",\"tipCommit\":null}"
     }
 
     @Test
@@ -83,27 +83,22 @@ class JsonlFormatterTest {
         )
 
         // When
-        val jsonl = JsonlFormatter.format(listOf(commit1, commit2))
+        val result = JsonlFormatter.format(sequenceOf(commit1, commit2)).toList()
 
         // Then
-        val lines = jsonl.lines()
-        lines.size shouldBe 2
+        result.size shouldBe 2
 
         // Each line is a valid JSON object
-        lines[0] shouldContain "\"hash\":\"abc123\""
-        lines[1] shouldContain "\"hash\":\"def456\""
-
-        // No array wrapper
-        jsonl shouldNotContain "[\n"
-        jsonl shouldNotContain "\n]"
+        result[0] shouldContain "\"hash\":\"abc123\""
+        result[1] shouldContain "\"hash\":\"def456\""
     }
 
     @Test
     fun `formats empty list as empty string`() {
         // When
-        val jsonl = JsonlFormatter.format(emptyList())
+        val result = JsonlFormatter.format(emptySequence()).toList()
 
         // Then
-        jsonl shouldBe ""
+        result.shouldBeEmpty()
     }
 }

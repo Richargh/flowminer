@@ -29,7 +29,7 @@ class WorkKeyDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].workKeys.shouldBeEmpty()
@@ -54,7 +54,7 @@ class WorkKeyDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].workKeys shouldContainExactlyInAnyOrder listOf(WorkKey.Known("#123"))
@@ -79,7 +79,7 @@ class WorkKeyDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].workKeys shouldContainExactlyInAnyOrder listOf(WorkKey.Known("ABC-123"))
@@ -104,7 +104,7 @@ class WorkKeyDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].workKeys shouldContainExactlyInAnyOrder expectedKeys
@@ -127,7 +127,7 @@ class WorkKeyDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].workKeys.size shouldBe 1
@@ -149,7 +149,7 @@ class WorkKeyDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result[0].workKeys.shouldBeEmpty()

@@ -23,7 +23,7 @@ class GitLogParserTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result shouldContainExactly listOf(aCommit {

@@ -22,7 +22,7 @@ class RefDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result.first().refs shouldContainExactlyInAnyOrder listOf(
@@ -41,7 +41,7 @@ class RefDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result.first().refs shouldContainExactlyInAnyOrder listOf(
@@ -60,7 +60,7 @@ class RefDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result.first().refs shouldContainExactly listOf(Ref.BranchTip("origin/develop"))
@@ -85,7 +85,7 @@ class RefDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result.first().refs shouldContainExactly listOf(Ref.BranchTip(branchName))
@@ -104,7 +104,7 @@ class RefDetectionTest {
         val testee = GitLogParser()
 
         // When
-        val result = testee.parse(gitLogContent.lineSequence())
+        val result = testee.parse(gitLogContent.lineSequence()).toList()
 
         // Then
         result.first().refs shouldContainExactlyInAnyOrder listOf(
