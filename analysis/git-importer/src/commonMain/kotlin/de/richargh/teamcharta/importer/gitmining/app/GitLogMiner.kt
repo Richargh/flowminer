@@ -12,12 +12,6 @@ import kotlin.time.Instant
 
 class GitLogMiner {
 
-    fun parse(lines: Sequence<String>, currentDate: Instant): GitMiningResult {
-        val rawCommits = splitIntoRawCommits(lines)
-        val commits = parseCommits(rawCommits)
-        return mine(commits, currentDate)
-    }
-
     fun mine(c: Sequence<Commit>, currentDate: Instant): GitMiningResult {
         val commits = c.toList()
         val branches = extractBranchInfo(commits, currentDate)

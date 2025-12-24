@@ -6,6 +6,7 @@ import de.richargh.teamcharta.importer.sharedfixtures.time.app.testNow2025
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.toInstant
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import parse
 import kotlin.time.Duration.Companion.days
 
 class WorkItemDurationTest {

@@ -9,6 +9,7 @@ import de.richargh.teamcharta.importer.sharedfixtures.time.app.testNow2025
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import parse
 
 class AuthorStatisticsDetectionTest {
 
