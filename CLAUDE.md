@@ -80,7 +80,7 @@ NEVER generate additional `.md` files beyond the ones mentioned above.
 ### Test Actions
 
 * `just test` - Run all test suites
-* `just test-analyis` - Run all analysis test suites
+* `just test-analysis` - Run all analysis test suites
 * `just test-viz` - Run all visualization test suites
 
 To run a test for a subproject use:
