@@ -4,11 +4,11 @@ import de.richargh.teamcharta.importer.git.app.api.Author
 import de.richargh.teamcharta.importer.git.app.api.CommitType
 import de.richargh.teamcharta.importer.git.app.api.FileChange
 import de.richargh.teamcharta.importer.git.app.api.WorkKey
-import de.richargh.teamcharta.importer.git.app.api.aCommit
+import de.richargh.teamcharta.importer.gitfixtures.app.api.aCommit
 import de.richargh.teamcharta.importer.gitmining.app.api.AuthorContribution
-import de.richargh.teamcharta.importer.gitmining.app.api.aBranch
-import de.richargh.teamcharta.importer.gitmining.app.api.aWorkItem
-import java.nio.file.Path
+import de.richargh.teamcharta.importer.gitminingfixtures.app.api.aBranch
+import de.richargh.teamcharta.importer.gitminingfixtures.app.api.aWorkItem
+import de.richargh.teamcharta.importer.gitmining.app.api.FilePath
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
@@ -659,7 +659,7 @@ class TableFormatterTest {
                 linesRemoved(20)
                 firstCommitDate(Instant.parse("2024-01-10T10:00:00+01:00"))
                 lastCommitDate(Instant.parse("2024-01-17T10:00:00+01:00"))
-                filesChanged(setOf(Path.of("src/Main.kt"), Path.of("src/Helper.kt")))
+                filesChanged(setOf(FilePath("src/Main.kt"), FilePath("src/Helper.kt")))
                 contributions(listOf(
                     AuthorContribution(Author("Alice Smith", "alice@example.com"), 80),
                     AuthorContribution(Author("Bob Jones", "bob@example.com"), 40)
