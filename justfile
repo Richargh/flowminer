@@ -58,13 +58,13 @@ clean:
 # Run all tests (Gradle + visualization)
 test: test-analysis test-viz
 
-# Run all Gradle tests
+# Run all Gradle tests (KMP via allTests + non-KMP via test)
 test-analysis:
-    ./gradlew test
+    ./gradlew allTests test
 
-# Run Gradle JVM tests only
+# Run Gradle JVM tests only (KMP jvmTest + non-KMP test)
 test-analysis-jvm:
-    ./gradlew jvmTest
+    ./gradlew jvmTest test
 
 # Run Gradle JS tests only
 test-analysis-js:
@@ -74,13 +74,13 @@ test-analysis-js:
 test-viz:
     cd visualization && npm test
 
-# Run tests for a specific Gradle subproject
+# Run tests for a specific Gradle subproject (KMP: allTests, non-KMP: test)
 test-analysis-project project:
-    ./gradlew :{{project}}:test
+    ./gradlew :{{project}}:allTests --dry-run 2>/dev/null && ./gradlew :{{project}}:allTests || ./gradlew :{{project}}:test
 
-# Run JVM tests for a specific Gradle subproject
+# Run JVM tests for a specific Gradle subproject (KMP: jvmTest, non-KMP: test)
 jvm-test-analysis-project project:
-    ./gradlew :{{project}}:jvmTest
+    ./gradlew :{{project}}:jvmTest --dry-run 2>/dev/null && ./gradlew :{{project}}:jvmTest || ./gradlew :{{project}}:test
 
 # Run JS tests for a specific Gradle subproject
 js-test-analysis-project project:
