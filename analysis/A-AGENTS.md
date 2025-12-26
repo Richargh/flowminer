@@ -4,17 +4,6 @@ STARTER_CHARACTER = 1️⃣
 
 ## Technical Guidelines
 
-### TypeScript
-* Modern ES6+ features
-* Strict TypeScript configuration
+### Kotlin
 
-## Development Commands
-
-### Quick Actions
-
-* `./gradlew build` - Run all checks and tests
-* `./gradlew test` - Run all test suites
-
-To run a test for a subproject use:
-
-* `./gradlew :analysis:<project>:test` - Run all test suites of the <project>.
+* Kotlin Multiplatform (KMP)
