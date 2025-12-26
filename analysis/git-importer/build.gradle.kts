@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 // TODO make KMP-native
@@ -48,6 +49,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":analysis:model"))
+                implementation(libs.kotlinx.serialization.json)
             }
         }
         val commonTest by getting {
