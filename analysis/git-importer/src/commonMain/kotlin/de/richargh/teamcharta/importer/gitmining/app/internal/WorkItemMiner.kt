@@ -50,12 +50,12 @@ private class MutableWorkKey(
             linesRemoved += fileChange.deletions
             val path = FilePath.of(fileChange.path)
             filesChanged.add(path)
-            fileTouchCount[path] = fileTouchCount.getOrDefault(path, 0) + 1
+            fileTouchCount[path] = (fileTouchCount[path] ?: 0) + 1
             commitLinesChanged += fileChange.additions + fileChange.deletions
         }
 
-        absoluteChurnByAuthor[commit.author] = absoluteChurnByAuthor.getOrDefault(commit.author, 0) + commitLinesChanged
-        absoluteChurnByType[commit.commitType] = absoluteChurnByType.getOrDefault(commit.commitType, 0) + commitLinesChanged
+        absoluteChurnByAuthor[commit.author] = (absoluteChurnByAuthor[commit.author] ?: 0) + commitLinesChanged
+        absoluteChurnByType[commit.commitType] = (absoluteChurnByType[commit.commitType] ?: 0) + commitLinesChanged
 
         val commitDate = commit.date
         if (commitDate < firstCommitDate) {
