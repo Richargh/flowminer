@@ -36,8 +36,7 @@ kotlin {
         testRuns["test"].executionTask.configure {
             useJUnitPlatform()
             testLogging {
-                events("passed", "skipped", "failed")
-                showStandardStreams = true
+                events("skipped", "failed")
             }
         }
         binaries {
@@ -57,8 +56,7 @@ kotlin {
                     useChromeHeadless()
                 }
                 testLogging {
-                    events("passed", "skipped", "failed")
-                    showStandardStreams = true
+                    events("skipped", "failed")
                 }
             }
         }
