@@ -1,7 +1,7 @@
 package de.richargh.teamcharta.importer.gitmining.app
 
 import io.kotest.matchers.collections.shouldNotBeEmpty
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 import java.io.File
 
 class GitRepositoryParserTest {

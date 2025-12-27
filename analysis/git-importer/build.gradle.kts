@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotest)
 }
 
 // TODO make KMP-native
@@ -56,6 +58,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.kotest.assertions)
+                implementation(libs.kotest.framework.engine)
             }
         }
         val jvmMain by getting {
@@ -70,6 +73,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-junit5"))
                 implementation(libs.junit.jupiter)
+                implementation(libs.kotest.runner.junit5)
             }
         }
     }

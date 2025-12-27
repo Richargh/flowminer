@@ -8,7 +8,7 @@ import de.richargh.teamcharta.importer.gitmining.app.api.ChurnMetric
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.testNow2025
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 import parse
 
 class AuthorStatisticsDetectionTest {

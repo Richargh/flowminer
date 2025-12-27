@@ -2,7 +2,7 @@ package de.richargh.teamcharta.importer.git.app.internal
 
 import de.richargh.teamcharta.importer.git.app.api.BranchName
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class MergeMessageParserTest {
 

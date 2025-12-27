@@ -7,7 +7,7 @@ import de.richargh.teamcharta.importer.gitminingfixtures.app.api.aBranch
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.testNow2025
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.toInstant
 import io.kotest.matchers.collections.shouldContainExactly
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 import parse
 
 class GitLogMinerTest {

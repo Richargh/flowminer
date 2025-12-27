@@ -5,7 +5,7 @@ import de.richargh.teamcharta.importer.gitfixtures.app.aGitLog
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.testNow2025
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.toInstant
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 import parse
 import kotlin.time.Duration.Companion.days
 

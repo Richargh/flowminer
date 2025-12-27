@@ -2,16 +2,14 @@ package de.richargh.teamcharta.importer.git.app
 
 import de.richargh.teamcharta.importer.git.app.api.Ref
 import de.richargh.teamcharta.importer.gitfixtures.app.aGitLog
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
 
-class RefDetectionTest {
+class RefDetectionTest : FunSpec({
 
-    @Test
-    fun `should parse HEAD ref`() {
+    test("should parse HEAD ref") {
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
@@ -31,8 +29,7 @@ class RefDetectionTest {
         )
     }
 
-    @Test
-    fun `should parse tag ref`() {
+    test("should parse tag ref") {
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") { refTag("v1.0.0") }
@@ -50,8 +47,7 @@ class RefDetectionTest {
         )
     }
 
-    @Test
-    fun `should parse branch ref without slash`() {
+    test("should parse branch ref without slash") {
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/develop") { }
@@ -66,8 +62,8 @@ class RefDetectionTest {
         result.first().refs shouldContainExactly listOf(Ref.BranchTip("origin/develop"))
     }
 
-    @ParameterizedTest(name = "should parse nested branch ref: {0}")
-    @CsvSource(
+    withData(
+        nameFn = { "should parse nested branch ref: $it" },
         "origin/add-user",
         "origin/feat/add-login",
         "origin/fix/at-1234",
@@ -75,8 +71,7 @@ class RefDetectionTest {
         "release/v2.0/hotfix",
         "bugfix/JIRA-123/fix-null-pointer",
         "upstream/develop/experimental"
-    )
-    fun `should parse nested branch refs`(branchName: String) {
+    ) { branchName ->
         // Given
         val gitLogContent = aGitLog {
             anEntry(branchName) { }
@@ -91,8 +86,7 @@ class RefDetectionTest {
         result.first().refs shouldContainExactly listOf(Ref.BranchTip(branchName))
     }
 
-    @Test
-    fun `should parse multiple refs`() {
+    test("should parse multiple refs") {
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
@@ -113,4 +107,4 @@ class RefDetectionTest {
             Ref.Tag("v1.0.0")
         )
     }
-}
+})

@@ -3,7 +3,7 @@ package de.richargh.teamcharta.importer.git.app
 import de.richargh.teamcharta.importer.gitfixtures.app.aGitLog
 import de.richargh.teamcharta.importer.gitfixtures.app.api.hash
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class GitLogBuilderTest {
 

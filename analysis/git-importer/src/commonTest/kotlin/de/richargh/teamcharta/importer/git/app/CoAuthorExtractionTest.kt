@@ -3,7 +3,7 @@ package de.richargh.teamcharta.importer.git.app
 import de.richargh.teamcharta.importer.git.app.api.Author
 import de.richargh.teamcharta.importer.gitfixtures.app.aGitLog
 import io.kotest.matchers.collections.shouldContainExactly
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 
 class CoAuthorExtractionTest {
 

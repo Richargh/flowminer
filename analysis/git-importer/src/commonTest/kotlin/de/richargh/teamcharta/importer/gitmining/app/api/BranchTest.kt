@@ -3,7 +3,7 @@ package de.richargh.teamcharta.importer.gitmining.app.api
 import de.richargh.teamcharta.importer.gitminingfixtures.app.api.aBranch
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.atStartOfYear
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Test
+import kotlin.test.Test
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
