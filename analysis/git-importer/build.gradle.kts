@@ -47,6 +47,28 @@ kotlin {
         }
     }
 
+    js(IR) {
+        browser {
+            webpackTask {
+                mainOutputFileName = "teamcharta-git-importer.js"
+            }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+                testLogging {
+                    events("passed", "skipped", "failed")
+                    showStandardStreams = true
+                }
+            }
+        }
+        binaries.library()
+        generateTypeScriptDefinitions()
+        compilerOptions {
+            moduleName.set("teamcharta-git-importer")
+        }
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
