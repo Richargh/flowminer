@@ -4,6 +4,7 @@ import './components/work-item-scatter-panel';
 import './components/sankey-panel';
 import './components/histogram-panel';
 import './components/theme-switcher';
+import './components/file-loader';
 import type { AuthorStats, CommitTimeline, WorkItemDuration, SankeyFlow, HistogramBucket } from './data-service';
 
 const sampleAuthors: AuthorStats[] = [
