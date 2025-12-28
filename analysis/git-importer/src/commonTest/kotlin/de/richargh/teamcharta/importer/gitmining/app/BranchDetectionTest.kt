@@ -1,5 +1,6 @@
 package de.richargh.teamcharta.importer.gitmining.app
 
+import de.infix.testBalloon.framework.core.testSuite
 import de.richargh.teamcharta.importer.gitfixtures.app.aGitLog
 import de.richargh.teamcharta.importer.gitfixtures.app.api.hash
 import de.richargh.teamcharta.importer.gitminingfixtures.app.api.aBranch
@@ -7,13 +8,12 @@ import de.richargh.teamcharta.importer.gitmining.app.api.BranchStatus
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.testNow2025
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.toInstant
 import de.richargh.teamcharta.importer.sharedfixtures.time.app.atStartOfYear
-import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import parse
 
-class BranchDetectionTest : FunSpec({
+val BranchDetectionTest by testSuite {
 
     // LastCommitTracking tests
 
@@ -1808,4 +1808,4 @@ class BranchDetectionTest : FunSpec({
         // Then
         result.branches["origin/main"]!!.status shouldBe BranchStatus.Stale
     }
-})
+}

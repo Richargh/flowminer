@@ -1,14 +1,13 @@
 package de.richargh.teamcharta.importer.git.app
 
+import de.infix.testBalloon.framework.core.testSuite
 import de.richargh.teamcharta.importer.git.app.api.Author
 import de.richargh.teamcharta.importer.gitfixtures.app.aGitLog
 import io.kotest.matchers.collections.shouldContainExactly
-import kotlin.test.Test
 
-class CoAuthorExtractionTest {
+val CoAuthorExtractionTest by testSuite {
 
-    @Test
-    fun `should extract co-authors`() {
+    test("should extract co-authors") {
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {
@@ -35,8 +34,7 @@ class CoAuthorExtractionTest {
         )
     }
 
-    @Test
-    fun `should deduplicate co-authors with different trailer key variations`() {
+    test("should deduplicate co-authors with different trailer key variations") {
         // Given
         val gitLogContent = aGitLog {
             anEntry("origin/main") {

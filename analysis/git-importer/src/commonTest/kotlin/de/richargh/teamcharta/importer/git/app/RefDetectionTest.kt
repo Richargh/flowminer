@@ -1,13 +1,12 @@
 package de.richargh.teamcharta.importer.git.app
 
+import de.infix.testBalloon.framework.core.testSuite
 import de.richargh.teamcharta.importer.git.app.api.Ref
 import de.richargh.teamcharta.importer.gitfixtures.app.aGitLog
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 
-class RefDetectionTest : FunSpec({
+val RefDetectionTest by testSuite {
 
     test("should parse HEAD ref") {
         // Given
@@ -62,8 +61,8 @@ class RefDetectionTest : FunSpec({
         result.first().refs shouldContainExactly listOf(Ref.BranchTip("origin/develop"))
     }
 
-    withData(
-        nameFn = { "should parse nested branch ref: $it" },
+    // Nested branch ref tests (expanded from withData)
+    listOf(
         "origin/add-user",
         "origin/feat/add-login",
         "origin/fix/at-1234",
@@ -71,19 +70,21 @@ class RefDetectionTest : FunSpec({
         "release/v2.0/hotfix",
         "bugfix/JIRA-123/fix-null-pointer",
         "upstream/develop/experimental"
-    ) { branchName ->
-        // Given
-        val gitLogContent = aGitLog {
-            anEntry(branchName) { }
+    ).forEach { branchName ->
+        test("should parse nested branch ref: $branchName") {
+            // Given
+            val gitLogContent = aGitLog {
+                anEntry(branchName) { }
+            }
+
+            val testee = GitLogParser()
+
+            // When
+            val result = testee.parse(gitLogContent.lineSequence()).toList()
+
+            // Then
+            result.first().refs shouldContainExactly listOf(Ref.BranchTip(branchName))
         }
-
-        val testee = GitLogParser()
-
-        // When
-        val result = testee.parse(gitLogContent.lineSequence()).toList()
-
-        // Then
-        result.first().refs shouldContainExactly listOf(Ref.BranchTip(branchName))
     }
 
     test("should parse multiple refs") {
@@ -107,4 +108,4 @@ class RefDetectionTest : FunSpec({
             Ref.Tag("v1.0.0")
         )
     }
-})
+}

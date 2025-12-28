@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.kotest)
+    alias(libs.plugins.testBalloon)
 }
 
 // TODO make KMP-native
@@ -78,7 +78,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.kotest.assertions)
-                implementation(libs.kotest.framework.engine)
+                implementation(libs.testBalloon.framework.core)
+                implementation(libs.testBalloon.integration.kotest.assertions)
             }
         }
         val jvmMain by getting {

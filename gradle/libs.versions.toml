@@ -9,6 +9,7 @@ kotest = "6.0.7"
 okhttp = "4.12.0"
 moshi = "1.15.2"
 kotlinx-serialization = "1.8.0"
+testBalloon = "0.8.0-Beta2"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -17,7 +18,7 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 application = { id = "application" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-kotest = { id = "io.kotest", version.ref = "kotest" }
+testBalloon = { id = "de.infix.testBalloon", version.ref = "testBalloon" }
 
 [libraries]
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
@@ -27,10 +28,10 @@ jackson-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "okhttp" }
 kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
-kotest-framework-engine = { module = "io.kotest:kotest-framework-engine", version.ref = "kotest" }
-kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" } 
 moshi-codegen = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "moshi" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+testBalloon-framework-core = { module = "de.infix.testBalloon:testBalloon-framework-core", version.ref = "testBalloon" }
+testBalloon-integration-kotest-assertions = { module = "de.infix.testBalloon:testBalloon-integration-kotest-assertions", version.ref = "testBalloon" }
