@@ -1,7 +1,6 @@
 package de.richargh.teamcharta.importer.gitmining.app.api
 
-@JvmInline
-value class FilePath(val value: String) : Comparable<FilePath> {
+data class FilePath(val value: String) : Comparable<FilePath> {
     companion object {
         fun of(path: String): FilePath = FilePath(path)
     }
