@@ -10,7 +10,7 @@ default:
 # =============================================================================
 
 # Build entire project (Gradle + visualization)
-build: build-analysis build-viz
+build: build-analysis build-kmp-js build-viz
 
 # Build all Gradle projects (compile only, no tests, includes KMP-JS dist)
 build-analysis:
@@ -18,7 +18,8 @@ build-analysis:
 
 # Build KMP JS distributions for browser
 build-kmp-js:
-    ./gradlew jsBrowserProductionLibraryDistribution
+    ./gradlew :shared:jsBrowserProductionLibraryDistribution
+    ./gradlew :analysis:git-importer:jsBrowserProductionLibraryDistribution
 
 # Build visualization (TypeScript + Vite)
 build-viz:
