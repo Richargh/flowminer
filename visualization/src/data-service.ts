@@ -1,16 +1,13 @@
 import type {
-  de as shared
+  AuthorStatsDto,
+  CommitTimelineDto,
+  WorkItemDurationDto
 } from 'teamcharta-shared';
 
-// Extract only data properties from Kotlin DTOs (excluding copy, hashCode, equals, etc.)
-type AuthorStatsDtoClass = shared.richargh.teamcharta.shared.dto.AuthorStatsDto;
-type CommitTimelineDtoClass = shared.richargh.teamcharta.shared.dto.CommitTimelineDto;
-type WorkItemDurationDtoClass = shared.richargh.teamcharta.shared.dto.WorkItemDurationDto;
-
-// Re-export as plain data interfaces that match the DTO structure
-export type AuthorStats = Pick<AuthorStatsDtoClass, 'name' | 'commitCount' | 'linesAdded' | 'linesDeleted' | 'avgCommitSize'>;
-export type CommitTimeline = Pick<CommitTimelineDtoClass, 'date' | 'cumulativeCount' | 'author'>;
-export type WorkItemDuration = Pick<WorkItemDurationDtoClass, 'key' | 'type' | 'startDate' | 'durationDays'>;
+// Re-export as plain data interfaces that match the DTO structure (excluding copy, hashCode, equals, etc.)
+export type AuthorStats = Pick<AuthorStatsDto, 'name' | 'commitCount' | 'linesAdded' | 'linesDeleted' | 'avgCommitSize'>;
+export type CommitTimeline = Pick<CommitTimelineDto, 'date' | 'cumulativeCount' | 'author'>;
+export type WorkItemDuration = Pick<WorkItemDurationDto, 'key' | 'type' | 'startDate' | 'durationDays'>;
 
 export interface SankeyNode {
   name: string;
