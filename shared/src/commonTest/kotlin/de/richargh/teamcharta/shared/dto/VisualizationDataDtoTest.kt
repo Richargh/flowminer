@@ -1,6 +1,5 @@
 package de.richargh.teamcharta.shared.dto
 
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -9,7 +8,7 @@ class VisualizationDataDtoTest {
 
     @Test
     fun serialization_roundtrip_preserves_full_structure() {
-        val original = VisualizationDataDto(
+        val original = GitMiningResultDto(
             authors = listOf(
                 AuthorStatsDto(
                     name = "Alice",
@@ -37,21 +36,21 @@ class VisualizationDataDtoTest {
         )
 
         val json = Json.encodeToString(original)
-        val deserialized = Json.decodeFromString<VisualizationDataDto>(json)
+        val deserialized = Json.decodeFromString<GitMiningResultDto>(json)
 
         assertEquals(original, deserialized)
     }
 
     @Test
     fun serialization_handles_empty_lists() {
-        val original = VisualizationDataDto(
+        val original = GitMiningResultDto(
             authors = emptyList(),
             commitTimeline = emptyList(),
             workItems = emptyList()
         )
 
         val json = Json.encodeToString(original)
-        val deserialized = Json.decodeFromString<VisualizationDataDto>(json)
+        val deserialized = Json.decodeFromString<GitMiningResultDto>(json)
 
         assertEquals(original, deserialized)
     }

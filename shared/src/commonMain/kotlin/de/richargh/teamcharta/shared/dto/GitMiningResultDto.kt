@@ -7,7 +7,7 @@ import kotlin.js.JsExport
 @OptIn(ExperimentalJsExport::class)
 @JsExport
 @Serializable
-data class VisualizationDataDto(
+data class GitMiningResultDto(
     val authors: List<AuthorStatsDto>,
     val commitTimeline: List<CommitTimelineDto>,
     val workItems: List<WorkItemDurationDto>

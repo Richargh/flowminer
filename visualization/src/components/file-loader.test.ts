@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import './file-loader';
 import type { FileLoader } from './file-loader';
-import type { CommitDto } from '../services/jsonl-parser';
+import type { GitMiningResultDto } from 'teamcharta-git-importer';
 
 describe('FileLoader', () => {
   let element: FileLoader;
@@ -38,26 +38,12 @@ describe('FileLoader', () => {
     expect(clickSpy).toHaveBeenCalled();
   });
 
-  it('dispatches commits-loaded event when file is loaded', async () => {
-    const mockCommit: CommitDto = {
-      hash: 'abc123',
-      authorName: 'Alice',
-      authorEmail: 'alice@example.com',
-      date: '2024-01-01T10:00:00Z',
-      message: 'Test commit',
-      parents: [],
-      branchId: { type: 'certain', name: 'main', tipCommit: null },
-      workKeys: [],
-      commitType: 'UNKNOWN',
-      fileChanges: [],
-      isOnCurrentBranch: true,
-      isMerge: false
-    };
-    const jsonlContent = JSON.stringify(mockCommit);
+  it('dispatches data-loaded event with mined data when file is loaded', async () => {
+    const jsonlContent = '{"hash":"abc123","authorName":"Alice","authorEmail":"alice@example.com","date":"2024-01-01T10:00:00Z","message":"Test commit","parents":[],"branchId":{"type":"certain","name":"main","tipCommit":null},"workKeys":[],"commitType":"UNKNOWN","fileChanges":[{"path":"src/main.ts","additions":10,"deletions":5,"isRename":false,"oldPath":null}],"isOnCurrentBranch":true,"isMerge":false}';
     const file = new File([jsonlContent], 'test.jsonl', { type: 'application/jsonl' });
 
-    const eventPromise = new Promise<CustomEvent<CommitDto[]>>((resolve) => {
-      element.addEventListener('commits-loaded', ((e: CustomEvent<CommitDto[]>) => resolve(e)) as EventListener);
+    const eventPromise = new Promise<CustomEvent<GitMiningResultDto>>((resolve) => {
+      element.addEventListener('data-loaded', ((e: CustomEvent<GitMiningResultDto>) => resolve(e)) as EventListener);
     });
 
     const input = element.shadowRoot?.querySelector('input[type="file"]') as HTMLInputElement;
@@ -67,8 +53,9 @@ describe('FileLoader', () => {
     input.dispatchEvent(new Event('change'));
 
     const event = await eventPromise;
-    expect(event.detail).toHaveLength(1);
-    expect(event.detail[0].hash).toBe('abc123');
+    const authors = event.detail.authors.asJsReadonlyArrayView();
+    expect(authors.length).toBeGreaterThan(0);
+    expect(authors[0].name).toBe('Alice');
   });
 
   it('shows filename after loading', async () => {
@@ -82,7 +69,7 @@ describe('FileLoader', () => {
     input.dispatchEvent(new Event('change'));
 
     // Wait for file read and update
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise(resolve => setTimeout(resolve, 100));
     await element.updateComplete;
 
     const text = element.shadowRoot?.textContent ?? '';

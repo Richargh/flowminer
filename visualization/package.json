@@ -12,7 +12,8 @@
   "dependencies": {
     "echarts": "6.0.0",
     "lit": "3.3.1",
-    "teamcharta-shared": "0.0.0-unspecified"
+    "teamcharta-shared": "file:../shared/build/dist/js/productionLibrary",
+    "teamcharta-git-importer": "file:../analysis/git-importer/build/dist/js/productionLibrary"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.18",

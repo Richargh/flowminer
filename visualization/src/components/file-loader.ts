@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { parseJsonl, type CommitDto } from '../services/jsonl-parser';
+import { mineCommitsFromJsonl, type GitMiningResultDto } from 'teamcharta-git-importer';
 
 @customElement('file-loader')
 export class FileLoader extends LitElement {
@@ -52,13 +52,13 @@ export class FileLoader extends LitElement {
     if (!file) return;
 
     const content = await file.text();
-    const commits = parseJsonl(content);
+    const result = mineCommitsFromJsonl(content);
 
     this.filename = file.name;
-    this.commitCount = commits.length;
+    this.commitCount = result.commitTimeline.asJsReadonlyArrayView().length;
 
-    this.dispatchEvent(new CustomEvent<CommitDto[]>('commits-loaded', {
-      detail: commits,
+    this.dispatchEvent(new CustomEvent<GitMiningResultDto>('data-loaded', {
+      detail: result,
       bubbles: true,
       composed: true
     }));

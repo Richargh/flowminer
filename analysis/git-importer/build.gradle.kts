@@ -73,6 +73,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":analysis:model"))
+                implementation(project(":shared"))
                 implementation(libs.kotlinx.serialization.json)
             }
         }

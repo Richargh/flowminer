@@ -2,9 +2,8 @@ package de.richargh.teamcharta.shared
 
 import de.richargh.teamcharta.shared.dto.AuthorStatsDto
 import de.richargh.teamcharta.shared.dto.CommitTimelineDto
-import de.richargh.teamcharta.shared.dto.VisualizationDataDto
+import de.richargh.teamcharta.shared.dto.GitMiningResultDto
 import de.richargh.teamcharta.shared.dto.WorkItemDurationDto
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 
@@ -25,7 +24,7 @@ fun main(args: Array<String>) {
     println("Generated sample data to: $outputPath")
 }
 
-fun generateSampleData(): VisualizationDataDto {
+fun generateSampleData(): GitMiningResultDto {
     val authors = listOf(
         AuthorStatsDto(
             name = "Alice Chen",
@@ -67,7 +66,7 @@ fun generateSampleData(): VisualizationDataDto {
     val commitTimeline = generateCommitTimeline()
     val workItems = generateWorkItems()
 
-    return VisualizationDataDto(
+    return GitMiningResultDto(
         authors = authors,
         commitTimeline = commitTimeline,
         workItems = workItems
