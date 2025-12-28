@@ -6,6 +6,7 @@ import './components/histogram-panel';
 import './components/theme-switcher';
 import './components/file-loader';
 import type { AuthorStats, CommitTimeline, WorkItemDuration, SankeyFlow, HistogramBucket } from './data-service';
+import type { GitMiningResultDto } from 'teamcharta-git-importer';
 
 const sampleAuthors: AuthorStats[] = [
   { name: 'Alice', commitCount: 120, linesAdded: 8500, linesDeleted: 3200, avgCommitSize: 97 },
@@ -102,3 +103,39 @@ const histogramPanel = document.querySelector('histogram-panel');
 if (histogramPanel) {
   histogramPanel.buckets = sampleHistogram;
 }
+
+// Listen for loaded JSONL data
+document.addEventListener('data-loaded', ((event: CustomEvent<GitMiningResultDto>) => {
+  const data = event.detail;
+
+  const authors: AuthorStats[] = data.authors.asJsReadonlyArrayView().map(a => ({
+    name: a.name,
+    commitCount: a.commitCount,
+    linesAdded: a.linesAdded,
+    linesDeleted: a.linesDeleted,
+    avgCommitSize: a.avgCommitSize
+  }));
+
+  const timeline: CommitTimeline[] = data.commitTimeline.asJsReadonlyArrayView().map(t => ({
+    date: t.date,
+    cumulativeCount: t.cumulativeCount,
+    author: t.author
+  }));
+
+  const workItems: WorkItemDuration[] = data.workItems.asJsReadonlyArrayView().map(w => ({
+    key: w.key,
+    type: w.type,
+    startDate: w.startDate,
+    durationDays: w.durationDays
+  }));
+
+  if (radarPanel) {
+    radarPanel.authors = authors;
+  }
+  if (timelinePanel) {
+    timelinePanel.timeline = timeline;
+  }
+  if (scatterPanel) {
+    scatterPanel.workItems = workItems;
+  }
+}) as EventListener);
