@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.kotlin.serialization)
+    id("esm-distribution")
 }
 
 kotlin {
@@ -20,6 +21,7 @@ kotlin {
     }
 
     js(IR) {
+        useEsModules()
         compilerOptions {
             moduleName.set("teamcharta-shared")
         }

@@ -47,6 +47,7 @@ kotlin {
     }
 
     js(IR) {
+        useEsModules()
         browser {
             webpackTask {
                 mainOutputFileName = "teamcharta-git-importer.js"
@@ -64,6 +65,7 @@ kotlin {
         generateTypeScriptDefinitions()
         compilerOptions {
             moduleName.set("teamcharta-git-importer")
+            useEsClasses.set(true)
         }
     }
 

@@ -19,6 +19,7 @@ kotlin {
     }
 
     js(IR) {
+        useEsModules()
         browser()
         generateTypeScriptDefinitions()
     }
