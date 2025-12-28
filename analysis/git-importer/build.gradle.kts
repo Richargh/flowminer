@@ -94,7 +94,6 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-junit5"))
                 implementation(libs.junit.jupiter)
-                implementation(libs.kotest.runner.junit5)
             }
         }
     }

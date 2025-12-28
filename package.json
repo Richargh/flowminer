@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "visualization",
-    "shared/build/dist/js/productionLibrary"
+    "shared/build/dist/js/productionLibrary",
+    "analysis/git-importer/build/dist/js/productionLibrary"
   ],
   "scripts": {
     "build:shared": "./gradlew :shared:jsBrowserProductionLibraryDistribution",
