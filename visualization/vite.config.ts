@@ -9,7 +9,7 @@ export default defineConfig({
         target: 'esnext',
         minify: 'esbuild',
         rollupOptions: {
-            external: [/\.test\.ts$/],
+            external: [/\.test\.ts$/, /__fixtures__/],
             output: {
                 manualChunks: {
                     'echarts': ['echarts/core', 'echarts/charts', 'echarts/components', 'echarts/renderers'],

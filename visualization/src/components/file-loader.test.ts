@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import './file-loader';
 import type { FileLoader } from './file-loader';
-import type { GitMiningResultDto } from 'teamcharta-git-importer';
+
+import type {GitMiningResult} from "../mining/git-mining-result.ts";
 
 describe('FileLoader', () => {
   let element: FileLoader;
@@ -42,8 +43,8 @@ describe('FileLoader', () => {
     const jsonlContent = '{"hash":"abc123","authorName":"Alice","authorEmail":"alice@example.com","date":"2024-01-01T10:00:00Z","message":"Test commit","parents":[],"branchId":{"type":"certain","name":"main","tipCommit":null},"workKeys":[],"commitType":"UNKNOWN","fileChanges":[{"path":"src/main.ts","additions":10,"deletions":5,"isRename":false,"oldPath":null}],"isOnCurrentBranch":true,"isMerge":false}';
     const file = new File([jsonlContent], 'test.jsonl', { type: 'application/jsonl' });
 
-    const eventPromise = new Promise<CustomEvent<GitMiningResultDto>>((resolve) => {
-      element.addEventListener('data-loaded', ((e: CustomEvent<GitMiningResultDto>) => resolve(e)) as EventListener);
+    const eventPromise = new Promise<CustomEvent<GitMiningResult>>((resolve) => {
+      element.addEventListener('data-loaded', ((e: CustomEvent<GitMiningResult>) => resolve(e)) as EventListener);
     });
 
     const input = element.shadowRoot?.querySelector('input[type="file"]') as HTMLInputElement;
@@ -53,9 +54,9 @@ describe('FileLoader', () => {
     input.dispatchEvent(new Event('change'));
 
     const event = await eventPromise;
-    const authors = event.detail.authors.asJsReadonlyArrayView();
+    const authors = event.detail.authorStatistics.all();
     expect(authors.length).toBeGreaterThan(0);
-    expect(authors[0].name).toBe('Alice');
+    expect(authors[0].author.name).toBe('Alice');
   });
 
   it('shows filename after loading', async () => {

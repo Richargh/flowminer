@@ -6,7 +6,8 @@ import './components/histogram-panel';
 import './components/theme-switcher';
 import './components/file-loader';
 import type { AuthorStats, CommitTimeline, WorkItemDuration, SankeyFlow, HistogramBucket } from './data-service';
-import type { GitMiningResultDto } from 'teamcharta-git-importer';
+
+import type {GitMiningResult} from "./mining/git-mining-result.ts";
 
 const sampleAuthors: AuthorStats[] = [
   { name: 'Alice', commitCount: 120, linesAdded: 8500, linesDeleted: 3200, avgCommitSize: 97 },
@@ -105,37 +106,69 @@ if (histogramPanel) {
 }
 
 // Listen for loaded JSONL data
-document.addEventListener('data-loaded', ((event: CustomEvent<GitMiningResultDto>) => {
-  const data = event.detail;
-
-  const authors: AuthorStats[] = data.authors.asJsReadonlyArrayView().map(a => ({
-    name: a.name,
-    commitCount: a.commitCount,
-    linesAdded: a.linesAdded,
-    linesDeleted: a.linesDeleted,
-    avgCommitSize: a.avgCommitSize
-  }));
-
-  const timeline: CommitTimeline[] = data.commitTimeline.asJsReadonlyArrayView().map(t => ({
-    date: t.date,
-    cumulativeCount: t.cumulativeCount,
-    author: t.author
-  }));
-
-  const workItems: WorkItemDuration[] = data.workItems.asJsReadonlyArrayView().map(w => ({
-    key: w.key,
-    type: w.type,
-    startDate: w.startDate,
-    durationDays: w.durationDays
-  }));
+document.addEventListener('data-loaded', ((event: CustomEvent<GitMiningResult>) => {
+  const result = event.detail;
 
   if (radarPanel) {
-    radarPanel.authors = authors;
+    radarPanel.authors = result.authorStatistics.all().map(stat => ({
+      name: stat.author.name,
+      commitCount: stat.commitCount,
+      linesAdded: stat.linesAdded,
+      linesDeleted: stat.linesRemoved,
+      avgCommitSize: stat.commitCount > 0
+        ? Math.round((stat.linesAdded + stat.linesRemoved) / stat.commitCount)
+        : 0
+    }));
   }
+
   if (timelinePanel) {
+    const commitsByDate = new Map<string, { author: string; count: number }[]>();
+    for (const commit of result.commits.all()) {
+      const dateKey = commit.date.toISOString().split('T')[0];
+      if (!commitsByDate.has(dateKey)) {
+        commitsByDate.set(dateKey, []);
+      }
+      const existing = commitsByDate.get(dateKey)!.find(e => e.author === commit.author.name);
+      if (existing) {
+        existing.count++;
+      } else {
+        commitsByDate.get(dateKey)!.push({ author: commit.author.name, count: 1 });
+      }
+    }
+
+    const sortedDates = Array.from(commitsByDate.keys()).sort();
+    let cumulativeCount = 0;
+    const timeline: CommitTimeline[] = [];
+
+    for (const date of sortedDates) {
+      for (const { author, count } of commitsByDate.get(date)!) {
+        cumulativeCount += count;
+        timeline.push({ date, cumulativeCount, author });
+      }
+    }
     timelinePanel.timeline = timeline;
   }
+
   if (scatterPanel) {
-    scatterPanel.workItems = workItems;
+    scatterPanel.workItems = result.workItems.all()
+      .filter(wi => wi.workKey.type === 'known')
+      .map(wi => {
+        const durationMs = wi.lastCommitDate.getTime() - wi.firstCommitDate.getTime();
+        const durationDays = Math.max(1, Math.round(durationMs / (1000 * 60 * 60 * 24)));
+        let maxType = 'Feature';
+        let maxChurn = 0;
+        for (const [type, churn] of wi.absoluteChurnByType) {
+          if (churn > maxChurn) {
+            maxChurn = churn;
+            maxType = type;
+          }
+        }
+        return {
+          key: (wi.workKey as { type: 'known'; key: string }).key,
+          type: maxType,
+          startDate: wi.firstCommitDate.toISOString().split('T')[0],
+          durationDays
+        };
+      });
   }
 }) as EventListener);
