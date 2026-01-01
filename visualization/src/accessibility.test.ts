@@ -11,7 +11,7 @@ describe('Accessibility', () => {
   });
 
   it('theme-switcher has no critical accessibility violations', async () => {
-    await import('./components/theme-switcher');
+    await import('./theme-switcher/theme-switcher');
     const element = document.createElement('theme-switcher');
     document.body.appendChild(element);
     await (element as any).updateComplete;
@@ -23,7 +23,7 @@ describe('Accessibility', () => {
   });
 
   it('all interactive elements have focus states', async () => {
-    await import('./components/theme-switcher');
+    await import('./theme-switcher/theme-switcher');
     const element = document.createElement('theme-switcher');
     document.body.appendChild(element);
     await (element as any).updateComplete;

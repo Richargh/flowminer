@@ -1,7 +1,7 @@
 import './commit-range/commit-range-panel.ts';
 import './work-item-scatter/work-item-scatter-panel.ts';
 import './work-item-duration-histogram/work-item-duration-panel.ts';
-import './components/theme-switcher';
+import './theme-switcher/theme-switcher';
 import './file-loading/file-loader.ts';
 import type { WorkItemDuration, HistogramBucket } from './data-service';
 import {aggregateCommitsByDate, type CommitActivity} from './commit-range/app/internal/commit-activity.ts';
