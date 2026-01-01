@@ -1,8 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { echarts } from '../echarts-setup';
+import { echarts } from '../echarts-setup.ts';
 import type { EChartsType } from 'echarts/core';
-import type { AuthorStats } from '../data-service';
+import type { AuthorStats } from '../data-service.ts';
 
 export interface RadarChartOption {
   radar: {

@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { AuthorStats } from '../data-service';
+import type { AuthorStats } from '../data-service.ts';
 
 @customElement('author-selector')
 export class AuthorSelector extends LitElement {

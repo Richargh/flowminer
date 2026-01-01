@@ -1,8 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import type { AuthorStats } from '../data-service';
-import './author-selector';
-import './author-radar-chart';
+import type { AuthorStats } from '../data-service.ts';
+import './author-selector.ts';
+import './author-radar-chart.ts';
 
 @customElement('author-radar-panel')
 export class AuthorRadarPanel extends LitElement {

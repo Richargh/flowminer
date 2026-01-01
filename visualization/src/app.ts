@@ -1,4 +1,4 @@
-import './components/author-radar-panel';
+import './author-statistics/author-radar-panel.ts';
 import './components/commit-timeline-panel';
 import './components/work-item-scatter-panel';
 import './components/sankey-panel';

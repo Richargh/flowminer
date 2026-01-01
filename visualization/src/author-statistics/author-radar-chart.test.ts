@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import './author-radar-chart';
-import type { AuthorRadarChart } from './author-radar-chart';
-import type { AuthorStats } from '../data-service';
+import './author-radar-chart.ts';
+import type { AuthorRadarChart } from './author-radar-chart.ts';
+import type { AuthorStats } from '../data-service.ts';
 
 describe('AuthorRadarChart', () => {
   let element: AuthorRadarChart;

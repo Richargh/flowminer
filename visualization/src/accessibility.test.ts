@@ -23,7 +23,7 @@ describe('Accessibility', () => {
   });
 
   it('author-selector has no critical accessibility violations', async () => {
-    await import('./components/author-selector');
+    await import('./author-statistics/author-selector.ts');
     const element = document.createElement('author-selector') as any;
     element.authors = [
       { name: 'Alice', commitCount: 100, linesAdded: 5000, linesDeleted: 2000, avgCommitSize: 70 },

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import './author-selector';
-import type { AuthorSelector } from './author-selector';
-import type { AuthorStats } from '../data-service';
+import './author-selector.ts';
+import type { AuthorSelector } from './author-selector.ts';
+import type { AuthorStats } from '../data-service.ts';
 
 describe('AuthorSelector', () => {
   let element: AuthorSelector;
