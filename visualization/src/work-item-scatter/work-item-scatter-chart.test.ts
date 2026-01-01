@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import './work-item-scatter-chart';
-import type { WorkItemScatterChart } from './work-item-scatter-chart';
-import type { WorkItemDuration } from '../data-service';
+import './work-item-scatter-chart.ts';
+import type { WorkItemScatterChart } from './work-item-scatter-chart.ts';
+import type { WorkItemDuration } from '../data-service.ts';
 
 describe('WorkItemScatterChart', () => {
   let element: WorkItemScatterChart;

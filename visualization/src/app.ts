@@ -1,5 +1,5 @@
 import './commit-range/commit-range-panel.ts';
-import './components/work-item-scatter-panel';
+import './work-item-scatter/work-item-scatter-panel.ts';
 import './work-item-duration-histogram/work-item-duration-panel.ts';
 import './components/theme-switcher';
 import './file-loading/file-loader.ts';

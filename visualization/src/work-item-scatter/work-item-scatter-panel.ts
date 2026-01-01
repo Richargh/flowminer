@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { WorkItemDuration } from '../data-service';
-import './work-item-scatter-chart';
+import type { WorkItemDuration } from '../data-service.ts';
+import './work-item-scatter-chart.ts';
 
 @customElement('work-item-scatter-panel')
 export class WorkItemScatterPanel extends LitElement {

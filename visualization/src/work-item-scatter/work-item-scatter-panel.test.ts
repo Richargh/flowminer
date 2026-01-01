@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import './work-item-scatter-panel';
-import type { WorkItemScatterPanel } from './work-item-scatter-panel';
-import type { WorkItemDuration } from '../data-service';
+import './work-item-scatter-panel.ts';
+import type { WorkItemScatterPanel } from './work-item-scatter-panel.ts';
+import type { WorkItemDuration } from '../data-service.ts';
 
 describe('WorkItemScatterPanel', () => {
   let element: WorkItemScatterPanel;
