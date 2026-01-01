@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import './work-item-scatter-panel.ts';
 import type { WorkItemScatterPanel } from './work-item-scatter-panel.ts';
 import type { WorkItemDuration } from '../data-service.ts';
+import type { GitMiningResult } from '../commit-mining/app/api-types/git-mining-result.ts';
+import { WorkItems, type WorkItem } from '../commit-mining/app/api-types/work-items.ts';
 
 describe('WorkItemScatterPanel', () => {
   let element: WorkItemScatterPanel;
@@ -47,5 +49,36 @@ describe('WorkItemScatterPanel', () => {
     const chartOption = chart.getChartOption();
     expect(chartOption?.series?.[0]?.data?.length).toBe(3);
     expect(chartOption?.series?.[0]?.markLine).toBeTruthy();
+  });
+
+  it('updates workItems when data-loaded event is received', async () => {
+    const mockWorkItem: WorkItem = {
+      workKey: { type: 'known', key: 'TEST-123' },
+      linesAdded: 100,
+      linesRemoved: 50,
+      firstCommitDate: new Date('2024-01-01'),
+      lastCommitDate: new Date('2024-01-06'),
+      filesChanged: ['file.ts'],
+      contributions: [],
+      absoluteChurnByType: new Map([['FEATURE', 150]]),
+      commits: 3,
+      collaborators: 1,
+      reworkFiles: []
+    };
+
+    const mockResult = {
+      workItems: new WorkItems([mockWorkItem])
+    } as GitMiningResult;
+
+    document.dispatchEvent(new CustomEvent<GitMiningResult>('data-loaded', {
+      detail: mockResult,
+      bubbles: true
+    }));
+
+    await element.updateComplete;
+
+    expect(element.workItems).toHaveLength(1);
+    expect(element.workItems[0].key).toBe('TEST-123');
+    expect(element.workItems[0].durationDays).toBe(5);
   });
 });

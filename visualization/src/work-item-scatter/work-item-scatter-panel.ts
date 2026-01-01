@@ -1,12 +1,49 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { WorkItemDuration } from '../data-service.ts';
+import type { GitMiningResult } from '../commit-mining/app/api-types/git-mining-result.ts';
 import './work-item-scatter-chart.ts';
 
 @customElement('work-item-scatter-panel')
 export class WorkItemScatterPanel extends LitElement {
   @property({ type: Array })
   workItems: WorkItemDuration[] = [];
+
+  private handleDataLoaded = (event: Event): void => {
+    const customEvent = event as CustomEvent<GitMiningResult>;
+    const result = customEvent.detail;
+
+    this.workItems = result.workItems.all()
+      .filter(wi => wi.workKey.type === 'known')
+      .map(wi => {
+        const durationMs = wi.lastCommitDate.getTime() - wi.firstCommitDate.getTime();
+        const durationDays = Math.max(1, Math.round(durationMs / (1000 * 60 * 60 * 24)));
+        let maxType = 'Feature';
+        let maxChurn = 0;
+        for (const [type, churn] of wi.absoluteChurnByType) {
+          if (churn > maxChurn) {
+            maxChurn = churn;
+            maxType = type;
+          }
+        }
+        return {
+          key: (wi.workKey as { type: 'known'; key: string }).key,
+          type: maxType,
+          startDate: wi.firstCommitDate.toISOString().split('T')[0],
+          durationDays
+        };
+      });
+  };
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    document.addEventListener('data-loaded', this.handleDataLoaded);
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    document.removeEventListener('data-loaded', this.handleDataLoaded);
+  }
 
   static styles = css`
     :host {
