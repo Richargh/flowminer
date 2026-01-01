@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import './histogram-panel';
-import type { HistogramPanel } from './histogram-panel';
-import type { HistogramBucket } from '../data-service';
+import './histogram-panel.ts';
+import type { HistogramPanel } from './histogram-panel.ts';
+import type { HistogramBucket } from '../data-service.ts';
 
 describe('HistogramPanel', () => {
   let element: HistogramPanel;

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import './histogram-chart';
-import type { HistogramChart } from './histogram-chart';
-import type { HistogramBucket } from '../data-service';
+import './histogram-chart.ts';
+import type { HistogramChart } from './histogram-chart.ts';
+import type { HistogramBucket } from '../data-service.ts';
 
 describe('HistogramChart', () => {
   let element: HistogramChart;

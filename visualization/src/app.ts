@@ -1,7 +1,7 @@
 import './commit-range/commit-range-panel.ts';
 import './components/commit-timeline-panel';
 import './components/work-item-scatter-panel';
-import './components/histogram-panel';
+import './work-item-duration-histogram/histogram-panel.ts';
 import './components/theme-switcher';
 import './file-loading/file-loader.ts';
 import type { CommitTimeline, WorkItemDuration, HistogramBucket } from './data-service';

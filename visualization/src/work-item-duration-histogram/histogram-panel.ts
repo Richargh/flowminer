@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { HistogramBucket } from '../data-service';
-import './histogram-chart';
+import type { HistogramBucket } from '../data-service.ts';
+import './histogram-chart.ts';
 
 export interface RangeChangeDetail {
   start: number;
