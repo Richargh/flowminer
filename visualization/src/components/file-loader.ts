@@ -1,7 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { parseJsonlStream } from '../commit/commit-file-parser.ts';
-import { toCommit } from '../commit/internal/commit-transform.ts';
 import { CommitMiner } from '../commit-mining/commit-miner.ts';
 import type {GitMiningResult} from "../commit-mining/api-types/git-mining-result.ts";
 
@@ -56,8 +55,7 @@ export class FileLoader extends LitElement {
 
     const miner = new CommitMiner();
 
-    for await (const commitDto of parseJsonlStream(file.stream())) {
-      const commit = toCommit(commitDto);
+    for await (const commit of parseJsonlStream(file.stream())) {
       miner.process(commit);
     }
 

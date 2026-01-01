@@ -1,50 +1,37 @@
 import { describe, it, expect } from 'vitest';
-import { parseLine, parseJsonlLines } from './commit-file-parser.ts';
-import type {SerializedCommitDto} from "./internal/serializable-commit-dto.ts";
+import { parseJsonlLines } from './commit-file-parser.ts';
 import {createCommitDtoJson} from "./__fixtures__/commit-dto-builder.ts";
 
 describe('jsonl-parser', () => {
-  describe('parseLine', () => {
-    it('returns null for empty string', () => {
-      expect(parseLine('')).toBeNull();
-    });
-
-    it('returns null for whitespace-only string', () => {
-      expect(parseLine('   ')).toBeNull();
-      expect(parseLine('\t')).toBeNull();
-      expect(parseLine('\n')).toBeNull();
-    });
-
-    it('deserializes valid JSON to CommitDto', () => {
-      const json = createCommitDtoJson({
+  describe('parseJsonlLines', () => {
+    it('parses valid JSON line to Commit', () => {
+      const jsonl = createCommitDtoJson({
         message: 'Initial commit',
         branchId: { type: 'certain', name: 'main', tipCommit: 'abc123' },
         workKeys: ['TASK-1'],
         fileChanges: [{ path: 'file.ts', additions: 10, deletions: 5, isRename: false, oldPath: null }]
       });
 
-      const result = parseLine(json) as SerializedCommitDto;
+      const commits = Array.from(parseJsonlLines(jsonl));
 
-      expect(result).not.toBeNull();
+      expect(commits).toHaveLength(1);
+      const result = commits[0];
       expect(result.hash).toBe('abc123');
-      expect(result.authorName).toBe('Alice');
-      expect(result.authorEmail).toBe('alice@example.com');
-      expect(result.date).toBe('2024-01-15T10:30:00Z');
+      expect(result.author.name).toBe('Alice');
+      expect(result.author.email).toBe('alice@example.com');
+      expect(result.date).toEqual(new Date('2024-01-15T10:30:00Z'));
       expect(result.message).toBe('Initial commit');
       expect(result.parents).toEqual([]);
       expect(result.branchId.type).toBe('certain');
-      expect(result.branchId.name).toBe('main');
-      expect(result.workKeys).toEqual(['TASK-1']);
-      expect(result.commitType).toBe('Feature');
+      expect(result.workKeys).toEqual([{ type: 'known', key: 'TASK-1' }]);
+      expect(result.commitType).toBe('FEATURE');
       expect(result.fileChanges).toHaveLength(1);
       expect(result.fileChanges[0].path).toBe('file.ts');
       expect(result.isOnCurrentBranch).toBe(true);
       expect(result.isMerge).toBe(false);
     });
-  });
 
-  describe('parseJsonlLines', () => {
-    it('yields CommitDto for each valid line', () => {
+    it('yields Commit for each valid line', () => {
       const jsonl = [
         createCommitDtoJson({ hash: 'abc123', authorName: 'Alice' }),
         createCommitDtoJson({ hash: 'def456', authorName: 'Bob' }),
@@ -55,11 +42,11 @@ describe('jsonl-parser', () => {
 
       expect(commits).toHaveLength(3);
       expect(commits[0].hash).toBe('abc123');
-      expect(commits[0].authorName).toBe('Alice');
+      expect(commits[0].author.name).toBe('Alice');
       expect(commits[1].hash).toBe('def456');
-      expect(commits[1].authorName).toBe('Bob');
+      expect(commits[1].author.name).toBe('Bob');
       expect(commits[2].hash).toBe('ghi789');
-      expect(commits[2].authorName).toBe('Carol');
+      expect(commits[2].author.name).toBe('Carol');
     });
 
     it('skips empty lines', () => {

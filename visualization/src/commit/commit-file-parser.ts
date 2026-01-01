@@ -1,23 +1,25 @@
 import type {SerializedCommitDto} from "./internal/serializable-commit-dto.ts";
+import type {Commit} from "./api-types/commit.ts";
+import {toCommit} from "./internal/commit-transform.ts";
 
-export function parseLine(line: string): SerializedCommitDto | null {
+function parseLine(line: string): SerializedCommitDto | null {
   if (!line || line.trim() === '') {
     return null;
   }
   return JSON.parse(line) as SerializedCommitDto;
 }
 
-export function* parseJsonlLines(content: string): Generator<SerializedCommitDto> {
+export function* parseJsonlLines(content: string): Generator<Commit> {
   const lines = content.split('\n');
   for (const line of lines) {
-    const commit = parseLine(line);
-    if (commit !== null) {
-      yield commit;
+    const dto = parseLine(line);
+    if (dto !== null) {
+      yield toCommit(dto);
     }
   }
 }
 
-export async function* parseJsonlStream(stream: ReadableStream): AsyncGenerator<SerializedCommitDto> {
+export async function* parseJsonlStream(stream: ReadableStream): AsyncGenerator<Commit> {
   const textStream = stream.pipeThrough(new TextDecoderStream());
   const reader = textStream.getReader();
   let buffer = '';
@@ -31,17 +33,17 @@ export async function* parseJsonlStream(stream: ReadableStream): AsyncGenerator<
     buffer = lines.pop() ?? '';
 
     for (const line of lines) {
-      const commit = parseLine(line);
-      if (commit !== null) {
-        yield commit;
+      const dto = parseLine(line);
+      if (dto !== null) {
+        yield toCommit(dto);
       }
     }
   }
 
   if (buffer.trim()) {
-    const commit = parseLine(buffer);
-    if (commit !== null) {
-      yield commit;
+    const dto = parseLine(buffer);
+    if (dto !== null) {
+      yield toCommit(dto);
     }
   }
 }
