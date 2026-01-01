@@ -22,20 +22,6 @@ describe('Accessibility', () => {
     expect(criticalViolations).toHaveLength(0);
   });
 
-  it('author-selector has no critical accessibility violations', async () => {
-    await import('./author-statistics/author-selector.ts');
-    const element = document.createElement('author-selector') as any;
-    element.authors = [
-      { name: 'Alice', commitCount: 100, linesAdded: 5000, linesDeleted: 2000, avgCommitSize: 70 },
-    ];
-    document.body.appendChild(element);
-    await element.updateComplete;
-
-    const results = await axe.run(document.body);
-    const criticalViolations = results.violations.filter(v => v.impact === 'critical');
-    expect(criticalViolations).toHaveLength(0);
-  });
-
   it('chart containers have accessible structure', async () => {
     await import('./components/commit-timeline-chart');
     const element = document.createElement('commit-timeline-chart') as any;

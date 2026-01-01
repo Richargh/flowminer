@@ -1,22 +1,13 @@
-import './author-statistics/author-radar-panel.ts';
 import './commit-range/commit-range-panel.ts';
 import './components/commit-timeline-panel';
 import './components/work-item-scatter-panel';
-import './components/sankey-panel';
 import './components/histogram-panel';
 import './components/theme-switcher';
 import './file-loading/file-loader.ts';
-import type { AuthorStats, CommitTimeline, WorkItemDuration, SankeyFlow, HistogramBucket } from './data-service';
+import type { CommitTimeline, WorkItemDuration, HistogramBucket } from './data-service';
 import {aggregateCommitsByDate, type CommitActivity} from './commit-range/app/internal/commit-activity.ts';
 
 import type {GitMiningResult} from "./commit-mining/app/api-types/git-mining-result.ts";
-
-const sampleAuthors: AuthorStats[] = [
-  { name: 'Alice', commitCount: 120, linesAdded: 8500, linesDeleted: 3200, avgCommitSize: 97 },
-  { name: 'Bob', commitCount: 85, linesAdded: 4200, linesDeleted: 1800, avgCommitSize: 71 },
-  { name: 'Charlie', commitCount: 65, linesAdded: 3100, linesDeleted: 1400, avgCommitSize: 69 },
-  { name: 'Diana', commitCount: 150, linesAdded: 9800, linesDeleted: 4100, avgCommitSize: 93 },
-];
 
 const sampleTimeline: CommitTimeline[] = [
   { date: '2024-01-01', cumulativeCount: 10, author: 'Alice' },
@@ -39,39 +30,6 @@ const sampleWorkItems: WorkItemDuration[] = [
   { key: 'FEAT-4', type: 'Feature', startDate: '2024-02-10', durationDays: 6 },
   { key: 'BUG-4', type: 'Bug', startDate: '2024-02-15', durationDays: 4 },
 ];
-
-const sampleSankeyFlow: SankeyFlow = {
-  nodes: [
-    { name: 'Alice' },
-    { name: 'Bob' },
-    { name: 'Charlie' },
-    { name: 'Diana' },
-    { name: 'Frontend' },
-    { name: 'Backend' },
-    { name: 'Infrastructure' },
-    { name: 'Database' },
-    { name: 'Cache' },
-    { name: 'API Gateway' },
-    { name: 'Monitoring' },
-  ],
-  links: [
-    { source: 'Alice', target: 'Frontend', value: 45 },
-    { source: 'Alice', target: 'Backend', value: 30 },
-    { source: 'Bob', target: 'Backend', value: 50 },
-    { source: 'Bob', target: 'Infrastructure', value: 25 },
-    { source: 'Charlie', target: 'Frontend', value: 35 },
-    { source: 'Charlie', target: 'Backend', value: 20 },
-    { source: 'Diana', target: 'Backend', value: 40 },
-    { source: 'Diana', target: 'Infrastructure', value: 55 },
-    { source: 'Frontend', target: 'API Gateway', value: 60 },
-    { source: 'Frontend', target: 'Cache', value: 20 },
-    { source: 'Backend', target: 'Database', value: 80 },
-    { source: 'Backend', target: 'Cache', value: 40 },
-    { source: 'Backend', target: 'API Gateway', value: 20 },
-    { source: 'Infrastructure', target: 'Monitoring', value: 50 },
-    { source: 'Infrastructure', target: 'Database', value: 30 },
-  ],
-};
 
 const sampleHistogram: HistogramBucket[] = [
   { range: '0-2 days', count: 15, minValue: 0, maxValue: 2 },
@@ -100,11 +58,6 @@ if (activityPanel) {
   activityPanel.data = sampleCommitActivity;
 }
 
-const radarPanel = document.querySelector('author-radar-panel');
-if (radarPanel) {
-  radarPanel.authors = sampleAuthors;
-}
-
 const timelinePanel = document.querySelector('commit-timeline-panel');
 if (timelinePanel) {
   timelinePanel.timeline = sampleTimeline;
@@ -113,11 +66,6 @@ if (timelinePanel) {
 const scatterPanel = document.querySelector('work-item-scatter-panel');
 if (scatterPanel) {
   scatterPanel.workItems = sampleWorkItems;
-}
-
-const sankeyPanel = document.querySelector('sankey-panel');
-if (sankeyPanel) {
-  sankeyPanel.flow = sampleSankeyFlow;
 }
 
 const histogramPanel = document.querySelector('histogram-panel');
@@ -131,18 +79,6 @@ document.addEventListener('data-loaded', ((event: CustomEvent<GitMiningResult>) 
 
   if (activityPanel) {
     activityPanel.data = aggregateCommitsByDate(result.commits.all());
-  }
-
-  if (radarPanel) {
-    radarPanel.authors = result.authorStatistics.all().map(stat => ({
-      name: stat.author.name,
-      commitCount: stat.commitCount,
-      linesAdded: stat.linesAdded,
-      linesDeleted: stat.linesRemoved,
-      avgCommitSize: stat.commitCount > 0
-        ? Math.round((stat.linesAdded + stat.linesRemoved) / stat.commitCount)
-        : 0
-    }));
   }
 
   if (timelinePanel) {
