@@ -40,26 +40,43 @@ describe('AuthorRadarPanel', () => {
     expect(selector.authors).toEqual(mockAuthors);
   });
 
-  it('updates radar chart when author is selected', async () => {
+  it('updates radar chart when authors are selected', async () => {
     element.authors = mockAuthors;
     await element.updateComplete;
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Initially shows first author
+    // Initially shows both authors (top 2 by default since < 5 authors)
     const chart = element.shadowRoot?.querySelector('author-radar-chart') as HTMLElement & { getChartOption: () => { series: { data: { name: string }[] }[] } | null };
     let chartOption = chart.getChartOption();
+    // Authors sorted by commit count: Alice=100, Bob=50
+    expect(chartOption?.series?.[0]?.data?.length).toBe(2);
     expect(chartOption?.series?.[0]?.data?.[0]?.name).toBe('Alice');
+    expect(chartOption?.series?.[0]?.data?.[1]?.name).toBe('Bob');
 
-    // Simulate selecting Bob
+    // Deselect Alice via dropdown
     const selector = element.shadowRoot?.querySelector('author-selector') as HTMLElement;
-    const select = selector.shadowRoot?.querySelector('select') as HTMLSelectElement;
-    select.value = 'Bob';
-    select.dispatchEvent(new Event('change'));
+    const trigger = selector.shadowRoot?.querySelector('.dropdown-trigger') as HTMLElement;
+    trigger.click();
+    await element.updateComplete;
+
+    const checkboxes = selector.shadowRoot?.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
+    checkboxes[0].click();
 
     await element.updateComplete;
     await new Promise(resolve => setTimeout(resolve, 100));
 
     chartOption = chart.getChartOption();
+    expect(chartOption?.series?.[0]?.data?.length).toBe(1);
     expect(chartOption?.series?.[0]?.data?.[0]?.name).toBe('Bob');
+  });
+
+  it('passes selected authors array to chart', async () => {
+    element.authors = mockAuthors;
+    await element.updateComplete;
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const chart = element.shadowRoot?.querySelector('author-radar-chart') as HTMLElement & { authors: unknown[] };
+    expect(Array.isArray(chart.authors)).toBe(true);
+    expect(chart.authors.length).toBe(2);
   });
 });

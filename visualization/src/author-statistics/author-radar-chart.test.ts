@@ -88,4 +88,52 @@ describe('AuthorRadarChart', () => {
     expect(chartOption?.series?.[0]?.data?.[0]?.name).toBe('Bob');
     expect(chartOption?.series?.[0]?.data?.[0]?.value?.[0]).toBe(50);
   });
+
+  describe('multi-series display', () => {
+    it('accepts array of authors via authors property', async () => {
+      const authors: AuthorStats[] = [
+        { name: 'Alice', commitCount: 100, linesAdded: 5000, linesDeleted: 2000, avgCommitSize: 70 },
+        { name: 'Bob', commitCount: 50, linesAdded: 2500, linesDeleted: 1000, avgCommitSize: 70 },
+      ];
+
+      element.authors = authors;
+      await element.updateComplete;
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const chartOption = element.getChartOption();
+      expect(chartOption).toBeTruthy();
+    });
+
+    it('displays multiple series with different colors', async () => {
+      const authors: AuthorStats[] = [
+        { name: 'Alice', commitCount: 100, linesAdded: 5000, linesDeleted: 2000, avgCommitSize: 70 },
+        { name: 'Bob', commitCount: 50, linesAdded: 2500, linesDeleted: 1000, avgCommitSize: 70 },
+      ];
+
+      element.authors = authors;
+      await element.updateComplete;
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const chartOption = element.getChartOption();
+      // Should have data items for both authors
+      expect(chartOption?.series?.[0]?.data?.length).toBe(2);
+      expect(chartOption?.series?.[0]?.data?.[0]?.name).toBe('Alice');
+      expect(chartOption?.series?.[0]?.data?.[1]?.name).toBe('Bob');
+    });
+
+    it('shows legend with author names', async () => {
+      const authors: AuthorStats[] = [
+        { name: 'Alice', commitCount: 100, linesAdded: 5000, linesDeleted: 2000, avgCommitSize: 70 },
+        { name: 'Bob', commitCount: 50, linesAdded: 2500, linesDeleted: 1000, avgCommitSize: 70 },
+      ];
+
+      element.authors = authors;
+      await element.updateComplete;
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const chartOption = element.getChartOption();
+      expect(chartOption?.legend?.data).toContain('Alice');
+      expect(chartOption?.legend?.data).toContain('Bob');
+    });
+  });
 });

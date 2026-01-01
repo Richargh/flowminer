@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import type { AuthorStats } from '../data-service.ts';
+import type { AuthorSelector } from './author-selector.ts';
 import './author-selector.ts';
 import './author-radar-chart.ts';
 
@@ -10,7 +11,7 @@ export class AuthorRadarPanel extends LitElement {
   authors: AuthorStats[] = [];
 
   @state()
-  private _selectedAuthor: AuthorStats | null = null;
+  private _selectedAuthors: AuthorStats[] = [];
 
   static styles = css`
     :host {
@@ -23,9 +24,30 @@ export class AuthorRadarPanel extends LitElement {
     }
   `;
 
+  protected async firstUpdated(): Promise<void> {
+    // Wait for selector to initialize and get its default selection
+    await this.updateComplete;
+    const selector = this.shadowRoot?.querySelector('author-selector') as AuthorSelector;
+    if (selector) {
+      await selector.updateComplete;
+      this._selectedAuthors = selector.selectedAuthors;
+    }
+  }
+
   protected willUpdate(changedProperties: Map<string, unknown>): void {
-    if (changedProperties.has('authors') && this.authors.length > 0 && !this._selectedAuthor) {
-      this._selectedAuthor = this.authors[0];
+    if (changedProperties.has('authors') && this.authors.length > 0) {
+      // Selector will auto-select top 5, we'll get them via event
+      // For initial load, we need to trigger this after selector updates
+      this._scheduleSelectionSync();
+    }
+  }
+
+  private async _scheduleSelectionSync(): Promise<void> {
+    await this.updateComplete;
+    const selector = this.shadowRoot?.querySelector('author-selector') as AuthorSelector;
+    if (selector) {
+      await selector.updateComplete;
+      this._selectedAuthors = selector.selectedAuthors;
     }
   }
 
@@ -34,17 +56,17 @@ export class AuthorRadarPanel extends LitElement {
       <div class="panel">
         <author-selector
           .authors=${this.authors}
-          @author-selected=${this._onAuthorSelected}
+          @authors-selected=${this._onAuthorsSelected}
         ></author-selector>
         <author-radar-chart
-          .author=${this._selectedAuthor}
+          .authors=${this._selectedAuthors}
         ></author-radar-chart>
       </div>
     `;
   }
 
-  private _onAuthorSelected(event: CustomEvent<{ author: AuthorStats }>): void {
-    this._selectedAuthor = event.detail.author;
+  private _onAuthorsSelected(event: CustomEvent<{ authors: AuthorStats[] }>): void {
+    this._selectedAuthors = event.detail.authors;
   }
 }
 
