@@ -4,7 +4,7 @@ import {WorkItemMiner} from './internal/work-item-miner.ts';
 import {BranchMiner} from './internal/branch-miner.ts';
 import {Commits, type GitMiningResult} from "./api-types/git-mining-result.ts";
 
-export class GitMiner {
+export class CommitMiner {
   private readonly authorMiner = new AuthorMiner();
   private readonly workItemMiner = new WorkItemMiner();
   private readonly branchMiner = new BranchMiner();

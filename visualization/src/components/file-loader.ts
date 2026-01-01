@@ -2,8 +2,8 @@ import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { parseJsonlStream } from '../commit/commit-file-parser.ts';
 import { toCommit } from '../commit/internal/commit-transform.ts';
-import { GitMiner } from '../mining/git-miner';
-import type {GitMiningResult} from "../mining/api-types/git-mining-result.ts";
+import { CommitMiner } from '../commit-mining/commit-miner.ts';
+import type {GitMiningResult} from "../commit-mining/api-types/git-mining-result.ts";
 
 @customElement('file-loader')
 export class FileLoader extends LitElement {
@@ -54,7 +54,7 @@ export class FileLoader extends LitElement {
     const file = input.files?.[0];
     if (!file) return;
 
-    const miner = new GitMiner();
+    const miner = new CommitMiner();
 
     for await (const commitDto of parseJsonlStream(file.stream())) {
       const commit = toCommit(commitDto);
