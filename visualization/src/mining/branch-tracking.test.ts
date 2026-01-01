@@ -1,27 +1,29 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { BranchMiner } from './internal/branch-miner.ts';
+import { GitMiner } from './git-miner.ts';
 import { createCommit } from './__fixtures__/commit-builder.ts';
 
-describe('BranchMiner', () => {
-  let miner: BranchMiner;
+describe('Branch Tracking', () => {
+  let miner: GitMiner;
 
   beforeEach(() => {
-    miner = new BranchMiner();
+    miner = new GitMiner();
   });
 
-  describe('process', () => {
-    it('groups commits by branchId', () => {
+  describe('commit grouping', () => {
+    it('groups commits by branch', () => {
       miner.process(createCommit({ hash: 'main1', branchId: { type: 'certain', name: 'main' } }));
       miner.process(createCommit({ hash: 'feat1', branchId: { type: 'certain', name: 'feature/test' } }));
       miner.process(createCommit({ hash: 'main2', branchId: { type: 'certain', name: 'main' } }));
 
       const result = miner.getResult(new Date());
 
-      expect(result.all()).toHaveLength(2);
-      expect(result.get('main')?.commits).toHaveLength(2);
-      expect(result.get('feature/test')?.commits).toHaveLength(1);
+      expect(result.branches.all()).toHaveLength(2);
+      expect(result.branches.get('main')?.commits).toHaveLength(2);
+      expect(result.branches.get('feature/test')?.commits).toHaveLength(1);
     });
+  });
 
+  describe('date tracking', () => {
     it('tracks first and last commit dates per branch', () => {
       miner.process(createCommit({
         hash: 'a',
@@ -40,14 +42,15 @@ describe('BranchMiner', () => {
       }));
 
       const result = miner.getResult(new Date());
-      const branch = result.get('main');
+      const branch = result.branches.get('main');
 
       expect(branch?.firstCommitDate.toISOString()).toBe('2024-01-10T00:00:00.000Z');
       expect(branch?.lastCommitDate.toISOString()).toBe('2024-01-20T00:00:00.000Z');
     });
+  });
 
+  describe('merge detection', () => {
     it('detects merge commits and tracks target branch', () => {
-      // Feature branch commit
       miner.process(createCommit({
         hash: 'feature1',
         branchId: { type: 'certain', name: 'feature/test' },
@@ -55,7 +58,6 @@ describe('BranchMiner', () => {
         isOnCurrentBranch: false
       }));
 
-      // Merge commit on main (merging feature/test)
       miner.process(createCommit({
         hash: 'merge1',
         branchId: { type: 'certain', name: 'main' },
@@ -65,13 +67,15 @@ describe('BranchMiner', () => {
       }));
 
       const result = miner.getResult(new Date());
-      const featureBranch = result.get('feature/test');
+      const featureBranch = result.branches.get('feature/test');
 
       expect(featureBranch?.mergeCommitHash).toBe('merge1');
       expect(featureBranch?.targetBranch).toBe('main');
     });
+  });
 
-    it('classifies Active branches (last commit within 90 days, not merged)', () => {
+  describe('branch status classification', () => {
+    it('classifies active branches (recent activity, not merged)', () => {
       const now = new Date('2024-03-15');
       const within90Days = new Date('2024-01-20');
 
@@ -82,12 +86,12 @@ describe('BranchMiner', () => {
       }));
 
       const result = miner.getResult(now);
-      const branch = result.get('feature/active');
+      const branch = result.branches.get('feature/active');
 
       expect(branch?.status).toBe('Active');
     });
 
-    it('classifies Stale branches (last commit older than 90 days, not merged)', () => {
+    it('classifies stale branches (no recent activity, not merged)', () => {
       const now = new Date('2024-06-15');
       const olderThan90Days = new Date('2024-01-15');
 
@@ -98,15 +102,14 @@ describe('BranchMiner', () => {
       }));
 
       const result = miner.getResult(now);
-      const branch = result.get('feature/stale');
+      const branch = result.branches.get('feature/stale');
 
       expect(branch?.status).toBe('Stale');
     });
 
-    it('classifies Completed branches (merged with no subsequent commits)', () => {
+    it('classifies completed branches (merged with no subsequent commits)', () => {
       const now = new Date('2024-03-15');
 
-      // Feature branch commit
       miner.process(createCommit({
         hash: 'feature1',
         branchId: { type: 'certain', name: 'feature/done' },
@@ -115,7 +118,6 @@ describe('BranchMiner', () => {
         isOnCurrentBranch: false
       }));
 
-      // Merge commit on main
       miner.process(createCommit({
         hash: 'merge1',
         branchId: { type: 'certain', name: 'main' },
@@ -126,7 +128,7 @@ describe('BranchMiner', () => {
       }));
 
       const result = miner.getResult(now);
-      const branch = result.get('feature/done');
+      const branch = result.branches.get('feature/done');
 
       expect(branch?.status).toBe('Completed');
     });
