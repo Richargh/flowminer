@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import './file-loader';
-import type { FileLoader } from './file-loader';
+import './file-loader.ts';
+import type { FileLoader } from './file-loader.ts';
 
 import type {GitMiningResult} from "../commit-mining/app/api-types/git-mining-result.ts";
 

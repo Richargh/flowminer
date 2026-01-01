@@ -4,7 +4,7 @@ import './components/work-item-scatter-panel';
 import './components/sankey-panel';
 import './components/histogram-panel';
 import './components/theme-switcher';
-import './components/file-loader';
+import './file-loading/file-loader.ts';
 import type { AuthorStats, CommitTimeline, WorkItemDuration, SankeyFlow, HistogramBucket } from './data-service';
 
 import type {GitMiningResult} from "./commit-mining/app/api-types/git-mining-result.ts";
