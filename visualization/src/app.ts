@@ -1,4 +1,5 @@
 import './author-statistics/author-radar-panel.ts';
+import './commit-range/commit-range-panel.ts';
 import './components/commit-timeline-panel';
 import './components/work-item-scatter-panel';
 import './components/sankey-panel';
@@ -6,6 +7,7 @@ import './components/histogram-panel';
 import './components/theme-switcher';
 import './file-loading/file-loader.ts';
 import type { AuthorStats, CommitTimeline, WorkItemDuration, SankeyFlow, HistogramBucket } from './data-service';
+import {aggregateCommitsByDate, type CommitActivity} from './commit-range/app/internal/commit-activity.ts';
 
 import type {GitMiningResult} from "./commit-mining/app/api-types/git-mining-result.ts";
 
@@ -80,6 +82,24 @@ const sampleHistogram: HistogramBucket[] = [
   { range: '10+ days', count: 5, minValue: 10, maxValue: 999 },
 ];
 
+const sampleCommitActivity: CommitActivity[] = [
+  { date: '2024-01-01', count: 5 },
+  { date: '2024-01-02', count: 8 },
+  { date: '2024-01-03', count: 3 },
+  { date: '2024-01-04', count: 12 },
+  { date: '2024-01-05', count: 7 },
+  { date: '2024-01-08', count: 10 },
+  { date: '2024-01-09', count: 6 },
+  { date: '2024-01-10', count: 15 },
+  { date: '2024-01-11', count: 4 },
+  { date: '2024-01-12', count: 9 },
+];
+
+const activityPanel = document.querySelector('commit-range-panel');
+if (activityPanel) {
+  activityPanel.data = sampleCommitActivity;
+}
+
 const radarPanel = document.querySelector('author-radar-panel');
 if (radarPanel) {
   radarPanel.authors = sampleAuthors;
@@ -108,6 +128,10 @@ if (histogramPanel) {
 // Listen for loaded JSONL data
 document.addEventListener('data-loaded', ((event: CustomEvent<GitMiningResult>) => {
   const result = event.detail;
+
+  if (activityPanel) {
+    activityPanel.data = aggregateCommitsByDate(result.commits.all());
+  }
 
   if (radarPanel) {
     radarPanel.authors = result.authorStatistics.all().map(stat => ({

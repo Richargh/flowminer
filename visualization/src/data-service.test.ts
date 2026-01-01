@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { loadVisualizationData, type VisualizationData } from './data-service';
+import type {CommitActivity} from "./commit-range/app/internal/commit-activity.ts";
 
 describe('DataService', () => {
   it('loads and parses visualization data from JSON', async () => {
@@ -38,5 +39,17 @@ describe('DataService', () => {
     expect(emptyData.authors).toEqual([]);
     expect(emptyData.commitTimeline).toEqual([]);
     expect(emptyData.workItems).toEqual([]);
+  });
+
+  describe('CommitActivity', () => {
+    it('has the expected structure with date and count', () => {
+      const activity: CommitActivity = {
+        date: '2024-01-15',
+        count: 5
+      };
+
+      expect(activity.date).toBe('2024-01-15');
+      expect(activity.count).toBe(5);
+    });
   });
 });

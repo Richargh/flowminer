@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 describe('App Shell', () => {
   beforeEach(() => {
     document.body.innerHTML = `
+      <commit-range-panel id="activity-panel"></commit-range-panel>
       <author-radar-panel id="radar-panel"></author-radar-panel>
       <commit-timeline-panel id="timeline-panel"></commit-timeline-panel>
       <work-item-scatter-panel id="scatter-panel"></work-item-scatter-panel>
@@ -19,11 +20,15 @@ describe('App Shell', () => {
     await import('./app');
     await new Promise(resolve => setTimeout(resolve, 100));
 
+    const activityPanel = document.getElementById('activity-panel') as any;
     const radarPanel = document.getElementById('radar-panel') as any;
     const timelinePanel = document.getElementById('timeline-panel') as any;
     const scatterPanel = document.getElementById('scatter-panel') as any;
     const sankeyPanel = document.getElementById('sankey-panel') as any;
     const histogramPanel = document.getElementById('histogram-panel') as any;
+
+    expect(activityPanel.data).toBeDefined();
+    expect(activityPanel.data.length).toBeGreaterThan(0);
 
     expect(radarPanel.authors).toBeDefined();
     expect(radarPanel.authors.length).toBeGreaterThan(0);

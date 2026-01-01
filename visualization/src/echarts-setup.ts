@@ -17,6 +17,8 @@ import {
   GridComponent,
   DataZoomComponent,
   MarkLineComponent,
+  BrushComponent,
+  ToolboxComponent,
 } from 'echarts/components';
 
 // Renderer
@@ -37,6 +39,8 @@ echarts.use([
   GridComponent,
   DataZoomComponent,
   MarkLineComponent,
+  BrushComponent,
+  ToolboxComponent,
   // Renderer
   CanvasRenderer,
 ]);
