@@ -1,5 +1,5 @@
-import type { SerializedCommitDto } from '../jsonl-parser.ts';
-import type { Author, Commit, CommitType, BranchId, WorkKey } from '../domain.ts';
+import type { Author, Commit, CommitType, BranchId, WorkKey } from '../api-types/commit.ts';
+import type {SerializedCommitDto} from "./serializable-commit-dto.ts";
 
 export function toCommit(dto: SerializedCommitDto): Commit {
   return {

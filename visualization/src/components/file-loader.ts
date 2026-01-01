@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { parseJsonlStream } from '../mining/jsonl-parser';
 import { toCommit } from '../mining/internal/commit-transform.ts';
 import { GitMiner } from '../mining/git-miner';
-import type {GitMiningResult} from "../mining/git-mining-result.ts";
+import type {GitMiningResult} from "../mining/api-types/git-mining-result.ts";
 
 @customElement('file-loader')
 export class FileLoader extends LitElement {

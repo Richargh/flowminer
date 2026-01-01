@@ -1,5 +1,6 @@
-import type { Commit } from '../domain';
-import type { SerializedCommitDto } from '../jsonl-parser';
+import type { Commit } from '../api-types/commit.ts';
+
+import type {SerializedCommitDto} from "../internal/serializable-commit-dto.ts";
 
 export const createCommit = (overrides: Partial<Commit> = {}): Commit => ({
   hash: 'abc123',

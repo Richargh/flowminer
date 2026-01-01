@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { parseLine, parseJsonlLines, type SerializedCommitDto } from './jsonl-parser';
+import { parseLine, parseJsonlLines } from './jsonl-parser';
 import { createCommitDtoJson } from './__fixtures__/commit';
+import type {SerializedCommitDto} from "./internal/serializable-commit-dto.ts";
 
 describe('jsonl-parser', () => {
   describe('parseLine', () => {

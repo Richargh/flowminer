@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import './file-loader';
 import type { FileLoader } from './file-loader';
 
-import type {GitMiningResult} from "../mining/git-mining-result.ts";
+import type {GitMiningResult} from "../mining/api-types/git-mining-result.ts";
 
 describe('FileLoader', () => {
   let element: FileLoader;

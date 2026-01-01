@@ -1,8 +1,8 @@
-import type {Commit} from './domain';
+import type {Commit} from './api-types/commit.ts';
 import {AuthorMiner} from './internal/author-miner.ts';
 import {WorkItemMiner} from './internal/work-item-miner.ts';
 import {BranchMiner} from './internal/branch-miner.ts';
-import {Commits, type GitMiningResult} from "./git-mining-result.ts";
+import {Commits, type GitMiningResult} from "./api-types/git-mining-result.ts";
 
 export class GitMiner {
   private readonly authorMiner = new AuthorMiner();

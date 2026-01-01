@@ -7,7 +7,7 @@ import './components/theme-switcher';
 import './components/file-loader';
 import type { AuthorStats, CommitTimeline, WorkItemDuration, SankeyFlow, HistogramBucket } from './data-service';
 
-import type {GitMiningResult} from "./mining/git-mining-result.ts";
+import type {GitMiningResult} from "./mining/api-types/git-mining-result.ts";
 
 const sampleAuthors: AuthorStats[] = [
   { name: 'Alice', commitCount: 120, linesAdded: 8500, linesDeleted: 3200, avgCommitSize: 97 },

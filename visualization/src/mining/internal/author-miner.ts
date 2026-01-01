@@ -1,47 +1,7 @@
-import type { Author, Commit, CommitType, WorkKey } from '../domain.ts';
+import type {Author, Commit, CommitType} from '../api-types/commit.ts';
+import {type AuthorStatistic, AuthorStatistics, type ChurnMetric} from "../api-types/author.ts";
 
-export interface ChurnMetric {
-  additions: number;
-  deletions: number;
-}
-
-export interface AuthorStatistic {
-  author: Author;
-  commitCount: number;
-  linesAdded: number;
-  linesRemoved: number;
-  workItems: WorkKey[];
-  churnByCommitType: Map<CommitType, ChurnMetric>;
-  collaborators: Author[];
-}
-
-export class AuthorStatistics {
-  private readonly authorStatistics: Map<string, AuthorStatistic>;
-
-  constructor(stats: AuthorStatistic[]) {
-    this.authorStatistics = new Map(
-      stats.map(s => [this.authorKey(s.author), s])
-    );
-  }
-
-  all(): AuthorStatistic[] {
-    return Array.from(this.authorStatistics.values());
-  }
-
-  size(): number {
-    return this.authorStatistics.size;
-  }
-
-  get(author: Author): AuthorStatistic | undefined {
-    return this.authorStatistics.get(this.authorKey(author));
-  }
-
-  private authorKey(author: Author): string {
-    return `${author.name}:${author.email}`;
-  }
-}
-
-interface AuthorAccumulator {
+interface MutableAuthor {
   author: Author;
   commitCount: number;
   linesAdded: number;
@@ -52,7 +12,7 @@ interface AuthorAccumulator {
 }
 
 export class AuthorMiner {
-  private readonly authorData: Map<string, AuthorAccumulator> = new Map();
+  private readonly authorData: Map<string, MutableAuthor> = new Map();
   private readonly workKeyToAuthors: Map<string, Set<string>> = new Map();
 
   process(commit: Commit): void {
@@ -141,7 +101,7 @@ export class AuthorMiner {
     return new AuthorStatistics(stats);
   }
 
-  private getOrCreateAccumulator(key: string, author: Author): AuthorAccumulator {
+  private getOrCreateAccumulator(key: string, author: Author): MutableAuthor {
     let acc = this.authorData.get(key);
     if (!acc) {
       acc = {

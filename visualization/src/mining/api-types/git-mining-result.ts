@@ -1,7 +1,7 @@
-import type {Commit} from "./domain.ts";
-import {Branches} from "./internal/branch-miner.ts";
-import {WorkItems} from "./internal/work-item-miner.ts";
-import {AuthorStatistics} from "./internal/author-miner.ts";
+import type {Commit} from "./commit.ts";
+import {Branches} from "./branch.ts";
+import {AuthorStatistics} from "./author.ts";
+import {WorkItems} from "./work-items.ts";
 
 export class Commits {
     private readonly commits: Commit[];
