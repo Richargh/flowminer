@@ -1,4 +1,4 @@
-import type {Commit} from "../../commit/api-types/commit.ts";
+import type {Commit} from "../../../commit/app/api-types/commit.ts";
 import {Branches} from "./branch.ts";
 import {AuthorStatistics} from "./author.ts";
 import {WorkItems} from "./work-items.ts";

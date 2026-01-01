@@ -1,4 +1,4 @@
-import type {BranchId, Commit} from '../../commit/api-types/commit.ts';
+import type {BranchId, Commit} from '../../../commit/app/api-types/commit.ts';
 import {type Branch, Branches, type BranchStatus} from "../api-types/branch.ts";
 
 interface MutableBranch {

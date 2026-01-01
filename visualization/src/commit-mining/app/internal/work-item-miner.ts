@@ -1,4 +1,4 @@
-import type {Author, Commit, CommitType, WorkKey} from '../../commit/api-types/commit.ts';
+import type {Author, Commit, CommitType, WorkKey} from '../../../commit/app/api-types/commit.ts';
 import {type AuthorContribution, type WorkItem, WorkItems} from "../api-types/work-items.ts";
 
 interface MutableWorkItem {

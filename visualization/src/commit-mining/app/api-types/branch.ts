@@ -1,4 +1,4 @@
-import type {BranchId} from "../../commit/api-types/commit.ts";
+import type {BranchId} from "../../../commit/app/api-types/commit.ts";
 
 export type BranchStatus = 'Active' | 'Stale' | 'Completed';
 

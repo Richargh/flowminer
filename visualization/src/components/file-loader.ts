@@ -1,8 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { parseJsonlStream } from '../commit/commit-file-parser.ts';
-import { CommitMiner } from '../commit-mining/commit-miner.ts';
-import type {GitMiningResult} from "../commit-mining/api-types/git-mining-result.ts";
+import { parseJsonlStream } from '../commit/app/commit-file-parser.ts';
+import { CommitMiner } from '../commit-mining/app/commit-miner.ts';
+import type {GitMiningResult} from "../commit-mining/app/api-types/git-mining-result.ts";
 
 @customElement('file-loader')
 export class FileLoader extends LitElement {

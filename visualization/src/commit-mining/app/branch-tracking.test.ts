@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { CommitMiner } from './commit-miner.ts';
-import { createCommit } from '../commit/__fixtures__/commit-builder.ts';
+import { createCommit } from '../../commit/app/__fixtures__/commit-builder.ts';
 
 describe('Branch Tracking', () => {
   let miner: CommitMiner;
