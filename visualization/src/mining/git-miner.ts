@@ -1,4 +1,4 @@
-import type {Commit} from './api-types/commit.ts';
+import type {Commit} from '../commit/api-types/commit.ts';
 import {AuthorMiner} from './internal/author-miner.ts';
 import {WorkItemMiner} from './internal/work-item-miner.ts';
 import {BranchMiner} from './internal/branch-miner.ts';

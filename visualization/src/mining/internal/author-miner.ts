@@ -1,4 +1,4 @@
-import type {Author, Commit, CommitType} from '../api-types/commit.ts';
+import type {Author, Commit, CommitType} from '../../commit/api-types/commit.ts';
 import {type AuthorStatistic, AuthorStatistics, type ChurnMetric} from "../api-types/author.ts";
 
 interface MutableAuthor {

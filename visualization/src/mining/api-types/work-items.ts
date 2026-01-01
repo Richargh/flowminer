@@ -1,4 +1,4 @@
-import type {Author, CommitType, WorkKey} from "./commit.ts";
+import type {Author, CommitType, WorkKey} from "../../commit/api-types/commit.ts";
 
 export interface AuthorContribution {
     author: Author;

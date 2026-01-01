@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { GitMiner } from './git-miner';
-import { createCommit } from './__fixtures__/commit-builder.ts';
+import { createCommit } from '../commit/__fixtures__/commit-builder.ts';
 
 describe('Git Mining', () => {
   let miner: GitMiner;

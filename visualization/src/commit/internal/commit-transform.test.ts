@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { toCommit } from './internal/commit-transform.ts';
+import { toCommit } from './commit-transform.ts';
 
-import type {SerializedCommitDto} from "./internal/serializable-commit-dto.ts";
+import type {SerializedCommitDto} from "./serializable-commit-dto.ts";
 
 describe('commit-transform', () => {
   describe('toCommit', () => {
