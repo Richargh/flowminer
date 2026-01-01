@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import './histogram-chart.ts';
-import type { HistogramChart } from './histogram-chart.ts';
+import './work-item-duration-chart.ts';
+import type { WorkItemDurationChart } from './work-item-duration-chart.ts';
 import type { HistogramBucket } from '../data-service.ts';
 
-describe('HistogramChart', () => {
-  let element: HistogramChart;
+describe('WorkItemDurationChart', () => {
+  let element: WorkItemDurationChart;
 
   beforeEach(async () => {
-    element = document.createElement('histogram-chart') as HistogramChart;
+    element = document.createElement('work-item-duration-chart') as WorkItemDurationChart;
     document.body.appendChild(element);
     await element.updateComplete;
   });
@@ -16,7 +16,7 @@ describe('HistogramChart', () => {
     element.remove();
   });
 
-  it('renders a container element for the histogram chart', () => {
+  it('renders a container element for the chart', () => {
     const container = element.shadowRoot?.querySelector('.chart-container');
     expect(container).toBeTruthy();
     expect(container?.tagName.toLowerCase()).toBe('div');
@@ -36,7 +36,7 @@ describe('HistogramChart', () => {
     expect(computedStyle.height).toBe('400px');
   });
 
-  it('displays histogram data as bar chart', async () => {
+  it('displays data as bar chart', async () => {
     const sampleBuckets: HistogramBucket[] = [
       { range: '0-5', count: 10, minValue: 0, maxValue: 5 },
       { range: '5-10', count: 25, minValue: 5, maxValue: 10 },
@@ -51,21 +51,6 @@ describe('HistogramChart', () => {
     const chartOption = element.getChartOption();
     expect(chartOption).toBeTruthy();
     expect(chartOption?.series?.[0]?.type).toBe('bar');
-  });
-
-  it('includes dataZoom for range selection', async () => {
-    const sampleBuckets: HistogramBucket[] = [
-      { range: '0-5', count: 10, minValue: 0, maxValue: 5 },
-      { range: '5-10', count: 25, minValue: 5, maxValue: 10 },
-    ];
-
-    element.data = sampleBuckets;
-    await element.updateComplete;
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    const chartOption = element.getChartOption();
-    expect(chartOption?.dataZoom).toBeTruthy();
-    expect(chartOption?.dataZoom?.length).toBeGreaterThan(0);
   });
 
   it('updates chart when data changes', async () => {

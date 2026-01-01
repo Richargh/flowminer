@@ -1,12 +1,12 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { CommitTimeline } from '../data-service';
-import './commit-timeline-chart';
+import type { HistogramBucket } from '../data-service.ts';
+import './work-item-duration-chart.ts';
 
-@customElement('commit-timeline-panel')
-export class CommitTimelinePanel extends LitElement {
+@customElement('work-item-duration-panel')
+export class WorkItemDurationPanel extends LitElement {
   @property({ type: Array })
-  timeline: CommitTimeline[] = [];
+  buckets: HistogramBucket[] = [];
 
   static styles = css`
     :host {
@@ -22,9 +22,9 @@ export class CommitTimelinePanel extends LitElement {
   render() {
     return html`
       <div class="panel">
-        <commit-timeline-chart
-          .data=${this.timeline}
-        ></commit-timeline-chart>
+        <work-item-duration-chart
+          .data=${this.buckets}
+        ></work-item-duration-chart>
       </div>
     `;
   }
@@ -32,6 +32,6 @@ export class CommitTimelinePanel extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'commit-timeline-panel': CommitTimelinePanel;
+    'work-item-duration-panel': WorkItemDurationPanel;
   }
 }

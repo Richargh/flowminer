@@ -22,21 +22,6 @@ describe('Accessibility', () => {
     expect(criticalViolations).toHaveLength(0);
   });
 
-  it('chart containers have accessible structure', async () => {
-    await import('./components/commit-timeline-chart');
-    const element = document.createElement('commit-timeline-chart') as any;
-    document.body.appendChild(element);
-    await element.updateComplete;
-
-    // Chart containers should have proper block display
-    const container = element.shadowRoot?.querySelector('.chart-container');
-    expect(container).toBeTruthy();
-
-    // Check computed styles indicate proper display
-    const style = window.getComputedStyle(container as Element);
-    expect(style.height).toBe('400px');
-  });
-
   it('all interactive elements have focus states', async () => {
     await import('./components/theme-switcher');
     const element = document.createElement('theme-switcher');

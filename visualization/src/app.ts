@@ -1,24 +1,12 @@
 import './commit-range/commit-range-panel.ts';
-import './components/commit-timeline-panel';
 import './components/work-item-scatter-panel';
-import './work-item-duration-histogram/histogram-panel.ts';
+import './work-item-duration-histogram/work-item-duration-panel.ts';
 import './components/theme-switcher';
 import './file-loading/file-loader.ts';
-import type { CommitTimeline, WorkItemDuration, HistogramBucket } from './data-service';
+import type { WorkItemDuration, HistogramBucket } from './data-service';
 import {aggregateCommitsByDate, type CommitActivity} from './commit-range/app/internal/commit-activity.ts';
 
 import type {GitMiningResult} from "./commit-mining/app/api-types/git-mining-result.ts";
-
-const sampleTimeline: CommitTimeline[] = [
-  { date: '2024-01-01', cumulativeCount: 10, author: 'Alice' },
-  { date: '2024-01-08', cumulativeCount: 25, author: 'Bob' },
-  { date: '2024-01-15', cumulativeCount: 45, author: 'Alice' },
-  { date: '2024-01-22', cumulativeCount: 68, author: 'Charlie' },
-  { date: '2024-01-29', cumulativeCount: 92, author: 'Diana' },
-  { date: '2024-02-05', cumulativeCount: 120, author: 'Alice' },
-  { date: '2024-02-12', cumulativeCount: 148, author: 'Bob' },
-  { date: '2024-02-19', cumulativeCount: 175, author: 'Diana' },
-];
 
 const sampleWorkItems: WorkItemDuration[] = [
   { key: 'FEAT-1', type: 'Feature', startDate: '2024-01-05', durationDays: 5 },
@@ -58,17 +46,12 @@ if (activityPanel) {
   activityPanel.data = sampleCommitActivity;
 }
 
-const timelinePanel = document.querySelector('commit-timeline-panel');
-if (timelinePanel) {
-  timelinePanel.timeline = sampleTimeline;
-}
-
 const scatterPanel = document.querySelector('work-item-scatter-panel');
 if (scatterPanel) {
   scatterPanel.workItems = sampleWorkItems;
 }
 
-const histogramPanel = document.querySelector('histogram-panel');
+const histogramPanel = document.querySelector('work-item-duration-panel');
 if (histogramPanel) {
   histogramPanel.buckets = sampleHistogram;
 }
@@ -79,34 +62,6 @@ document.addEventListener('data-loaded', ((event: CustomEvent<GitMiningResult>) 
 
   if (activityPanel) {
     activityPanel.data = aggregateCommitsByDate(result.commits.all());
-  }
-
-  if (timelinePanel) {
-    const commitsByDate = new Map<string, { author: string; count: number }[]>();
-    for (const commit of result.commits.all()) {
-      const dateKey = commit.date.toISOString().split('T')[0];
-      if (!commitsByDate.has(dateKey)) {
-        commitsByDate.set(dateKey, []);
-      }
-      const existing = commitsByDate.get(dateKey)!.find(e => e.author === commit.author.name);
-      if (existing) {
-        existing.count++;
-      } else {
-        commitsByDate.get(dateKey)!.push({ author: commit.author.name, count: 1 });
-      }
-    }
-
-    const sortedDates = Array.from(commitsByDate.keys()).sort();
-    let cumulativeCount = 0;
-    const timeline: CommitTimeline[] = [];
-
-    for (const date of sortedDates) {
-      for (const { author, count } of commitsByDate.get(date)!) {
-        cumulativeCount += count;
-        timeline.push({ date, cumulativeCount, author });
-      }
-    }
-    timelinePanel.timeline = timeline;
   }
 
   if (scatterPanel) {

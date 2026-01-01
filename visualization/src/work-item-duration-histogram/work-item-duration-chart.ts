@@ -1,24 +1,27 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { echarts } from '../echarts-setup';
+import { echarts } from '../echarts-setup.ts';
 import type { EChartsType } from 'echarts/core';
-import type { CommitTimeline } from '../data-service';
+import type { HistogramBucket } from '../data-service.ts';
 
-export interface LineChartOption {
+export interface WorkItemDurationChartOption {
   xAxis: {
     type: 'category';
     data: string[];
   };
   yAxis: {
     type: 'value';
+    name?: string;
   };
   series: Array<{
-    type: 'line';
+    type: 'bar';
     data: number[];
-    smooth?: boolean;
   }>;
   tooltip?: {
     trigger: 'axis';
+    axisPointer?: {
+      type: 'shadow';
+    };
   };
   grid?: {
     left: string;
@@ -28,13 +31,13 @@ export interface LineChartOption {
   };
 }
 
-@customElement('commit-timeline-chart')
-export class CommitTimelineChart extends LitElement {
+@customElement('work-item-duration-chart')
+export class WorkItemDurationChart extends LitElement {
   private chart: EChartsType | null = null;
-  private currentOption: LineChartOption | null = null;
+  private currentOption: WorkItemDurationChartOption | null = null;
 
   @property({ type: Array })
-  data: CommitTimeline[] = [];
+  data: HistogramBucket[] = [];
 
   static styles = css`
     :host {
@@ -71,31 +74,34 @@ export class CommitTimelineChart extends LitElement {
   private updateChartWithData(): void {
     if (!this.chart) return;
 
-    const dates = this.data.map(d => d.date);
-    const counts = this.data.map(d => d.cumulativeCount);
+    const ranges = this.data.map(d => d.range);
+    const counts = this.data.map(d => d.count);
 
-    const option: LineChartOption = {
+    const option: WorkItemDurationChartOption = {
       xAxis: {
         type: 'category',
-        data: dates,
+        data: ranges,
       },
       yAxis: {
         type: 'value',
+        name: 'Count',
       },
       tooltip: {
         trigger: 'axis',
+        axisPointer: {
+          type: 'shadow',
+        },
       },
       grid: {
         left: '3%',
         right: '4%',
-        bottom: '3%',
+        bottom: '15%',
         containLabel: true,
       },
       series: [
         {
-          type: 'line',
+          type: 'bar',
           data: counts,
-          smooth: true,
         },
       ],
     };
@@ -105,7 +111,7 @@ export class CommitTimelineChart extends LitElement {
     this.chart.setOption(option as any);
   }
 
-  getChartOption(): LineChartOption | null {
+  getChartOption(): WorkItemDurationChartOption | null {
     return this.currentOption;
   }
 
@@ -117,6 +123,6 @@ export class CommitTimelineChart extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'commit-timeline-chart': CommitTimelineChart;
+    'work-item-duration-chart': WorkItemDurationChart;
   }
 }
