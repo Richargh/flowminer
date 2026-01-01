@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { AuthorMiner } from './internal/author-miner.ts';
-import { createCommit } from './__fixtures__/commit';
+import { createCommit } from './__fixtures__/commit-builder.ts';
 
 describe('AuthorMiner', () => {
   let miner: AuthorMiner;
