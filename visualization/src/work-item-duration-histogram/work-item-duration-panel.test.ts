@@ -96,4 +96,67 @@ describe('WorkItemDurationPanel', () => {
     expect(element.buckets[0].count).toBe(1); // 0-2 days bucket has 1 item
     expect(element.buckets[1].count).toBe(1); // 2-4 days bucket has 1 item
   });
+
+  it('updates buckets when data-constrained event is received', async () => {
+    const mockWorkItems: WorkItem[] = [
+      {
+        workKey: { type: 'known', key: 'FILTERED-1' },
+        linesAdded: 50,
+        linesRemoved: 25,
+        firstCommitDate: new Date('2024-02-01'),
+        lastCommitDate: new Date('2024-02-06'), // 5 days - bucket 4-6
+        filesChanged: ['filtered.ts'],
+        contributions: [],
+        absoluteChurnByType: new Map([['BUG', 75]]),
+        commits: 3,
+        collaborators: 1,
+        reworkFiles: []
+      },
+      {
+        workKey: { type: 'known', key: 'FILTERED-2' },
+        linesAdded: 100,
+        linesRemoved: 50,
+        firstCommitDate: new Date('2024-02-10'),
+        lastCommitDate: new Date('2024-02-19'), // 9 days - bucket 8-10
+        filesChanged: ['filtered2.ts'],
+        contributions: [],
+        absoluteChurnByType: new Map([['FEATURE', 150]]),
+        commits: 4,
+        collaborators: 2,
+        reworkFiles: []
+      }
+    ];
+
+    const mockResult = {
+      workItems: new WorkItems(mockWorkItems)
+    } as GitMiningResult;
+
+    document.dispatchEvent(new CustomEvent<GitMiningResult>('data-constrained', {
+      detail: mockResult,
+      bubbles: true
+    }));
+
+    await element.updateComplete;
+
+    expect(element.buckets).toHaveLength(6);
+    expect(element.buckets[2].count).toBe(1); // 4-6 days bucket has 1 item
+    expect(element.buckets[4].count).toBe(1); // 8-10 days bucket has 1 item
+  });
+
+  it('shows empty state message when all buckets are zero', async () => {
+    const mockResult = {
+      workItems: new WorkItems([])
+    } as GitMiningResult;
+
+    document.dispatchEvent(new CustomEvent<GitMiningResult>('data-constrained', {
+      detail: mockResult,
+      bubbles: true
+    }));
+
+    await element.updateComplete;
+
+    const emptyState = element.shadowRoot?.querySelector('.empty-state');
+    expect(emptyState).toBeTruthy();
+    expect(emptyState?.textContent).toContain('No work items in selected range');
+  });
 });

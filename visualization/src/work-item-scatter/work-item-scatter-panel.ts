@@ -38,11 +38,13 @@ export class WorkItemScatterPanel extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     document.addEventListener('data-loaded', this.handleDataLoaded);
+    document.addEventListener('data-constrained', this.handleDataLoaded);
   }
 
   disconnectedCallback(): void {
     super.disconnectedCallback();
     document.removeEventListener('data-loaded', this.handleDataLoaded);
+    document.removeEventListener('data-constrained', this.handleDataLoaded);
   }
 
   static styles = css`
@@ -54,9 +56,25 @@ export class WorkItemScatterPanel extends LitElement {
       flex-direction: column;
       gap: 1rem;
     }
+    .empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 300px;
+      color: var(--text-secondary, #666);
+      font-style: italic;
+    }
   `;
 
   render() {
+    if (this.workItems.length === 0) {
+      return html`
+        <div class="panel">
+          <div class="empty-state">No work items in selected range</div>
+        </div>
+      `;
+    }
+
     return html`
       <div class="panel">
         <work-item-scatter-chart

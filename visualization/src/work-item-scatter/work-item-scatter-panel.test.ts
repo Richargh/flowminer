@@ -81,4 +81,52 @@ describe('WorkItemScatterPanel', () => {
     expect(element.workItems[0].key).toBe('TEST-123');
     expect(element.workItems[0].durationDays).toBe(5);
   });
+
+  it('updates workItems when data-constrained event is received', async () => {
+    const mockWorkItem: WorkItem = {
+      workKey: { type: 'known', key: 'FILTERED-1' },
+      linesAdded: 50,
+      linesRemoved: 25,
+      firstCommitDate: new Date('2024-02-01'),
+      lastCommitDate: new Date('2024-02-03'),
+      filesChanged: ['filtered.ts'],
+      contributions: [],
+      absoluteChurnByType: new Map([['BUG', 75]]),
+      commits: 2,
+      collaborators: 1,
+      reworkFiles: []
+    };
+
+    const mockResult = {
+      workItems: new WorkItems([mockWorkItem])
+    } as GitMiningResult;
+
+    document.dispatchEvent(new CustomEvent<GitMiningResult>('data-constrained', {
+      detail: mockResult,
+      bubbles: true
+    }));
+
+    await element.updateComplete;
+
+    expect(element.workItems).toHaveLength(1);
+    expect(element.workItems[0].key).toBe('FILTERED-1');
+    expect(element.workItems[0].durationDays).toBe(2);
+  });
+
+  it('shows empty state message when workItems is empty', async () => {
+    const mockResult = {
+      workItems: new WorkItems([])
+    } as GitMiningResult;
+
+    document.dispatchEvent(new CustomEvent<GitMiningResult>('data-constrained', {
+      detail: mockResult,
+      bubbles: true
+    }));
+
+    await element.updateComplete;
+
+    const emptyState = element.shadowRoot?.querySelector('.empty-state');
+    expect(emptyState).toBeTruthy();
+    expect(emptyState?.textContent).toContain('No work items in selected range');
+  });
 });
