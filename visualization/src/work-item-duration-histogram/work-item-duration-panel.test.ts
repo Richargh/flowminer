@@ -107,7 +107,7 @@ describe('WorkItemDurationPanel', () => {
         lastCommitDate: new Date('2024-02-06'), // 5 days - bucket 4-6
         filesChanged: ['filtered.ts'],
         contributions: [],
-        absoluteChurnByType: new Map([['BUG', 75]]),
+        absoluteChurnByType: new Map([['FIX', 75]]),
         commits: 3,
         collaborators: 1,
         reworkFiles: []

@@ -60,13 +60,13 @@ describe('commit-table-helpers', () => {
       expect(getBranchName(branch)).toBe('main');
     });
 
-    it('returns name for uncertain branch', () => {
-      const branch: BranchId = { type: 'uncertain', name: 'feature/test' };
+    it('returns name for inferred branch', () => {
+      const branch: BranchId = { type: 'inferred', name: 'feature/test' };
       expect(getBranchName(branch)).toBe('feature/test');
     });
 
     it('returns empty string for nameless branch', () => {
-      const branch: BranchId = { type: 'nameless' };
+      const branch: BranchId = { type: 'nameless', tipCommit: 'abc123' };
       expect(getBranchName(branch)).toBe('');
     });
 

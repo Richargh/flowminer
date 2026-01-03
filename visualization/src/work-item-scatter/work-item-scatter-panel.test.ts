@@ -91,7 +91,7 @@ describe('WorkItemScatterPanel', () => {
       lastCommitDate: new Date('2024-02-03'),
       filesChanged: ['filtered.ts'],
       contributions: [],
-      absoluteChurnByType: new Map([['BUG', 75]]),
+      absoluteChurnByType: new Map([['FIX', 75]]),
       commits: 2,
       collaborators: 1,
       reworkFiles: []
