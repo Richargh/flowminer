@@ -6,6 +6,17 @@ default:
     @just --list
 
 # =============================================================================
+# Lint COMMANDS
+# =============================================================================
+lint: lint-viz
+
+lint-viz: lint-viz-types
+
+lint-viz-types:
+    cd visualization && npx tsc --noEmit
+
+
+# =============================================================================
 # BUILD COMMANDS
 # =============================================================================
 
@@ -22,7 +33,7 @@ build-kmp-js:
     ./gradlew :analysis:git-importer:jsBrowserProductionLibraryDistribution
 
 # Build visualization (TypeScript + Vite)
-build-viz:
+build-viz: lint-viz
     cd visualization && npm run build
 
 
