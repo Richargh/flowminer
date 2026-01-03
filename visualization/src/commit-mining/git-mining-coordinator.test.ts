@@ -5,6 +5,7 @@ import { Commits } from './app/api-types/git-mining-result.ts';
 import { WorkItems, type WorkItem } from './app/api-types/work-items.ts';
 import { Branches } from './app/api-types/branch.ts';
 import { AuthorStatistics } from './app/api-types/author.ts';
+import type { Commit } from '../commit/app/api-types/commit.ts';
 
 function createWorkItem(firstCommitDate: Date): WorkItem {
   return {
@@ -19,6 +20,23 @@ function createWorkItem(firstCommitDate: Date): WorkItem {
     commits: 1,
     collaborators: 1,
     reworkFiles: []
+  };
+}
+
+function createCommit(date: Date): Commit {
+  return {
+    hash: `hash-${date.getTime()}`,
+    author: { name: 'Test Author', email: 'test@example.com' },
+    date,
+    message: 'Test commit',
+    parents: [],
+    fileChanges: [],
+    coAuthors: [],
+    commitType: 'FEATURE',
+    workKeys: [],
+    branchId: { type: 'certain', name: 'main' },
+    isOnCurrentBranch: true,
+    isMerge: false
   };
 }
 
@@ -84,6 +102,36 @@ describe('GitMiningCoordinator', () => {
     const event = dataConstrainedHandler.mock.calls[0][0] as CustomEvent<GitMiningResult>;
     expect(event.detail.workItems.size()).toBe(1);
     expect(event.detail.workItems.all()[0].firstCommitDate).toEqual(new Date('2024-01-05'));
+
+    document.removeEventListener('data-constrained', dataConstrainedHandler);
+  });
+
+  it('should dispatch data-constrained with filtered commits based on range', () => {
+    const coordinator = new GitMiningCoordinator();
+    const commits = [
+      createCommit(new Date('2024-01-01')),
+      createCommit(new Date('2024-01-05')),
+      createCommit(new Date('2024-01-10'))
+    ];
+
+    const mockResult: GitMiningResult = {
+      commits: new Commits(commits),
+      branches: new Branches([]),
+      workItems: new WorkItems([]),
+      authorStatistics: new AuthorStatistics([])
+    };
+
+    coordinator.storeResult(mockResult);
+
+    const dataConstrainedHandler = vi.fn();
+    document.addEventListener('data-constrained', dataConstrainedHandler);
+
+    coordinator.setRange({ startDate: '2024-01-03', endDate: '2024-01-08' });
+
+    expect(dataConstrainedHandler).toHaveBeenCalledTimes(1);
+    const event = dataConstrainedHandler.mock.calls[0][0] as CustomEvent<GitMiningResult>;
+    expect(event.detail.commits.size()).toBe(1);
+    expect(event.detail.commits.all()[0].date).toEqual(new Date('2024-01-05'));
 
     document.removeEventListener('data-constrained', dataConstrainedHandler);
   });
