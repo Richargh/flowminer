@@ -54,6 +54,36 @@ describe('CommitsTablePanel', () => {
     expect(element.commits[0].hash).toBe('abc1234567890');
   });
 
+  it('configures all commit columns', async () => {
+    const dataTable = element.shadowRoot?.querySelector('data-table');
+    expect(dataTable).toBeTruthy();
+
+    // Access columns through the data-table element
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const columns = (dataTable as any).columns;
+    const headers = columns.map((c: { header: string }) => c.header);
+
+    expect(headers).toContain('Hash');
+    expect(headers).toContain('Author');
+    expect(headers).toContain('Date');
+    expect(headers).toContain('Message');
+    expect(headers).toContain('Type');
+    expect(headers).toContain('Work Keys');
+    expect(headers).toContain('Branch');
+    expect(columns).toHaveLength(7);
+  });
+
+  it('shows empty state message when no commits', async () => {
+    // Commits array is empty by default
+    expect(element.commits).toHaveLength(0);
+
+    const dataTable = element.shadowRoot?.querySelector('data-table');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const emptyMessage = (dataTable as any).emptyMessage;
+
+    expect(emptyMessage).toBe('No commits in selected range');
+  });
+
   it('updates commits on data-constrained event', async () => {
     const filteredCommit: Commit = {
       hash: 'filtered123456',
@@ -83,5 +113,103 @@ describe('CommitsTablePanel', () => {
 
     expect(element.commits).toHaveLength(1);
     expect(element.commits[0].hash).toBe('filtered123456');
+  });
+
+  it('truncates long commit messages', async () => {
+    const longMessage = 'A'.repeat(500);
+    const commitWithLongMessage: Commit = {
+      ...mockCommit,
+      message: longMessage
+    };
+
+    const mockResult = {
+      commits: new Commits([commitWithLongMessage])
+    } as GitMiningResult;
+
+    document.dispatchEvent(new CustomEvent<GitMiningResult>('data-loaded', {
+      detail: mockResult,
+      bubbles: true
+    }));
+
+    await element.updateComplete;
+
+    const dataTable = element.shadowRoot?.querySelector('data-table');
+    await (dataTable as { updateComplete: Promise<boolean> }).updateComplete;
+
+    const messageCell = dataTable?.shadowRoot?.querySelector('td:nth-child(4)');
+    expect(messageCell?.textContent?.length).toBeLessThan(150);
+  });
+
+  it('renders special characters in author name correctly', async () => {
+    const commitWithSpecialAuthor: Commit = {
+      ...mockCommit,
+      author: { name: 'François Müller <测试>', email: 'test@example.com' }
+    };
+
+    const mockResult = {
+      commits: new Commits([commitWithSpecialAuthor])
+    } as GitMiningResult;
+
+    document.dispatchEvent(new CustomEvent<GitMiningResult>('data-loaded', {
+      detail: mockResult,
+      bubbles: true
+    }));
+
+    await element.updateComplete;
+
+    const dataTable = element.shadowRoot?.querySelector('data-table');
+    await (dataTable as { updateComplete: Promise<boolean> }).updateComplete;
+
+    const authorCell = dataTable?.shadowRoot?.querySelector('td:nth-child(2)');
+    expect(authorCell?.textContent).toContain('François Müller <测试>');
+  });
+
+  it('handles unknown work keys', async () => {
+    const commitWithUnknownWorkKey: Commit = {
+      ...mockCommit,
+      workKeys: [{ type: 'unknown' }]
+    };
+
+    const mockResult = {
+      commits: new Commits([commitWithUnknownWorkKey])
+    } as GitMiningResult;
+
+    document.dispatchEvent(new CustomEvent<GitMiningResult>('data-loaded', {
+      detail: mockResult,
+      bubbles: true
+    }));
+
+    await element.updateComplete;
+
+    const dataTable = element.shadowRoot?.querySelector('data-table');
+    await (dataTable as { updateComplete: Promise<boolean> }).updateComplete;
+
+    const workKeysCell = dataTable?.shadowRoot?.querySelector('td:nth-child(6)');
+    // Unknown work keys should result in empty string (filtered out)
+    expect(workKeysCell?.textContent?.trim()).toBe('');
+  });
+
+  it('displays branch names with slashes correctly', async () => {
+    const commitWithSlashedBranch: Commit = {
+      ...mockCommit,
+      branchId: { type: 'certain', name: 'feature/JIRA-123/description' }
+    };
+
+    const mockResult = {
+      commits: new Commits([commitWithSlashedBranch])
+    } as GitMiningResult;
+
+    document.dispatchEvent(new CustomEvent<GitMiningResult>('data-loaded', {
+      detail: mockResult,
+      bubbles: true
+    }));
+
+    await element.updateComplete;
+
+    const dataTable = element.shadowRoot?.querySelector('data-table');
+    await (dataTable as { updateComplete: Promise<boolean> }).updateComplete;
+
+    const branchCell = dataTable?.shadowRoot?.querySelector('td:nth-child(7)');
+    expect(branchCell?.textContent).toContain('feature/JIRA-123/description');
   });
 });
