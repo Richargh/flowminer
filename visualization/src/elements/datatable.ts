@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 export interface ColumnDef<T> {
@@ -49,17 +49,10 @@ export class DataTable<T> extends LitElement {
   @state()
   private columnFilters: Record<string, string> = {};
 
-  static styles = css`
-    :host {
-      display: block;
-    }
-    th {
-      cursor: pointer;
-    }
-    .table-scroll-container {
-      overflow-y: auto;
-    }
-  `;
+  // Use light DOM so DaisyUI global styles apply
+  createRenderRoot() {
+    return this;
+  }
 
   protected willUpdate(): void {
     if (!this.initialized && this.defaultSortColumnId) {
@@ -181,7 +174,7 @@ export class DataTable<T> extends LitElement {
         <thead>
           <tr>
             ${this.columns.map(col => html`
-              <th @click=${() => this.handleHeaderClick(col)}>
+              <th class="${col.sortable ? 'cursor-pointer' : ''}" @click=${() => this.handleHeaderClick(col)}>
                 ${col.header}
                 ${col.sortable ? html`<span class="sort-indicator">${this.getSortIndicator(col)}</span>` : ''}
               </th>
@@ -233,7 +226,7 @@ export class DataTable<T> extends LitElement {
       ` : ''}
       ${this.maxVisibleRows !== null
         ? html`
-          <div class="table-scroll-container" style="max-height: calc(${this.maxVisibleRows} * 2.5rem + 3rem)">
+          <div class="overflow-y-auto" style="max-height: calc(${this.maxVisibleRows} * 2.5rem + 3rem)">
             ${this.renderTable(sortedData)}
           </div>
         `

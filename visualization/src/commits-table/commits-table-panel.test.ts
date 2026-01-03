@@ -35,7 +35,6 @@ describe('CommitsTablePanel', () => {
 
   it('renders without error when created', () => {
     expect(element).toBeTruthy();
-    expect(element.shadowRoot).toBeTruthy();
   });
 
   it('updates commits on data-loaded event', async () => {
@@ -55,7 +54,7 @@ describe('CommitsTablePanel', () => {
   });
 
   it('configures all commit columns', async () => {
-    const dataTable = element.shadowRoot?.querySelector('data-table');
+    const dataTable = element.querySelector('data-table');
     expect(dataTable).toBeTruthy();
 
     // Access columns through the data-table element
@@ -77,7 +76,7 @@ describe('CommitsTablePanel', () => {
     // Commits array is empty by default
     expect(element.commits).toHaveLength(0);
 
-    const dataTable = element.shadowRoot?.querySelector('data-table');
+    const dataTable = element.querySelector('data-table');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const emptyMessage = (dataTable as any).emptyMessage;
 
@@ -133,10 +132,10 @@ describe('CommitsTablePanel', () => {
 
     await element.updateComplete;
 
-    const dataTable = element.shadowRoot?.querySelector('data-table');
+    const dataTable = element.querySelector('data-table');
     await (dataTable as { updateComplete: Promise<boolean> }).updateComplete;
 
-    const messageCell = dataTable?.shadowRoot?.querySelector('td:nth-child(4)');
+    const messageCell = dataTable?.querySelector('td:nth-child(4)');
     expect(messageCell?.textContent?.length).toBeLessThan(150);
   });
 
@@ -157,10 +156,10 @@ describe('CommitsTablePanel', () => {
 
     await element.updateComplete;
 
-    const dataTable = element.shadowRoot?.querySelector('data-table');
+    const dataTable = element.querySelector('data-table');
     await (dataTable as { updateComplete: Promise<boolean> }).updateComplete;
 
-    const authorCell = dataTable?.shadowRoot?.querySelector('td:nth-child(2)');
+    const authorCell = dataTable?.querySelector('td:nth-child(2)');
     expect(authorCell?.textContent).toContain('François Müller <测试>');
   });
 
@@ -181,10 +180,10 @@ describe('CommitsTablePanel', () => {
 
     await element.updateComplete;
 
-    const dataTable = element.shadowRoot?.querySelector('data-table');
+    const dataTable = element.querySelector('data-table');
     await (dataTable as { updateComplete: Promise<boolean> }).updateComplete;
 
-    const workKeysCell = dataTable?.shadowRoot?.querySelector('td:nth-child(6)');
+    const workKeysCell = dataTable?.querySelector('td:nth-child(6)');
     // Unknown work keys should result in empty string (filtered out)
     expect(workKeysCell?.textContent?.trim()).toBe('');
   });
@@ -206,10 +205,10 @@ describe('CommitsTablePanel', () => {
 
     await element.updateComplete;
 
-    const dataTable = element.shadowRoot?.querySelector('data-table');
+    const dataTable = element.querySelector('data-table');
     await (dataTable as { updateComplete: Promise<boolean> }).updateComplete;
 
-    const branchCell = dataTable?.shadowRoot?.querySelector('td:nth-child(7)');
+    const branchCell = dataTable?.querySelector('td:nth-child(7)');
     expect(branchCell?.textContent).toContain('feature/JIRA-123/description');
   });
 });

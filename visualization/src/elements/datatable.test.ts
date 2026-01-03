@@ -22,7 +22,6 @@ describe('DataTable', () => {
 
   it('renders without error when created', () => {
     expect(element).toBeTruthy();
-    expect(element.shadowRoot).toBeTruthy();
   });
 
   it('accepts data and columns properties', async () => {
@@ -47,10 +46,10 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const header = element.shadowRoot?.querySelector('th');
+    const header = element.querySelector('th');
     expect(header?.textContent).toContain('Name');
 
-    const cell = element.shadowRoot?.querySelector('td');
+    const cell = element.querySelector('td');
     expect(cell?.textContent).toContain('Alice');
   });
 
@@ -64,7 +63,7 @@ describe('DataTable', () => {
     element.emptyMessage = 'No data available';
     await element.updateComplete;
 
-    const emptyText = element.shadowRoot?.textContent;
+    const emptyText = element.textContent;
     expect(emptyText).toContain('No data available');
   });
 
@@ -77,7 +76,7 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const table = element.shadowRoot?.querySelector('table');
+    const table = element.querySelector('table');
     expect(table?.classList.contains('table')).toBe(true);
     expect(table?.classList.contains('table-zebra')).toBe(true);
   });
@@ -91,7 +90,7 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const header = element.shadowRoot?.querySelector('th');
+    const header = element.querySelector('th');
     const sortIndicator = header?.querySelector('.sort-indicator');
     expect(sortIndicator).toBeTruthy();
   });
@@ -105,11 +104,11 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const header = element.shadowRoot?.querySelector('th');
+    const header = element.querySelector('th');
     header?.click();
     await element.updateComplete;
 
-    const cells = element.shadowRoot?.querySelectorAll('td');
+    const cells = element.querySelectorAll('td');
     expect(cells?.[0]?.textContent).toContain('Alice');
     expect(cells?.[1]?.textContent).toContain('Bob');
   });
@@ -123,13 +122,13 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const header = element.shadowRoot?.querySelector('th');
+    const header = element.querySelector('th');
     header?.click(); // First click - ascending
     await element.updateComplete;
     header?.click(); // Second click - descending
     await element.updateComplete;
 
-    const cells = element.shadowRoot?.querySelectorAll('td');
+    const cells = element.querySelectorAll('td');
     expect(cells?.[0]?.textContent).toContain('Bob');
     expect(cells?.[1]?.textContent).toContain('Alice');
   });
@@ -143,11 +142,11 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const header = element.shadowRoot?.querySelector('th');
+    const header = element.querySelector('th');
     header?.click();
     await element.updateComplete;
 
-    const cells = element.shadowRoot?.querySelectorAll('td');
+    const cells = element.querySelectorAll('td');
     expect(cells?.[0]?.textContent).toContain('Bob');
     expect(cells?.[1]?.textContent).toContain('Alice');
   });
@@ -161,7 +160,7 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const searchInput = element.shadowRoot?.querySelector('input[type="search"]');
+    const searchInput = element.querySelector('input[type="search"]');
     expect(searchInput).toBeTruthy();
   });
 
@@ -174,12 +173,12 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const searchInput = element.shadowRoot?.querySelector('input[type="search"]') as HTMLInputElement;
+    const searchInput = element.querySelector('input[type="search"]') as HTMLInputElement;
     searchInput.value = 'Alice';
     searchInput.dispatchEvent(new Event('input'));
     await element.updateComplete;
 
-    const rows = element.shadowRoot?.querySelectorAll('tbody tr');
+    const rows = element.querySelectorAll('tbody tr');
     expect(rows).toHaveLength(1);
     expect(rows?.[0]?.textContent).toContain('Alice');
   });
@@ -194,12 +193,12 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const searchInput = element.shadowRoot?.querySelector('input[type="search"]') as HTMLInputElement;
+    const searchInput = element.querySelector('input[type="search"]') as HTMLInputElement;
     searchInput.value = '30';  // Searching for age, which is not searchable
     searchInput.dispatchEvent(new Event('input'));
     await element.updateComplete;
 
-    const rows = element.shadowRoot?.querySelectorAll('tbody tr');
+    const rows = element.querySelectorAll('tbody tr');
     expect(rows).toHaveLength(0);
   });
 
@@ -212,7 +211,7 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const select = element.shadowRoot?.querySelector('select');
+    const select = element.querySelector('select');
     expect(select).toBeTruthy();
     expect(select?.querySelectorAll('option')).toHaveLength(3); // "All" + 2 options
   });
@@ -226,12 +225,12 @@ describe('DataTable', () => {
     element.columns = columns;
     await element.updateComplete;
 
-    const select = element.shadowRoot?.querySelector('select') as HTMLSelectElement;
+    const select = element.querySelector('select') as HTMLSelectElement;
     select.value = 'Alice';
     select.dispatchEvent(new Event('change'));
     await element.updateComplete;
 
-    const rows = element.shadowRoot?.querySelectorAll('tbody tr');
+    const rows = element.querySelectorAll('tbody tr');
     expect(rows).toHaveLength(1);
     expect(rows?.[0]?.textContent).toContain('Alice');
   });
@@ -246,8 +245,7 @@ describe('DataTable', () => {
     element.maxVisibleRows = 20;
     await element.updateComplete;
 
-    const scrollContainer = element.shadowRoot?.querySelector('.table-scroll-container');
+    const scrollContainer = element.querySelector('div.overflow-y-auto');
     expect(scrollContainer).toBeTruthy();
-    expect(getComputedStyle(scrollContainer!).overflowY).toBe('auto');
   });
 });

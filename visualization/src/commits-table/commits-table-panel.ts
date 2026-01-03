@@ -1,4 +1,4 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import type { Commit } from '../commit/app/api-types/commit.ts';
 import type { GitMiningResult } from '../commit-mining/app/api-types/git-mining-result.ts';
@@ -46,11 +46,10 @@ export class CommitsTablePanel extends LitElement {
     document.removeEventListener('data-constrained', this.handleDataLoaded);
   }
 
-  static styles = css`
-    :host {
-      display: block;
-    }
-  `;
+  // Use light DOM so DaisyUI styles apply to child data-table
+  createRenderRoot() {
+    return this;
+  }
 
   render() {
     return html`
