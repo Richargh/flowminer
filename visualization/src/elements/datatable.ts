@@ -8,7 +8,7 @@ export interface ColumnDef<T> {
   sortable?: boolean;
   searchable?: boolean;
   filterable?: boolean;
-  filterType?: 'select';
+  filterType?: 'select' | 'multiSelect';
   filterOptions?: string[];
 }
 
@@ -49,6 +49,9 @@ export class DataTable<T> extends LitElement {
   @state()
   private columnFilters: Record<string, string> = {};
 
+  @state()
+  private multiSelectFilters: Record<string, Set<string>> = {};
+
   // Use light DOM so DaisyUI global styles apply
   createRenderRoot() {
     return this;
@@ -77,6 +80,19 @@ export class DataTable<T> extends LitElement {
     } else {
       this.columnFilters = { ...this.columnFilters, [colId]: value };
     }
+  }
+
+  private handleMultiSelectChange(colId: string, option: string, checked: boolean): void {
+    const currentSet = this.multiSelectFilters[colId] ?? new Set<string>();
+    const newSet = new Set(currentSet);
+
+    if (checked) {
+      newSet.add(option);
+    } else {
+      newSet.delete(option);
+    }
+
+    this.multiSelectFilters = { ...this.multiSelectFilters, [colId]: newSet };
   }
 
   private handleHeaderClick(col: ColumnDef<T>): void {
@@ -127,18 +143,32 @@ export class DataTable<T> extends LitElement {
 
   private applyColumnFilters(data: T[]): T[] {
     const filterEntries = Object.entries(this.columnFilters);
-    if (filterEntries.length === 0) {
+    const multiSelectEntries = Object.entries(this.multiSelectFilters);
+
+    if (filterEntries.length === 0 && multiSelectEntries.length === 0) {
       return data;
     }
 
-    return data.filter(row =>
-      filterEntries.every(([colId, filterValue]) => {
+    return data.filter(row => {
+      // Apply single-select filters
+      const passesSingleSelect = filterEntries.every(([colId, filterValue]) => {
         const col = this.columns.find(c => c.id === colId);
         if (!col) return true;
         const value = col.accessor(row);
         return String(value) === filterValue;
-      })
-    );
+      });
+
+      // Apply multi-select filters (only if any options are selected)
+      const passesMultiSelect = multiSelectEntries.every(([colId, selectedValues]) => {
+        if (selectedValues.size === 0) return true; // No filter applied
+        const col = this.columns.find(c => c.id === colId);
+        if (!col) return true;
+        const value = col.accessor(row);
+        return selectedValues.has(String(value));
+      });
+
+      return passesSingleSelect && passesMultiSelect;
+    });
   }
 
   private getFilteredData(): T[] {
@@ -200,7 +230,7 @@ export class DataTable<T> extends LitElement {
     const filteredData = this.getFilteredData();
     const sortedData = this.getSortedDataFrom(filteredData);
 
-    const filterableColumns = this.columns.filter(col => col.filterable && col.filterType === 'select');
+    const filterableColumns = this.columns.filter(col => col.filterable && (col.filterType === 'select' || col.filterType === 'multiSelect'));
 
     return html`
       <input
@@ -211,17 +241,46 @@ export class DataTable<T> extends LitElement {
       />
       ${filterableColumns.length > 0 ? html`
         <div class="flex gap-2 mb-4">
-          ${filterableColumns.map(col => html`
-            <select
-              class="select select-bordered"
-              @change=${(e: Event) => this.handleColumnFilterChange(col.id, e)}
-            >
-              <option value="">All ${col.header}</option>
-              ${col.filterOptions?.map(option => html`
-                <option value="${option}">${option}</option>
-              `)}
-            </select>
-          `)}
+          ${filterableColumns.map(col => {
+            if (col.filterType === 'multiSelect') {
+              const selectedCount = this.multiSelectFilters[col.id]?.size ?? 0;
+              const buttonLabel = selectedCount > 0
+                ? `${col.header} (${selectedCount})`
+                : `All ${col.header}`;
+              return html`
+                <div class="dropdown">
+                  <div tabindex="0" role="button" class="select select-bordered flex items-center">${buttonLabel}</div>
+                  <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-lg">
+                    ${col.filterOptions?.map(option => html`
+                      <li>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            class="checkbox checkbox-sm"
+                            .checked=${this.multiSelectFilters[col.id]?.has(option) ?? false}
+                            @change=${(e: Event) => this.handleMultiSelectChange(col.id, option, (e.target as HTMLInputElement).checked)}
+                          />
+                          <span>${option}</span>
+                        </label>
+                      </li>
+                    `)}
+                  </ul>
+                </div>
+              `;
+            } else {
+              return html`
+                <select
+                  class="select select-bordered"
+                  @change=${(e: Event) => this.handleColumnFilterChange(col.id, e)}
+                >
+                  <option value="">All ${col.header}</option>
+                  ${col.filterOptions?.map(option => html`
+                    <option value="${option}">${option}</option>
+                  `)}
+                </select>
+              `;
+            }
+          })}
         </div>
       ` : ''}
       ${this.maxVisibleRows !== null

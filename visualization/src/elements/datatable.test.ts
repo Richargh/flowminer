@@ -248,4 +248,36 @@ describe('DataTable', () => {
     const scrollContainer = element.querySelector('div.overflow-y-auto');
     expect(scrollContainer).toBeTruthy();
   });
+
+  it('renders checkboxes for multi-select filter', async () => {
+    const columns: ColumnDef<Person>[] = [
+      { id: 'name', header: 'Name', accessor: (row) => row.name, filterable: true, filterType: 'multiSelect', filterOptions: ['Alice', 'Bob', 'Charlie'] }
+    ];
+
+    element.data = [{ name: 'Alice', age: 30 }, { name: 'Bob', age: 25 }, { name: 'Charlie', age: 35 }];
+    element.columns = columns;
+    await element.updateComplete;
+
+    const checkboxes = element.querySelectorAll('input[type="checkbox"]');
+    expect(checkboxes.length).toBe(3);
+  });
+
+  it('filters rows when multiple options are selected', async () => {
+    const columns: ColumnDef<Person>[] = [
+      { id: 'name', header: 'Name', accessor: (row) => row.name, filterable: true, filterType: 'multiSelect', filterOptions: ['Alice', 'Bob', 'Charlie'] }
+    ];
+
+    element.data = [{ name: 'Alice', age: 30 }, { name: 'Bob', age: 25 }, { name: 'Charlie', age: 35 }];
+    element.columns = columns;
+    await element.updateComplete;
+
+    // Select Alice and Charlie
+    const checkboxes = element.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
+    checkboxes[0].click(); // Alice
+    checkboxes[2].click(); // Charlie
+    await element.updateComplete;
+
+    const rows = element.querySelectorAll('tbody tr');
+    expect(rows).toHaveLength(2);
+  });
 });
