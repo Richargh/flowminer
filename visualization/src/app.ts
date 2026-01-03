@@ -1,6 +1,7 @@
 import './commit-range/commit-range-panel.ts';
 import './work-item-scatter/work-item-scatter-panel.ts';
 import './work-item-duration-histogram/work-item-duration-panel.ts';
+import './commits-table/commits-table-panel.ts';
 import './theme-switcher/theme-switcher';
 import './file-loading/file-loader.ts';
 import { loadDefaultData } from './startup/default-data-loader.ts';
