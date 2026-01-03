@@ -59,6 +59,7 @@ build/
 /test-results/
 /test-output/
 /reports/
+**/__screenshots__/
 
 # Mac QuickLook
 *.qlgenerator
