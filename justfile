@@ -92,6 +92,7 @@ js-test-analysis-project project:
 # =============================================================================
 
 # Run gitcli
+# f.ex. just run-gitcli '. --format table --since "'2 weeks ago'"'
 run-gitcli *args:
     ./gradlew :analysis:gitcli:run --args='{{args}}'
 
