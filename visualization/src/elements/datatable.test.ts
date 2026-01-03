@@ -235,4 +235,19 @@ describe('DataTable', () => {
     expect(rows).toHaveLength(1);
     expect(rows?.[0]?.textContent).toContain('Alice');
   });
+
+  it('wraps table in scrollable container when maxVisibleRows is set', async () => {
+    const columns: ColumnDef<Person>[] = [
+      { id: 'name', header: 'Name', accessor: (row) => row.name }
+    ];
+
+    element.data = [{ name: 'Alice', age: 30 }];
+    element.columns = columns;
+    element.maxVisibleRows = 20;
+    await element.updateComplete;
+
+    const scrollContainer = element.shadowRoot?.querySelector('.table-scroll-container');
+    expect(scrollContainer).toBeTruthy();
+    expect(getComputedStyle(scrollContainer!).overflowY).toBe('auto');
+  });
 });

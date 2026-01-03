@@ -60,6 +60,7 @@ export class CommitsTablePanel extends LitElement {
         .emptyMessage=${'No commits in selected range'}
         .defaultSortColumnId=${'date'}
         .defaultSortDirection=${'desc'}
+        .maxVisibleRows=${10}
       ></data-table>
     `;
   }

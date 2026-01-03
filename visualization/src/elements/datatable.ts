@@ -31,6 +31,9 @@ export class DataTable<T> extends LitElement {
   @property({ type: String, attribute: 'default-sort-direction' })
   defaultSortDirection: SortDirection = null;
 
+  @property({ type: Number, attribute: 'max-visible-rows' })
+  maxVisibleRows: number | null = null;
+
   @state()
   private sortColumnId: string | null = null;
 
@@ -52,6 +55,9 @@ export class DataTable<T> extends LitElement {
     }
     th {
       cursor: pointer;
+    }
+    .table-scroll-container {
+      overflow-y: auto;
     }
   `;
 
@@ -169,6 +175,30 @@ export class DataTable<T> extends LitElement {
     );
   }
 
+  private renderTable(data: T[]) {
+    return html`
+      <table class="table table-zebra">
+        <thead>
+          <tr>
+            ${this.columns.map(col => html`
+              <th @click=${() => this.handleHeaderClick(col)}>
+                ${col.header}
+                ${col.sortable ? html`<span class="sort-indicator">${this.getSortIndicator(col)}</span>` : ''}
+              </th>
+            `)}
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(row => html`
+            <tr>
+              ${this.columns.map(col => html`<td>${col.accessor(row)}</td>`)}
+            </tr>
+          `)}
+        </tbody>
+      </table>
+    `;
+  }
+
   render() {
     if (this.data.length === 0 && this.emptyMessage) {
       return html`<div class="text-center p-4">${this.emptyMessage}</div>`;
@@ -201,25 +231,13 @@ export class DataTable<T> extends LitElement {
           `)}
         </div>
       ` : ''}
-      <table class="table table-zebra">
-        <thead>
-          <tr>
-            ${this.columns.map(col => html`
-              <th @click=${() => this.handleHeaderClick(col)}>
-                ${col.header}
-                ${col.sortable ? html`<span class="sort-indicator">${this.getSortIndicator(col)}</span>` : ''}
-              </th>
-            `)}
-          </tr>
-        </thead>
-        <tbody>
-          ${sortedData.map(row => html`
-            <tr>
-              ${this.columns.map(col => html`<td>${col.accessor(row)}</td>`)}
-            </tr>
-          `)}
-        </tbody>
-      </table>
+      ${this.maxVisibleRows !== null
+        ? html`
+          <div class="table-scroll-container" style="max-height: calc(${this.maxVisibleRows} * 2.5rem + 3rem)">
+            ${this.renderTable(sortedData)}
+          </div>
+        `
+        : this.renderTable(sortedData)}
     `;
   }
 }
