@@ -16,7 +16,7 @@ export class WorkItemScatterPanel extends LitElement {
     this.workItems = result.workItems.all()
       .filter(wi => wi.workKey.type === 'known')
       .map(wi => {
-        const durationMs = wi.lastCommitDate.getTime() - wi.firstCommitDate.getTime();
+        const durationMs = wi.lastCommitDate - wi.firstCommitDate;
         const durationDays = Math.max(1, Math.round(durationMs / (1000 * 60 * 60 * 24)));
         let maxType = 'Feature';
         let maxChurn = 0;
@@ -29,7 +29,7 @@ export class WorkItemScatterPanel extends LitElement {
         return {
           key: (wi.workKey as { type: 'known'; key: string }).key,
           type: maxType,
-          startDate: wi.firstCommitDate.toISOString().split('T')[0],
+          startDate: new Date(wi.firstCommitDate).toISOString().split('T')[0],
           durationDays
         };
       });

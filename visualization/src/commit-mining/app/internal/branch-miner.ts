@@ -5,11 +5,11 @@ interface MutableBranch {
   branchId: BranchId;
   commits: Set<string>;
   firstCommitHash: string;
-  firstCommitDate: Date;
+  firstCommitDate: number;
   lastCommitHash: string;
-  lastCommitDate: Date;
+  lastCommitDate: number;
   mergeCommitHash: string | null;
-  mergeCommitDate: Date | null;
+  mergeCommitDate: number | null;
   targetBranch: string | null;
   mergedParentHash: string | null;
   isCurrent: boolean;
@@ -29,7 +29,7 @@ export class BranchMiner {
     }
   }
 
-  getResult(currentDate: Date): Branches {
+  getResult(currentDate: number): Branches {
     // Process pending merges
     for (const mergeCommit of this.pendingMerges) {
       this.processMerge(mergeCommit);
@@ -99,14 +99,14 @@ export class BranchMiner {
     }
   }
 
-  private toBranch(mutable: MutableBranch, currentDate: Date): Branch {
+  private toBranch(mutable: MutableBranch, currentDate: number): Branch {
     const wasMerged = mutable.mergeCommitHash !== null;
     const noCommitsAfterMerge = mutable.mergedParentHash
       ? mutable.lastCommitHash === mutable.mergedParentHash
       : false;
     const isCompleted = wasMerged && noCommitsAfterMerge && !mutable.isCurrent;
 
-    const ninetyDaysAgo = new Date(currentDate.getTime() - 90 * 24 * 60 * 60 * 1000);
+    const ninetyDaysAgo = currentDate - 90 * 24 * 60 * 60 * 1000;
     const isActive = mutable.lastCommitDate >= ninetyDaysAgo;
 
     let status: BranchStatus;

@@ -25,7 +25,7 @@ export type BranchId =
 export interface Commit {
   hash: string;
   author: Author;
-  date: Date;
+  date: number;
   message: string;
   parents: string[];
   fileChanges: FileChange[];

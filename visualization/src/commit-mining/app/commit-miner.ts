@@ -17,7 +17,7 @@ export class CommitMiner {
     this.branchMiner.process(commit);
   }
 
-  getResult(currentDate: Date): GitMiningResult {
+  getResult(currentDate: number): GitMiningResult {
     return {
       commits: new Commits(this.processedCommits),
       branches: this.branchMiner.getResult(currentDate),

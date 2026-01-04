@@ -9,7 +9,7 @@ export function aggregateCommitsByDate(commits: Commit[]): CommitActivity[] {
   const countsByDate = new Map<string, number>();
 
   for (const commit of commits) {
-    const dateString = commit.date.toISOString().split('T')[0];
+    const dateString = new Date(commit.date).toISOString().split('T')[0];
     const currentCount = countsByDate.get(dateString) ?? 0;
     countsByDate.set(dateString, currentCount + 1);
   }

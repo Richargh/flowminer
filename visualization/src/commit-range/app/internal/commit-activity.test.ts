@@ -5,9 +5,9 @@ import { createCommit } from '../../../commit/app/__fixtures__/commit-builder.ts
 describe('Commit Activity Aggregation', () => {
   it('aggregates commits by date', () => {
     const commits = [
-      createCommit({ date: new Date('2024-01-15') }),
-      createCommit({ date: new Date('2024-01-15') }),
-      createCommit({ date: new Date('2024-01-16') }),
+      createCommit({ date: new Date('2024-01-15').getTime() }),
+      createCommit({ date: new Date('2024-01-15').getTime() }),
+      createCommit({ date: new Date('2024-01-16').getTime() }),
     ];
 
     const activity = aggregateCommitsByDate(commits);
@@ -25,9 +25,9 @@ describe('Commit Activity Aggregation', () => {
 
   it('sorts results by date ascending', () => {
     const commits = [
-      createCommit({ date: new Date('2024-01-20') }),
-      createCommit({ date: new Date('2024-01-10') }),
-      createCommit({ date: new Date('2024-01-15') }),
+      createCommit({ date: new Date('2024-01-20').getTime() }),
+      createCommit({ date: new Date('2024-01-10').getTime() }),
+      createCommit({ date: new Date('2024-01-15').getTime() }),
     ];
 
     const activity = aggregateCommitsByDate(commits);

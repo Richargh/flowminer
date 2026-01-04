@@ -15,7 +15,7 @@ describe('Work Item Tracking', () => {
       miner.process(createCommit({ workKeys: [{ type: 'known', key: 'TASK-2' }] }));
       miner.process(createCommit({ workKeys: [{ type: 'known', key: 'TASK-1' }] }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
 
       expect(result.workItems.all()).toHaveLength(2);
       expect(result.workItems.get({ type: 'known', key: 'TASK-1' })?.commits).toBe(2);
@@ -26,7 +26,7 @@ describe('Work Item Tracking', () => {
       miner.process(createCommit({ workKeys: [{ type: 'unknown' }] }));
       miner.process(createCommit({ workKeys: [] }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
 
       expect(result.workItems.all()).toHaveLength(1);
       expect(result.workItems.get({ type: 'unknown' })?.commits).toBe(2);
@@ -37,22 +37,22 @@ describe('Work Item Tracking', () => {
     it('tracks first and last commit dates per work item', () => {
       miner.process(createCommit({
         workKeys: [{ type: 'known', key: 'TASK-1' }],
-        date: new Date('2024-01-15')
+        date: new Date('2024-01-15').getTime()
       }));
       miner.process(createCommit({
         workKeys: [{ type: 'known', key: 'TASK-1' }],
-        date: new Date('2024-01-10')
+        date: new Date('2024-01-10').getTime()
       }));
       miner.process(createCommit({
         workKeys: [{ type: 'known', key: 'TASK-1' }],
-        date: new Date('2024-01-20')
+        date: new Date('2024-01-20').getTime()
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const workItem = result.workItems.get({ type: 'known', key: 'TASK-1' });
 
-      expect(workItem?.firstCommitDate.toISOString()).toBe('2024-01-10T00:00:00.000Z');
-      expect(workItem?.lastCommitDate.toISOString()).toBe('2024-01-20T00:00:00.000Z');
+      expect(workItem?.firstCommitDate).toBe(new Date('2024-01-10').getTime());
+      expect(workItem?.lastCommitDate).toBe(new Date('2024-01-20').getTime());
     });
   });
 
@@ -71,7 +71,7 @@ describe('Work Item Tracking', () => {
         ]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const workItem = result.workItems.get({ type: 'known', key: 'TASK-1' });
 
       expect(workItem?.linesAdded).toBe(30);
@@ -95,7 +95,7 @@ describe('Work Item Tracking', () => {
         ]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const workItem = result.workItems.get({ type: 'known', key: 'TASK-1' });
 
       expect(workItem?.filesChanged).toContain('a.ts');
@@ -118,7 +118,7 @@ describe('Work Item Tracking', () => {
         ]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const workItem = result.workItems.get({ type: 'known', key: 'TASK-1' });
 
       expect(workItem?.reworkFiles).toContain('a.ts');
@@ -139,7 +139,7 @@ describe('Work Item Tracking', () => {
         fileChanges: [{ path: 'b.ts', additions: 30, deletions: 0, isRename: false, oldPath: null }]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const workItem = result.workItems.get({ type: 'known', key: 'TASK-1' });
 
       expect(workItem?.contributions).toHaveLength(2);
@@ -162,7 +162,7 @@ describe('Work Item Tracking', () => {
         workKeys: [{ type: 'known', key: 'TASK-1' }]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const workItem = result.workItems.get({ type: 'known', key: 'TASK-1' });
 
       expect(workItem?.collaborators).toBe(3);

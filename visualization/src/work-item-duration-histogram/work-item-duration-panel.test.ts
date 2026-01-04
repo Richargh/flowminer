@@ -57,8 +57,8 @@ describe('WorkItemDurationPanel', () => {
         workKey: { type: 'known', key: 'FEAT-1' },
         linesAdded: 100,
         linesRemoved: 50,
-        firstCommitDate: new Date('2024-01-01'),
-        lastCommitDate: new Date('2024-01-02'), // 1 day - bucket 0-2
+        firstCommitDate: new Date('2024-01-01').getTime(),
+        lastCommitDate: new Date('2024-01-02').getTime(), // 1 day - bucket 0-2
         filesChanged: ['file.ts'],
         contributions: [],
         absoluteChurnByType: new Map([['FEATURE', 150]]),
@@ -70,8 +70,8 @@ describe('WorkItemDurationPanel', () => {
         workKey: { type: 'known', key: 'FEAT-2' },
         linesAdded: 200,
         linesRemoved: 100,
-        firstCommitDate: new Date('2024-01-01'),
-        lastCommitDate: new Date('2024-01-04'), // 3 days - bucket 2-4
+        firstCommitDate: new Date('2024-01-01').getTime(),
+        lastCommitDate: new Date('2024-01-04').getTime(), // 3 days - bucket 2-4
         filesChanged: ['file2.ts'],
         contributions: [],
         absoluteChurnByType: new Map([['FEATURE', 300]]),
@@ -103,8 +103,8 @@ describe('WorkItemDurationPanel', () => {
         workKey: { type: 'known', key: 'FILTERED-1' },
         linesAdded: 50,
         linesRemoved: 25,
-        firstCommitDate: new Date('2024-02-01'),
-        lastCommitDate: new Date('2024-02-06'), // 5 days - bucket 4-6
+        firstCommitDate: new Date('2024-02-01').getTime(),
+        lastCommitDate: new Date('2024-02-06').getTime(), // 5 days - bucket 4-6
         filesChanged: ['filtered.ts'],
         contributions: [],
         absoluteChurnByType: new Map([['FIX', 75]]),
@@ -116,8 +116,8 @@ describe('WorkItemDurationPanel', () => {
         workKey: { type: 'known', key: 'FILTERED-2' },
         linesAdded: 100,
         linesRemoved: 50,
-        firstCommitDate: new Date('2024-02-10'),
-        lastCommitDate: new Date('2024-02-19'), // 9 days - bucket 8-10
+        firstCommitDate: new Date('2024-02-10').getTime(),
+        lastCommitDate: new Date('2024-02-19').getTime(), // 9 days - bucket 8-10
         filesChanged: ['filtered2.ts'],
         contributions: [],
         absoluteChurnByType: new Map([['FEATURE', 150]]),

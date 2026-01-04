@@ -9,8 +9,8 @@ export interface WorkItem {
     workKey: WorkKey;
     linesAdded: number;
     linesRemoved: number;
-    firstCommitDate: Date;
-    lastCommitDate: Date;
+    firstCommitDate: number;
+    lastCommitDate: number;
     filesChanged: string[];
     contributions: AuthorContribution[];
     absoluteChurnByType: Map<CommitType, number>;

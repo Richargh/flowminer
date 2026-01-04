@@ -7,9 +7,9 @@ import { Branches } from './app/api-types/branch.ts';
 import { AuthorStatistics } from './app/api-types/author.ts';
 import type { Commit } from '../commit/app/api-types/commit.ts';
 
-function createWorkItem(firstCommitDate: Date): WorkItem {
+function createWorkItem(firstCommitDate: number): WorkItem {
   return {
-    workKey: { type: 'known', key: `WORK-${firstCommitDate.getTime()}` },
+    workKey: { type: 'known', key: `WORK-${firstCommitDate}` },
     linesAdded: 100,
     linesRemoved: 50,
     firstCommitDate,
@@ -23,9 +23,9 @@ function createWorkItem(firstCommitDate: Date): WorkItem {
   };
 }
 
-function createCommit(date: Date): Commit {
+function createCommit(date: number): Commit {
   return {
-    hash: `hash-${date.getTime()}`,
+    hash: `hash-${date}`,
     author: { name: 'Test Author', email: 'test@example.com' },
     date,
     message: 'Test commit',
@@ -79,9 +79,9 @@ describe('GitMiningCoordinator', () => {
   it('should dispatch data-constrained with filtered work items based on range', () => {
     const coordinator = new GitMiningCoordinator();
     const workItems = [
-      createWorkItem(new Date('2024-01-01')),
-      createWorkItem(new Date('2024-01-05')),
-      createWorkItem(new Date('2024-01-10'))
+      createWorkItem(new Date('2024-01-01').getTime()),
+      createWorkItem(new Date('2024-01-05').getTime()),
+      createWorkItem(new Date('2024-01-10').getTime())
     ];
 
     const mockResult: GitMiningResult = {
@@ -101,7 +101,7 @@ describe('GitMiningCoordinator', () => {
     expect(dataConstrainedHandler).toHaveBeenCalledTimes(1);
     const event = dataConstrainedHandler.mock.calls[0][0] as CustomEvent<GitMiningResult>;
     expect(event.detail.workItems.size()).toBe(1);
-    expect(event.detail.workItems.all()[0].firstCommitDate).toEqual(new Date('2024-01-05'));
+    expect(event.detail.workItems.all()[0].firstCommitDate).toBe(new Date('2024-01-05').getTime());
 
     document.removeEventListener('data-constrained', dataConstrainedHandler);
   });
@@ -109,9 +109,9 @@ describe('GitMiningCoordinator', () => {
   it('should dispatch data-constrained with filtered commits based on range', () => {
     const coordinator = new GitMiningCoordinator();
     const commits = [
-      createCommit(new Date('2024-01-01')),
-      createCommit(new Date('2024-01-05')),
-      createCommit(new Date('2024-01-10'))
+      createCommit(new Date('2024-01-01').getTime()),
+      createCommit(new Date('2024-01-05').getTime()),
+      createCommit(new Date('2024-01-10').getTime())
     ];
 
     const mockResult: GitMiningResult = {
@@ -131,7 +131,7 @@ describe('GitMiningCoordinator', () => {
     expect(dataConstrainedHandler).toHaveBeenCalledTimes(1);
     const event = dataConstrainedHandler.mock.calls[0][0] as CustomEvent<GitMiningResult>;
     expect(event.detail.commits.size()).toBe(1);
-    expect(event.detail.commits.all()[0].date).toEqual(new Date('2024-01-05'));
+    expect(event.detail.commits.all()[0].date).toBe(new Date('2024-01-05').getTime());
 
     document.removeEventListener('data-constrained', dataConstrainedHandler);
   });
@@ -139,9 +139,9 @@ describe('GitMiningCoordinator', () => {
   it('should dispatch full data when range matches full data range', () => {
     const coordinator = new GitMiningCoordinator();
     const workItems = [
-      createWorkItem(new Date('2024-01-01')),
-      createWorkItem(new Date('2024-01-05')),
-      createWorkItem(new Date('2024-01-10'))
+      createWorkItem(new Date('2024-01-01').getTime()),
+      createWorkItem(new Date('2024-01-05').getTime()),
+      createWorkItem(new Date('2024-01-10').getTime())
     ];
 
     const mockResult: GitMiningResult = {
@@ -168,9 +168,9 @@ describe('GitMiningCoordinator', () => {
   it('should dispatch empty workItems when range excludes all items', () => {
     const coordinator = new GitMiningCoordinator();
     const workItems = [
-      createWorkItem(new Date('2024-01-01')),
-      createWorkItem(new Date('2024-01-02')),
-      createWorkItem(new Date('2024-01-03'))
+      createWorkItem(new Date('2024-01-01').getTime()),
+      createWorkItem(new Date('2024-01-02').getTime()),
+      createWorkItem(new Date('2024-01-03').getTime())
     ];
 
     const mockResult: GitMiningResult = {

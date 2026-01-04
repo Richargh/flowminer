@@ -10,5 +10,5 @@ export function loadDefaultData(): GitMiningResult {
         miner.process(commit);
     }
 
-    return miner.getResult(new Date());
+    return miner.getResult(Date.now());
 }

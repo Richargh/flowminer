@@ -6,11 +6,11 @@ export interface Branch {
     branchId: BranchId;
     commits: string[];
     firstCommitHash: string;
-    firstCommitDate: Date;
+    firstCommitDate: number;
     lastCommitHash: string;
-    lastCommitDate: Date;
+    lastCommitDate: number;
     mergeCommitHash: string | null;
-    mergeDate: Date | null;
+    mergeDate: number | null;
     targetBranch: string | null;
     isCurrent: boolean;
     status: BranchStatus;

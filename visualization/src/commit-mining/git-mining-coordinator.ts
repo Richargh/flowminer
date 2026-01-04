@@ -51,11 +51,10 @@ export class GitMiningCoordinator {
   }
 
   private filterCommitsByRange(commits: Commit[], startDate: string, endDate: string): Commit[] {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
     return commits.filter(commit => {
-      const commitDate = commit.date;
-      return commitDate >= start && commitDate <= end;
+      return commit.date >= start && commit.date <= end;
     });
   }
 

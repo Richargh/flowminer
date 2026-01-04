@@ -15,7 +15,7 @@ describe('Branch Tracking', () => {
       miner.process(createCommit({ hash: 'feat1', branchId: { type: 'certain', name: 'feature/test' } }));
       miner.process(createCommit({ hash: 'main2', branchId: { type: 'certain', name: 'main' } }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
 
       expect(result.branches.all()).toHaveLength(2);
       expect(result.branches.get('main')?.commits).toHaveLength(2);
@@ -28,24 +28,24 @@ describe('Branch Tracking', () => {
       miner.process(createCommit({
         hash: 'a',
         branchId: { type: 'certain', name: 'main' },
-        date: new Date('2024-01-15')
+        date: new Date('2024-01-15').getTime()
       }));
       miner.process(createCommit({
         hash: 'b',
         branchId: { type: 'certain', name: 'main' },
-        date: new Date('2024-01-10')
+        date: new Date('2024-01-10').getTime()
       }));
       miner.process(createCommit({
         hash: 'c',
         branchId: { type: 'certain', name: 'main' },
-        date: new Date('2024-01-20')
+        date: new Date('2024-01-20').getTime()
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const branch = result.branches.get('main');
 
-      expect(branch?.firstCommitDate.toISOString()).toBe('2024-01-10T00:00:00.000Z');
-      expect(branch?.lastCommitDate.toISOString()).toBe('2024-01-20T00:00:00.000Z');
+      expect(branch?.firstCommitDate).toBe(new Date('2024-01-10').getTime());
+      expect(branch?.lastCommitDate).toBe(new Date('2024-01-20').getTime());
     });
   });
 
@@ -66,7 +66,7 @@ describe('Branch Tracking', () => {
         isOnCurrentBranch: true
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const featureBranch = result.branches.get('feature/test');
 
       expect(featureBranch?.mergeCommitHash).toBe('merge1');
@@ -76,8 +76,8 @@ describe('Branch Tracking', () => {
 
   describe('branch status classification', () => {
     it('classifies active branches (recent activity, not merged)', () => {
-      const now = new Date('2024-03-15');
-      const within90Days = new Date('2024-01-20');
+      const now = new Date('2024-03-15').getTime();
+      const within90Days = new Date('2024-01-20').getTime();
 
       miner.process(createCommit({
         branchId: { type: 'certain', name: 'feature/active' },
@@ -92,8 +92,8 @@ describe('Branch Tracking', () => {
     });
 
     it('classifies stale branches (no recent activity, not merged)', () => {
-      const now = new Date('2024-06-15');
-      const olderThan90Days = new Date('2024-01-15');
+      const now = new Date('2024-06-15').getTime();
+      const olderThan90Days = new Date('2024-01-15').getTime();
 
       miner.process(createCommit({
         branchId: { type: 'certain', name: 'feature/stale' },
@@ -108,13 +108,13 @@ describe('Branch Tracking', () => {
     });
 
     it('classifies completed branches (merged with no subsequent commits)', () => {
-      const now = new Date('2024-03-15');
+      const now = new Date('2024-03-15').getTime();
 
       miner.process(createCommit({
         hash: 'feature1',
         branchId: { type: 'certain', name: 'feature/done' },
         parents: [],
-        date: new Date('2024-01-10'),
+        date: new Date('2024-01-10').getTime(),
         isOnCurrentBranch: false
       }));
 
@@ -122,7 +122,7 @@ describe('Branch Tracking', () => {
         hash: 'merge1',
         branchId: { type: 'certain', name: 'main' },
         parents: ['main1', 'feature1'],
-        date: new Date('2024-01-15'),
+        date: new Date('2024-01-15').getTime(),
         isMerge: true,
         isOnCurrentBranch: true
       }));

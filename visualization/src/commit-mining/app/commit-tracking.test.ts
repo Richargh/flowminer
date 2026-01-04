@@ -17,7 +17,7 @@ describe('Git Mining', () => {
       miner.process(commit1);
       miner.process(commit2);
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
 
       expect(result.commits.all()).toHaveLength(2);
       expect(result.commits.get(0).hash).toBe('abc123');
@@ -40,7 +40,7 @@ describe('Git Mining', () => {
         branchId: { type: 'certain', name: 'feature/test' }
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
 
       expect(result.commits.all()).toHaveLength(2);
       expect(result.authorStatistics.size()).toBe(2);

@@ -5,8 +5,8 @@ interface MutableWorkItem {
   workKey: WorkKey;
   linesAdded: number;
   linesRemoved: number;
-  firstCommitDate: Date;
-  lastCommitDate: Date;
+  firstCommitDate: number;
+  lastCommitDate: number;
   filesChanged: Set<string>;
   fileTouchCount: Map<string, number>;
   absoluteChurnByAuthor: Map<string, number>;
@@ -36,7 +36,7 @@ export class WorkItemMiner {
     return new WorkItems(items);
   }
 
-  private getOrCreate(key: string, workKey: WorkKey, date: Date): MutableWorkItem {
+  private getOrCreate(key: string, workKey: WorkKey, date: number): MutableWorkItem {
     let item = this.workItems.get(key);
     if (!item) {
       item = {

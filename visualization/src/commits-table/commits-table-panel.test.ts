@@ -11,7 +11,7 @@ describe('CommitsTablePanel', () => {
   const mockCommit: Commit = {
     hash: 'abc1234567890',
     author: { name: 'Alice', email: 'alice@example.com' },
-    date: new Date('2024-01-15'),
+    date: new Date('2024-01-15').getTime(),
     message: 'Add feature X',
     parents: [],
     fileChanges: [],
@@ -87,7 +87,7 @@ describe('CommitsTablePanel', () => {
     const filteredCommit: Commit = {
       hash: 'filtered123456',
       author: { name: 'Bob', email: 'bob@example.com' },
-      date: new Date('2024-02-01'),
+      date: new Date('2024-02-01').getTime(),
       message: 'Filtered commit',
       parents: [],
       fileChanges: [],

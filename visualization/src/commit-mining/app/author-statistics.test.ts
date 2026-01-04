@@ -15,7 +15,7 @@ describe('Author Statistics', () => {
       miner.process(createCommit({ author: { name: 'Alice', email: 'alice@example.com' } }));
       miner.process(createCommit({ author: { name: 'Bob', email: 'bob@example.com' } }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
 
       expect(result.authorStatistics.all()).toHaveLength(2);
       expect(result.authorStatistics.get({ name: 'Alice', email: 'alice@example.com' })?.commitCount).toBe(2);
@@ -39,7 +39,7 @@ describe('Author Statistics', () => {
         ]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const aliceStats = result.authorStatistics.get({ name: 'Alice', email: 'alice@example.com' });
 
       expect(aliceStats?.linesAdded).toBe(35);
@@ -65,7 +65,7 @@ describe('Author Statistics', () => {
         fileChanges: [{ path: 'c.ts', additions: 7, deletions: 1, isRename: false, oldPath: null }]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const aliceStats = result.authorStatistics.get({ name: 'Alice', email: 'alice@example.com' });
 
       expect(aliceStats?.churnByCommitType.get('FEATURE')).toEqual({ additions: 17, deletions: 6 });
@@ -83,7 +83,7 @@ describe('Author Statistics', () => {
         ]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const aliceStats = result.authorStatistics.get({ name: 'Alice', email: 'alice@example.com' });
 
       expect(aliceStats?.collaborators).toHaveLength(2);
@@ -101,7 +101,7 @@ describe('Author Statistics', () => {
         workKeys: [{ type: 'known', key: 'TASK-1' }]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const aliceStats = result.authorStatistics.get({ name: 'Alice', email: 'alice@example.com' });
       const bobStats = result.authorStatistics.get({ name: 'Bob', email: 'bob@example.com' });
 
@@ -121,7 +121,7 @@ describe('Author Statistics', () => {
         workKeys: [{ type: 'known', key: 'TASK-1' }, { type: 'known', key: 'TASK-3' }]
       }));
 
-      const result = miner.getResult(new Date());
+      const result = miner.getResult(Date.now());
       const aliceStats = result.authorStatistics.get({ name: 'Alice', email: 'alice@example.com' });
 
       expect(aliceStats?.workItems).toHaveLength(3);

@@ -8,7 +8,7 @@ export function toCommit(dto: SerializedCommitDto): Commit {
       name: dto.authorName,
       email: dto.authorEmail
     },
-    date: new Date(dto.date),
+    date: new Date(dto.date).getTime(),
     message: dto.message,
     parents: dto.parents,
     fileChanges: dto.fileChanges.map(fc => ({

@@ -33,14 +33,22 @@ describe('commit-transform', () => {
       expect(commit.isMerge).toBe(false);
     });
 
-    it('parses ISO date string to Date', () => {
+    it('parses ISO date string to milliseconds', () => {
       const dto = createMinimalCommitDto();
-      dto.date = '2024-01-15T10:30:00Z';
+      dto.date = '2024-01-15T10:30:00.000Z';
 
       const commit = toCommit(dto);
 
-      expect(commit.date).toBeInstanceOf(Date);
-      expect(commit.date.toISOString()).toBe('2024-01-15T10:30:00.000Z');
+      expect(commit.date).toBe(1705314600000);
+    });
+
+    it('date supports arithmetic operations', () => {
+      const dto = createMinimalCommitDto();
+      const commit = toCommit(dto);
+
+      // TypeScript should accept arithmetic on commit.date
+      const futureDate = commit.date + 1000;
+      expect(typeof futureDate).toBe('number');
     });
 
     it('converts parents array', () => {

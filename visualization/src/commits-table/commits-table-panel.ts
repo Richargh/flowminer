@@ -20,7 +20,7 @@ export class CommitsTablePanel extends LitElement {
     return [
       { id: 'hash', header: 'Hash', accessor: (c) => formatShortHash(c.hash), sortable: true },
       { id: 'author', header: 'Author', accessor: (c) => c.author.name, sortable: true, filterable: true, filterType: 'select', filterOptions: uniqueAuthors },
-      { id: 'date', header: 'Date', accessor: (c) => c.date.toLocaleDateString(), sortable: true },
+      { id: 'date', header: 'Date', accessor: (c) => new Date(c.date).toLocaleDateString(), sortable: true },
       { id: 'message', header: 'Message', accessor: (c) => truncateMessage(c.message), sortable: true },
       { id: 'type', header: 'Type', accessor: (c) => c.commitType, sortable: true, filterable: true, filterType: 'multiSelect', filterOptions: uniqueTypes },
       { id: 'workKeys', header: 'Work Keys', accessor: (c) => formatWorkKeys(c.workKeys), sortable: true, filterable: true, filterType: 'select', filterOptions: uniqueWorkKeys },

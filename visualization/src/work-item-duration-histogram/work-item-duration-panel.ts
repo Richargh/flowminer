@@ -25,7 +25,7 @@ export class WorkItemDurationPanel extends LitElement {
     const durations = result.workItems.all()
       .filter(wi => wi.workKey.type === 'known')
       .map(wi => {
-        const durationMs = wi.lastCommitDate.getTime() - wi.firstCommitDate.getTime();
+        const durationMs = wi.lastCommitDate - wi.firstCommitDate;
         return Math.max(1, Math.round(durationMs / (1000 * 60 * 60 * 24)));
       });
 

@@ -19,7 +19,7 @@ describe('jsonl-parser', () => {
       expect(result.hash).toBe('abc123');
       expect(result.author.name).toBe('Alice');
       expect(result.author.email).toBe('alice@example.com');
-      expect(result.date).toEqual(new Date('2024-01-15T10:30:00Z'));
+      expect(result.date).toBe(1705314600000);
       expect(result.message).toBe('Initial commit');
       expect(result.parents).toEqual([]);
       expect(result.branchId.type).toBe('certain');

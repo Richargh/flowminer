@@ -59,7 +59,7 @@ export class FileLoader extends LitElement {
       miner.process(commit);
     }
 
-    const result = miner.getResult(new Date());
+    const result = miner.getResult(Date.now());
 
     this.filename = file.name;
     this.commitCount = result.commits.size();

@@ -65,7 +65,7 @@ describe('CommitRangePanel', () => {
       {
         hash: 'abc123',
         author: { name: 'Test', email: 'test@example.com' },
-        date: new Date('2024-01-01'),
+        date: new Date('2024-01-01').getTime(),
         message: 'feat: first commit',
         parents: [],
         fileChanges: [],
@@ -79,7 +79,7 @@ describe('CommitRangePanel', () => {
       {
         hash: 'def456',
         author: { name: 'Test', email: 'test@example.com' },
-        date: new Date('2024-01-01'),
+        date: new Date('2024-01-01').getTime(),
         message: 'feat: second commit',
         parents: ['abc123'],
         fileChanges: [],
@@ -93,7 +93,7 @@ describe('CommitRangePanel', () => {
       {
         hash: 'ghi789',
         author: { name: 'Test', email: 'test@example.com' },
-        date: new Date('2024-01-02'),
+        date: new Date('2024-01-02').getTime(),
         message: 'fix: third commit',
         parents: ['def456'],
         fileChanges: [],
