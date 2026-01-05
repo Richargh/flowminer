@@ -82,6 +82,7 @@ class GitHubCli : Callable<Int> {
             0
         } catch (e: Exception) {
             System.err.println("Error: ${e.message}")
+            e.printStackTrace()
             1
         } finally {
             service.close()
