@@ -7,6 +7,8 @@ import de.richargh.teamcharta.importer.github.app.internal.GitHubGraphQlClient
 import de.richargh.teamcharta.importer.github.app.internal.createGraphQLHttpClient
 import de.richargh.teamcharta.importer.github.app.internal.toGitHubWorkItem
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
  * Service for fetching GitHub issues as work items.
@@ -33,12 +35,8 @@ class GitHubImporter(
      * @param quiet If true, suppress progress logging
      * @return List of GitHubWorkItem with transitions populated
      */
-    suspend fun fetchIssuesWithTimelines(repoId: RepositoryId, quiet: Boolean = false): List<GitHubWorkItem> {
-        val graphqlIssues = graphqlClient.fetchAllIssues(repoId, quiet)
-
-        if (!quiet) println("Converting ${graphqlIssues.size} issues...")
-        val workItems = graphqlIssues.map { it.toGitHubWorkItem(repoId) }
-        return workItems
+    fun fetchIssuesWithTimelines(repoId: RepositoryId, quiet: Boolean = false): Flow<GitHubWorkItem> {
+        return graphqlClient.fetchAllIssues(repoId, quiet).map { it.toGitHubWorkItem(repoId) }
     }
 
     /**

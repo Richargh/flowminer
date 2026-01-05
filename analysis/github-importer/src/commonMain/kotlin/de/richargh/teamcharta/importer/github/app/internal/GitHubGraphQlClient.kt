@@ -14,6 +14,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.time.Instant
@@ -91,11 +94,11 @@ class GitHubGraphQlClient(
      * @param repoId The repository to fetch issues from
      * @param quiet If true, suppress progress logging
      */
-    suspend fun fetchAllIssues(repoId: RepositoryId, quiet: Boolean = false): List<GraphQLIssue> {
-        val allIssues = mutableListOf<GraphQLIssue>()
+    fun fetchAllIssues(repoId: RepositoryId, quiet: Boolean = false): Flow<GraphQLIssue> = flow {
         var cursor: String? = null
         var hasNextPage = true
         var page = 0
+        var issueCount = 0
 
         if (!quiet) println("Fetching issues from ${repoId.owner}/${repoId.name}...")
 
@@ -106,10 +109,11 @@ class GitHubGraphQlClient(
 
             val issues = response.data?.repository?.issues
             if (issues != null) {
-                allIssues.addAll(issues.nodes)
+                issueCount += issues.nodes.size
+                issues.nodes.forEach { emit(it) }
                 hasNextPage = issues.pageInfo?.hasNextPage ?: false
                 cursor = issues.pageInfo?.endCursor
-                if (!quiet) println("  Page $page: ${allIssues.size} issues fetched")
+                if (!quiet) println("  Page $page: $issueCount issues fetched")
 
                 // Warn about nested pagination limits
                 checkNestedPaginationLimits(issues.nodes, quiet)
@@ -117,8 +121,6 @@ class GitHubGraphQlClient(
                 hasNextPage = false
             }
         }
-
-        return allIssues
     }
 
     /**

@@ -4,6 +4,7 @@ import de.richargh.teamcharta.importer.github.app.GitHubImporter
 import de.richargh.teamcharta.importer.github.app.api.GitHubCredentials
 import de.richargh.teamcharta.importer.github.app.api.GitHubWorkItem
 import de.richargh.teamcharta.importer.github.app.api.RepositoryId
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.Command
@@ -73,16 +74,11 @@ class GitHubCli : Callable<Int> {
         val repoId = RepositoryId(owner = owner, name = repo)
 
         return try {
-            val workItems = runBlocking {
-                service.fetchIssuesWithTimelines(repoId, quiet)
+            runBlocking {
+                val issues = service.fetchIssuesWithTimelines(repoId, quiet)
+                consume(issues)
             }
 
-            val content = when (format) {
-                OutputFormat.table -> formatTable(workItems)
-                OutputFormat.jsonl -> formatJsonl(workItems)
-            }
-
-            writeOutput(content)
             0
         } catch (e: Exception) {
             System.err.println("Error: ${e.message}")
@@ -92,26 +88,35 @@ class GitHubCli : Callable<Int> {
         }
     }
 
-    private fun formatTable(workItems: List<GitHubWorkItem>): Sequence<String> {
+    private suspend fun consume(workItems: Flow<GitHubWorkItem>) {
+        val content = when (format) {
+            OutputFormat.table -> formatTable(workItems)
+            OutputFormat.jsonl -> formatJsonl(workItems)
+        }
+
+        writeOutput(content)
+    }
+
+    private suspend fun formatTable(workItems: Flow<GitHubWorkItem>): Flow<String> {
         return TableFormatter.format(workItems)
     }
 
-    private fun formatJsonl(workItems: List<GitHubWorkItem>): Sequence<String> {
+    private fun formatJsonl(workItems: Flow<GitHubWorkItem>): Flow<String> {
         return JsonlFormatter.format(workItems)
     }
 
-    private fun writeOutput(content: Sequence<String>) {
+    private suspend fun writeOutput(content: Flow<String>) {
         val out = output
         if (out != null) {
             File(out).bufferedWriter().use { file ->
-                content.forEach { line ->
+                content.collect { line ->
                     file.write(line)
                     file.newLine()
                 }
             }
             println("Written to $out")
         } else {
-            content.forEach { line ->
+            content.collect { line ->
                 println(line)
             }
         }

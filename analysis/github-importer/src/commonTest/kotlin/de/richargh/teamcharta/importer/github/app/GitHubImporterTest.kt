@@ -20,6 +20,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
@@ -68,7 +69,7 @@ class GitHubImporterTest {
         val service = GitHubImporter(credentials, httpClient)
 
         // when
-        val workItems = service.fetchIssuesWithTimelines(repoId)
+        val workItems = service.fetchIssuesWithTimelines(repoId).toList()
 
         // then
         workItems shouldHaveSize 2
@@ -103,7 +104,7 @@ class GitHubImporterTest {
         val service = GitHubImporter(credentials, httpClient)
 
         // when
-        val workItems = service.fetchIssuesWithTimelines(repoId)
+        val workItems = service.fetchIssuesWithTimelines(repoId).toList()
 
         // then
         workItems shouldBe emptyList()
@@ -151,7 +152,7 @@ class GitHubImporterTest {
         val service = GitHubImporter(credentials, httpClient)
 
         // when
-        val workItems = service.fetchIssuesWithTimelines(repoId)
+        val workItems = service.fetchIssuesWithTimelines(repoId).toList()
 
         // then
         workItems shouldHaveSize 1
@@ -194,7 +195,7 @@ class GitHubImporterTest {
         val service = GitHubImporter(credentials, httpClient)
 
         // when
-        val workItems = service.fetchIssuesWithTimelines(repoId)
+        val workItems = service.fetchIssuesWithTimelines(repoId).toList()
 
         // then
         workItems shouldHaveSize 1
@@ -239,7 +240,7 @@ class GitHubImporterTest {
         val service = GitHubImporter(credentials, httpClient)
 
         // when
-        val workItems = service.fetchIssuesWithTimelines(repoId)
+        val workItems = service.fetchIssuesWithTimelines(repoId).toList()
 
         // then
         workItems shouldHaveSize 2
@@ -284,7 +285,7 @@ class GitHubImporterTest {
         val service = GitHubImporter(credentials, httpClient)
 
         // when
-        val workItems = service.fetchIssuesWithTimelines(repoId)
+        val workItems = service.fetchIssuesWithTimelines(repoId).toList()
 
         // then - cross-repo parent reference should be preserved
         workItems shouldHaveSize 1
@@ -347,7 +348,7 @@ class GitHubImporterTest {
         val service = GitHubImporter(credentials, httpClient)
 
         // when
-        val workItems = service.fetchIssuesWithTimelines(repoId)
+        val workItems = service.fetchIssuesWithTimelines(repoId).toList()
 
         // then
         workItems shouldHaveSize 4
@@ -401,7 +402,7 @@ class GitHubImporterTest {
         val service = GitHubImporter(credentials, httpClient)
 
         // when
-        val workItems = service.fetchIssuesWithTimelines(repoId)
+        val workItems = service.fetchIssuesWithTimelines(repoId).toList()
 
         // then
         workItems shouldHaveSize 1
