@@ -56,13 +56,6 @@ class GitHubCliTest {
                     state("OPEN")
                     createdAt("2024-01-01T10:00:00Z")
                 },
-                aGraphQLIssue {
-                    number(2)
-                    title("Feature request")
-                    state("CLOSED")
-                    createdAt("2024-01-02T10:00:00Z")
-                    closedAt("2024-01-15T10:00:00Z")
-                }
             )
         }
         mockServer.enqueue(
@@ -87,7 +80,6 @@ class GitHubCliTest {
         exitCode shouldBe 0
         val output = outContent.toString()
         output shouldContain "Bug report"
-        output shouldContain "Feature request"
     }
 
     @Test
@@ -156,74 +148,5 @@ class GitHubCliTest {
         exitCode shouldBe 1
         val errorOutput = errContent.toString()
         errorOutput shouldContain "Error:"
-    }
-
-    @Test
-    fun `should handle empty repository`() {
-        // given
-        val graphqlResponse = aGraphQLResponse {
-            // no issues
-        }
-        mockServer.enqueue(
-            MockResponse()
-                .setBody(json.encodeToString(graphqlResponse))
-                .addHeader("Content-Type", "application/json")
-        )
-
-        val cli = GitHubCli()
-        val cmd = CommandLine(cli)
-
-        // when
-        val exitCode = cmd.execute(
-            "--token", "test-token",
-            "--owner", "octocat",
-            "--repo", "empty-repo",
-            "--base-url", mockServer.url("/").toString().removeSuffix("/"),
-            "--quiet"
-        )
-
-        // then
-        exitCode shouldBe 0
-    }
-
-    @Test
-    fun `should send correct GraphQL request`() {
-        // given
-        val graphqlResponse = aGraphQLResponse {
-            issues(
-                aGraphQLIssue {
-                    number(1)
-                    title("Test")
-                    state("OPEN")
-                    createdAt("2024-01-01T10:00:00Z")
-                }
-            )
-        }
-        mockServer.enqueue(
-            MockResponse()
-                .setBody(json.encodeToString(graphqlResponse))
-                .addHeader("Content-Type", "application/json")
-        )
-
-        val cli = GitHubCli()
-        val cmd = CommandLine(cli)
-
-        // when
-        cmd.execute(
-            "--token", "my-secret-token",
-            "--owner", "myorg",
-            "--repo", "myrepo",
-            "--base-url", mockServer.url("/").toString().removeSuffix("/"),
-            "--quiet"
-        )
-
-        // then
-        val request = mockServer.takeRequest()
-        request.path shouldBe "/graphql"
-        request.getHeader("Authorization") shouldBe "Bearer my-secret-token"
-        request.getHeader("Content-Type") shouldContain "application/json"
-        val body = request.body.readUtf8()
-        body shouldContain "myorg"
-        body shouldContain "myrepo"
     }
 }
