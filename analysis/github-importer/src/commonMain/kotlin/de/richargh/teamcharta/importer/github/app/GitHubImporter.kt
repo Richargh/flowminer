@@ -19,8 +19,8 @@ import io.ktor.client.HttpClient
  * This is the main public API for the github-importer library.
  */
 class GitHubImporter(
-    private val credentials: GitHubCredentials,
-    private val httpClient: HttpClient = createGraphQLHttpClient()
+    credentials: GitHubCredentials,
+    httpClient: HttpClient = createGraphQLHttpClient()
 ) {
     private val graphqlClient = GitHubGraphQlClient(credentials, httpClient)
     /**
