@@ -1,10 +1,9 @@
 package de.richargh.teamcharta.importer.githubcli
 
-import de.richargh.teamcharta.importer.github.app.api.GitHubCredentials
 import de.richargh.teamcharta.importer.github.app.GitHubImporter
+import de.richargh.teamcharta.importer.github.app.api.GitHubCredentials
 import de.richargh.teamcharta.importer.github.app.api.GitHubWorkItem
 import de.richargh.teamcharta.importer.github.app.api.RepositoryId
-import de.richargh.teamcharta.importer.github.app.internal.GitHubGraphQlClient
 import kotlinx.coroutines.runBlocking
 import picocli.CommandLine
 import picocli.CommandLine.Command
@@ -65,12 +64,13 @@ class GitHubCli : Callable<Int> {
     @Option(names = ["--quiet", "-q"], description = ["Suppress progress output"])
     var quiet: Boolean = false
 
-    override fun call(): Int {
-        val connection = GitHubCredentials(token = token)
-        val repoId = RepositoryId(owner = owner, name = repo)
+    @Option(names = ["--base-url"], hidden = true, description = ["Base URL for GitHub API (for testing)"])
+    var baseUrl: String = "https://api.github.com"
 
-        val graphqlClient = GitHubGraphQlClient(connection)
-        val service = GitHubImporter(graphqlClient)
+    override fun call(): Int {
+        val credentials = GitHubCredentials(token = token, baseUrl = baseUrl)
+        val service = GitHubImporter(credentials)
+        val repoId = RepositoryId(owner = owner, name = repo)
 
         return try {
             val workItems = runBlocking {

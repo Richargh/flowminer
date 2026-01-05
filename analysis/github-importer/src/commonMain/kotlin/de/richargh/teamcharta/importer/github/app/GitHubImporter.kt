@@ -1,9 +1,12 @@
 package de.richargh.teamcharta.importer.github.app
 
+import de.richargh.teamcharta.importer.github.app.api.GitHubCredentials
 import de.richargh.teamcharta.importer.github.app.api.GitHubWorkItem
 import de.richargh.teamcharta.importer.github.app.api.RepositoryId
 import de.richargh.teamcharta.importer.github.app.internal.GitHubGraphQlClient
+import de.richargh.teamcharta.importer.github.app.internal.createGraphQLHttpClient
 import de.richargh.teamcharta.importer.github.app.internal.toGitHubWorkItem
+import io.ktor.client.HttpClient
 
 /**
  * Service for fetching GitHub issues as work items.
@@ -16,8 +19,10 @@ import de.richargh.teamcharta.importer.github.app.internal.toGitHubWorkItem
  * This is the main public API for the github-importer library.
  */
 class GitHubImporter(
-    private val graphqlClient: GitHubGraphQlClient
+    private val credentials: GitHubCredentials,
+    private val httpClient: HttpClient = createGraphQLHttpClient()
 ) {
+    private val graphqlClient = GitHubGraphQlClient(credentials, httpClient)
     /**
      * Fetch all issues from a repository with full timeline events.
      *

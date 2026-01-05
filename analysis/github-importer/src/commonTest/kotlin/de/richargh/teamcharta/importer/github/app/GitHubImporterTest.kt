@@ -3,7 +3,6 @@ package de.richargh.teamcharta.importer.github.app
 import de.richargh.teamcharta.importer.github.app.api.GitHubCredentials
 import de.richargh.teamcharta.importer.github.app.api.RepositoryId
 import de.richargh.teamcharta.importer.github.app.api.WorkItemState
-import de.richargh.teamcharta.importer.github.app.internal.GitHubGraphQlClient
 import de.richargh.teamcharta.importer.githubfixtures.aGraphQLAuthor
 import de.richargh.teamcharta.importer.githubfixtures.aGraphQLClosedEvent
 import de.richargh.teamcharta.importer.githubfixtures.aGraphQLIssue
@@ -28,7 +27,7 @@ import kotlin.time.Instant
 
 class GitHubImporterTest {
 
-    private val connection = GitHubCredentials(token = "test-token")
+    private val credentials = GitHubCredentials(token = "test-token")
     private val repoId = RepositoryId("octocat", "hello-world")
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -66,8 +65,7 @@ class GitHubImporterTest {
             install(ContentNegotiation) { json(json) }
         }
 
-        val graphqlClient = GitHubGraphQlClient(connection, httpClient)
-        val service = GitHubImporter(graphqlClient)
+        val service = GitHubImporter(credentials, httpClient)
 
         // when
         val workItems = service.fetchIssuesWithTimelines(repoId)
@@ -102,8 +100,7 @@ class GitHubImporterTest {
             install(ContentNegotiation) { json(json) }
         }
 
-        val graphqlClient = GitHubGraphQlClient(connection, httpClient)
-        val service = GitHubImporter(graphqlClient)
+        val service = GitHubImporter(credentials, httpClient)
 
         // when
         val workItems = service.fetchIssuesWithTimelines(repoId)
@@ -151,8 +148,7 @@ class GitHubImporterTest {
             install(ContentNegotiation) { json(json) }
         }
 
-        val graphqlClient = GitHubGraphQlClient(connection, httpClient)
-        val service = GitHubImporter(graphqlClient)
+        val service = GitHubImporter(credentials, httpClient)
 
         // when
         val workItems = service.fetchIssuesWithTimelines(repoId)
@@ -195,8 +191,7 @@ class GitHubImporterTest {
             install(ContentNegotiation) { json(json) }
         }
 
-        val graphqlClient = GitHubGraphQlClient(connection, httpClient)
-        val service = GitHubImporter(graphqlClient)
+        val service = GitHubImporter(credentials, httpClient)
 
         // when
         val workItems = service.fetchIssuesWithTimelines(repoId)
@@ -241,8 +236,7 @@ class GitHubImporterTest {
             install(ContentNegotiation) { json(json) }
         }
 
-        val graphqlClient = GitHubGraphQlClient(connection, httpClient)
-        val service = GitHubImporter(graphqlClient)
+        val service = GitHubImporter(credentials, httpClient)
 
         // when
         val workItems = service.fetchIssuesWithTimelines(repoId)
@@ -287,8 +281,7 @@ class GitHubImporterTest {
             install(ContentNegotiation) { json(json) }
         }
 
-        val graphqlClient = GitHubGraphQlClient(connection, httpClient)
-        val service = GitHubImporter(graphqlClient)
+        val service = GitHubImporter(credentials, httpClient)
 
         // when
         val workItems = service.fetchIssuesWithTimelines(repoId)
@@ -351,8 +344,7 @@ class GitHubImporterTest {
             install(ContentNegotiation) { json(json) }
         }
 
-        val graphqlClient = GitHubGraphQlClient(connection, httpClient)
-        val service = GitHubImporter(graphqlClient)
+        val service = GitHubImporter(credentials, httpClient)
 
         // when
         val workItems = service.fetchIssuesWithTimelines(repoId)
@@ -406,8 +398,7 @@ class GitHubImporterTest {
             install(ContentNegotiation) { json(json) }
         }
 
-        val graphqlClient = GitHubGraphQlClient(connection, httpClient)
-        val service = GitHubImporter(graphqlClient)
+        val service = GitHubImporter(credentials, httpClient)
 
         // when
         val workItems = service.fetchIssuesWithTimelines(repoId)
