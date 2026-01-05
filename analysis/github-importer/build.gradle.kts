@@ -1,0 +1,104 @@
+plugins {
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.testBalloon)
+}
+
+// TODO make KMP-native
+// Create a jar of JVM test classes for sharing test fixtures with other projects
+val jvmTestJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("jvm-test")
+    from(kotlin.jvm().compilations["test"].output.allOutputs)
+}
+
+// Create a configuration for consuming the test jar
+val jvmTestElements by configurations.creating {
+    isCanBeConsumed = true
+    isCanBeResolved = false
+    attributes {
+        attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_RUNTIME))
+        attribute(Category.CATEGORY_ATTRIBUTE, objects.named(Category::class.java, Category.LIBRARY))
+    }
+}
+
+artifacts {
+    add("jvmTestElements", jvmTestJar)
+}
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
+
+    jvm {
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+            testLogging {
+                events("skipped", "failed")
+            }
+        }
+    }
+
+    js(IR) {
+        useEsModules()
+        browser {
+            webpackTask {
+                mainOutputFileName = "teamcharta-github-importer.js"
+            }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+                testLogging {
+                    events("skipped", "failed")
+                }
+            }
+        }
+        binaries.library()
+        generateTypeScriptDefinitions()
+        compilerOptions {
+            moduleName.set("teamcharta-github-importer")
+            useEsClasses.set(true)
+        }
+    }
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(project(":analysis:model"))
+                implementation(project(":shared"))
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.kotest.assertions)
+                implementation(libs.testBalloon.framework.core)
+                implementation(libs.testBalloon.integration.kotest.assertions)
+                implementation(libs.ktor.client.mock)
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                implementation(libs.ktor.client.java)
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit5"))
+                implementation(libs.junit.jupiter)
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation(libs.ktor.client.js)
+            }
+        }
+    }
+}
