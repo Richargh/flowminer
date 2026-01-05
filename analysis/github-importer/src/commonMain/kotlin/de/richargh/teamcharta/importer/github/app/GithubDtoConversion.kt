@@ -6,7 +6,7 @@ import de.richargh.teamcharta.model.SerializableGitHubWorkItemDto
 import de.richargh.teamcharta.model.SerializableStateTransitionDto
 
 fun StateTransition.toDto(): SerializableStateTransitionDto = SerializableStateTransitionDto(
-    field = field,
+    field = field.name,
     from = from,
     to = to,
     at = at.toString(),

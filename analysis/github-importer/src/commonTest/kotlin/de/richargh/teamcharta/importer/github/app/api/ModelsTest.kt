@@ -68,7 +68,7 @@ class ModelsTest {
         // given
         val instant = Instant.parse("2024-01-15T10:00:00Z")
         val transition = StateTransition(
-            field = "state",
+            field = TransitionField.State,
             from = "open",
             to = "closed",
             at = instant,
@@ -76,7 +76,7 @@ class ModelsTest {
         )
 
         // then
-        transition.field shouldBe "state"
+        transition.field shouldBe TransitionField.State
         transition.from shouldBe "open"
         transition.to shouldBe "closed"
         transition.at shouldBe instant
@@ -89,7 +89,7 @@ class ModelsTest {
         val created = Instant.parse("2024-01-01T10:00:00Z")
         val closed = Instant.parse("2024-01-15T10:00:00Z")
         val transition = StateTransition(
-            field = "state",
+            field = TransitionField.State,
             from = "open",
             to = "closed",
             at = closed,

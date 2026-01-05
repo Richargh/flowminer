@@ -1,5 +1,6 @@
 package de.richargh.teamcharta.importer.githubfixtures
 
+import de.richargh.teamcharta.importer.github.app.api.TransitionField
 import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 import kotlin.time.Instant
@@ -13,7 +14,7 @@ class StateTransitionBuilderTest {
 
         // when
         val transition = aStateTransition {
-            field("state")
+            field(TransitionField.State)
             from("open")
             to("closed")
             at(instant)
@@ -21,7 +22,7 @@ class StateTransitionBuilderTest {
         }
 
         // then
-        transition.field shouldBe "state"
+        transition.field shouldBe TransitionField.State
         transition.from shouldBe "open"
         transition.to shouldBe "closed"
         transition.at shouldBe instant
@@ -34,7 +35,7 @@ class StateTransitionBuilderTest {
         val transition = aStateTransition()
 
         // then
-        transition.field shouldBe "state"
+        transition.field shouldBe TransitionField.State
         transition.from shouldBe null
         transition.to shouldBe null
         transition.actor shouldBe null

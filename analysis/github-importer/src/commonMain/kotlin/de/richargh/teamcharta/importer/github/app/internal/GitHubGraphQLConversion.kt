@@ -5,6 +5,7 @@ import de.richargh.teamcharta.importer.github.app.api.IssueNumber
 import de.richargh.teamcharta.importer.github.app.api.IssueReference
 import de.richargh.teamcharta.importer.github.app.api.RepositoryId
 import de.richargh.teamcharta.importer.github.app.api.StateTransition
+import de.richargh.teamcharta.importer.github.app.api.TransitionField
 import de.richargh.teamcharta.importer.github.app.api.WorkItemState
 import de.richargh.teamcharta.importer.github.app.api.WorkItemType
 import kotlin.time.Instant
@@ -87,56 +88,56 @@ private fun inferWorkItemTypeFromGraphQL(labels: List<GraphQLLabel>): WorkItemTy
 fun GraphQLTimelineItem.toStateTransition(): StateTransition? {
     return when (this) {
         is GraphQLTimelineItem.LabeledEvent -> StateTransition(
-            field = "label",
+            field = TransitionField.Label,
             from = null,
             to = label.name,
             at = Instant.parse(createdAt),
             actor = actor?.login
         )
         is GraphQLTimelineItem.UnlabeledEvent -> StateTransition(
-            field = "label",
+            field = TransitionField.Label,
             from = label.name,
             to = null,
             at = Instant.parse(createdAt),
             actor = actor?.login
         )
         is GraphQLTimelineItem.AssignedEvent -> StateTransition(
-            field = "assignee",
+            field = TransitionField.Assignee,
             from = null,
             to = assignee?.login,
             at = Instant.parse(createdAt),
             actor = actor?.login
         )
         is GraphQLTimelineItem.UnassignedEvent -> StateTransition(
-            field = "assignee",
+            field = TransitionField.Assignee,
             from = assignee?.login,
             to = null,
             at = Instant.parse(createdAt),
             actor = actor?.login
         )
         is GraphQLTimelineItem.ClosedEvent -> StateTransition(
-            field = "state",
+            field = TransitionField.State,
             from = "open",
             to = "closed",
             at = Instant.parse(createdAt),
             actor = actor?.login
         )
         is GraphQLTimelineItem.ReopenedEvent -> StateTransition(
-            field = "state",
+            field = TransitionField.State,
             from = "closed",
             to = "open",
             at = Instant.parse(createdAt),
             actor = actor?.login
         )
         is GraphQLTimelineItem.MilestonedEvent -> StateTransition(
-            field = "milestone",
+            field = TransitionField.Milestone,
             from = null,
             to = milestoneTitle,
             at = Instant.parse(createdAt),
             actor = actor?.login
         )
         is GraphQLTimelineItem.DemilestonedEvent -> StateTransition(
-            field = "milestone",
+            field = TransitionField.Milestone,
             from = milestoneTitle,
             to = null,
             at = Instant.parse(createdAt),

@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.github.app
 
 import de.richargh.teamcharta.importer.github.app.api.GitHubCredentials
 import de.richargh.teamcharta.importer.github.app.api.RepositoryId
+import de.richargh.teamcharta.importer.github.app.api.TransitionField
 import de.richargh.teamcharta.importer.github.app.api.WorkItemState
 import de.richargh.teamcharta.importer.githubfixtures.aGraphQLAuthor
 import de.richargh.teamcharta.importer.githubfixtures.aGraphQLClosedEvent
@@ -158,9 +159,9 @@ class GitHubImporterTest {
         workItems shouldHaveSize 1
         workItems[0].id.value shouldBe 1
         workItems[0].transitions shouldHaveSize 2
-        workItems[0].transitions[0].field shouldBe "label"
+        workItems[0].transitions[0].field shouldBe TransitionField.Label
         workItems[0].transitions[0].to shouldBe "bug"
-        workItems[0].transitions[1].field shouldBe "state"
+        workItems[0].transitions[1].field shouldBe TransitionField.State
         workItems[0].transitions[1].to shouldBe "closed"
     }
 

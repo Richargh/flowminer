@@ -1,6 +1,7 @@
 package de.richargh.teamcharta.importer.githubcli
 
 import de.richargh.teamcharta.importer.github.app.api.GitHubWorkItem
+import de.richargh.teamcharta.importer.github.app.api.TransitionField
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.take
@@ -18,7 +19,7 @@ object TableFormatter {
             }
 
             // Column headers
-            val headers = listOf("ID", "Title", "State", "Type", "Labels", "Assignees", "Milestone")
+            val headers = listOf("ID", "Title", "State", "Type", "Transitions", "Labels", "Assignees", "Milestone")
 
             // Calculate column widths
             val rows = items.map { item ->
@@ -27,6 +28,7 @@ object TableFormatter {
                     item.title.take(40) + if (item.title.length > 40) "..." else "",
                     item.state.name,
                     item.type?.name ?: "-",
+                    formatTransitions(item),
                     item.labels.take(2).joinToString(", ").take(20) + if (item.labels.size > 2) "..." else "",
                     item.assignees.take(2).joinToString(", ").take(20) + if (item.assignees.size > 2) "..." else "",
                     item.milestone ?: "-"
@@ -50,5 +52,19 @@ object TableFormatter {
             emit("")
             emit("Total: ${items.size} issues" + if (items.size == limit) " (limited)" else "")
         }
+    }
+
+    private fun formatTransitions(item: GitHubWorkItem): String {
+        val transitions = item.transitions
+        if (transitions.isEmpty()) return "-"
+
+        // Group by field and show summary
+        val summary = transitions
+//            .filter { it.field == TransitionField.Milestone || it.field == TransitionField.Assignee }
+            .map { "${it.field}[${it.from} -> ${it.to}]" }
+            .take(3)
+            .joinToString(", ")
+
+        return if (summary.length > 50) summary.take(47) + "..." else summary
     }
 }

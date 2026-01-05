@@ -1,5 +1,6 @@
 package de.richargh.teamcharta.importer.github
 
+import de.richargh.teamcharta.importer.github.app.api.TransitionField
 import de.richargh.teamcharta.importer.github.app.api.WorkItemState
 import de.richargh.teamcharta.importer.github.app.api.WorkItemType
 import de.richargh.teamcharta.importer.github.app.toDto
@@ -17,7 +18,7 @@ class GithubDtoConversionTest {
         // given
         val instant = Instant.parse("2024-01-15T10:00:00Z")
         val transition = aStateTransition {
-            field("state")
+            field(TransitionField.State)
             from("open")
             to("closed")
             at(instant)
@@ -28,7 +29,7 @@ class GithubDtoConversionTest {
         val dto = transition.toDto()
 
         // then
-        dto.field shouldBe "state"
+        dto.field shouldBe "State"
         dto.from shouldBe "open"
         dto.to shouldBe "closed"
         dto.at shouldBe "2024-01-15T10:00:00Z"
@@ -40,7 +41,7 @@ class GithubDtoConversionTest {
         // given
         val instant = Instant.parse("2024-01-15T10:00:00Z")
         val transition = aStateTransition {
-            field("state")
+            field(TransitionField.State)
             from("open")
             to("closed")
             at(instant)
@@ -52,7 +53,7 @@ class GithubDtoConversionTest {
         val json = Json.encodeToString(dto)
 
         // then
-        json shouldBe """{"field":"state","from":"open","to":"closed","at":"2024-01-15T10:00:00Z","actor":"octocat"}"""
+        json shouldBe """{"field":"State","from":"open","to":"closed","at":"2024-01-15T10:00:00Z","actor":"octocat"}"""
     }
 
     @Test
@@ -61,7 +62,7 @@ class GithubDtoConversionTest {
         val created = Instant.parse("2024-01-01T10:00:00Z")
         val closed = Instant.parse("2024-01-15T10:00:00Z")
         val transition = aStateTransition {
-            field("state")
+            field(TransitionField.State)
             from("open")
             to("closed")
             at(closed)

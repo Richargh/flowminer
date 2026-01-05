@@ -48,10 +48,21 @@ enum class WorkItemType {
 }
 
 /**
+ * The field that changed in a state transition.
+ */
+enum class TransitionField {
+    Label,
+    Assignee,
+    State,
+    Milestone
+    // TODO other is also possible
+}
+
+/**
  * Represents a state change in an issue's lifecycle.
  */
 data class StateTransition(
-    val field: String,
+    val field: TransitionField,
     val from: String?,
     val to: String?,
     val at: Instant,

@@ -2,6 +2,7 @@ package de.richargh.teamcharta.importer.github.app.internal
 
 import de.richargh.teamcharta.importer.github.app.api.IssueNumber
 import de.richargh.teamcharta.importer.github.app.api.RepositoryId
+import de.richargh.teamcharta.importer.github.app.api.TransitionField
 import de.richargh.teamcharta.importer.github.app.api.WorkItemState
 import de.richargh.teamcharta.importer.github.app.api.WorkItemType
 import de.richargh.teamcharta.importer.githubfixtures.*
@@ -189,7 +190,7 @@ class GitHubGraphQLConversionTest {
         // then
         workItem.transitions shouldHaveSize 1
         val transition = workItem.transitions.first()
-        transition.field shouldBe "label"
+        transition.field shouldBe TransitionField.Label
         transition.from shouldBe null
         transition.to shouldBe "bug"
         transition.at shouldBe Instant.parse("2024-01-15T10:00:00Z")
@@ -215,7 +216,7 @@ class GitHubGraphQLConversionTest {
         // then
         workItem.transitions shouldHaveSize 1
         val transition = workItem.transitions.first()
-        transition.field shouldBe "label"
+        transition.field shouldBe TransitionField.Label
         transition.from shouldBe "wontfix"
         transition.to shouldBe null
     }
@@ -238,7 +239,7 @@ class GitHubGraphQLConversionTest {
         // then
         workItem.transitions shouldHaveSize 1
         val transition = workItem.transitions.first()
-        transition.field shouldBe "state"
+        transition.field shouldBe TransitionField.State
         transition.from shouldBe "open"
         transition.to shouldBe "closed"
         transition.actor shouldBe "resolver"
@@ -262,7 +263,7 @@ class GitHubGraphQLConversionTest {
         // then
         workItem.transitions shouldHaveSize 1
         val transition = workItem.transitions.first()
-        transition.field shouldBe "state"
+        transition.field shouldBe TransitionField.State
         transition.from shouldBe "closed"
         transition.to shouldBe "open"
     }
@@ -286,7 +287,7 @@ class GitHubGraphQLConversionTest {
         // then
         workItem.transitions shouldHaveSize 1
         val transition = workItem.transitions.first()
-        transition.field shouldBe "assignee"
+        transition.field shouldBe TransitionField.Assignee
         transition.from shouldBe null
         transition.to shouldBe "developer"
         transition.actor shouldBe "manager"
@@ -311,7 +312,7 @@ class GitHubGraphQLConversionTest {
         // then
         workItem.transitions shouldHaveSize 1
         val transition = workItem.transitions.first()
-        transition.field shouldBe "assignee"
+        transition.field shouldBe TransitionField.Assignee
         transition.from shouldBe "developer"
         transition.to shouldBe null
     }
@@ -335,7 +336,7 @@ class GitHubGraphQLConversionTest {
         // then
         workItem.transitions shouldHaveSize 1
         val transition = workItem.transitions.first()
-        transition.field shouldBe "milestone"
+        transition.field shouldBe TransitionField.Milestone
         transition.from shouldBe null
         transition.to shouldBe "v2.0"
     }
@@ -359,7 +360,7 @@ class GitHubGraphQLConversionTest {
         // then
         workItem.transitions shouldHaveSize 1
         val transition = workItem.transitions.first()
-        transition.field shouldBe "milestone"
+        transition.field shouldBe TransitionField.Milestone
         transition.from shouldBe "v1.5"
         transition.to shouldBe null
     }
@@ -381,10 +382,10 @@ class GitHubGraphQLConversionTest {
 
         // then
         workItem.transitions shouldHaveSize 4
-        workItem.transitions[0].field shouldBe "label"
-        workItem.transitions[1].field shouldBe "assignee"
-        workItem.transitions[2].field shouldBe "milestone"
-        workItem.transitions[3].field shouldBe "state"
+        workItem.transitions[0].field shouldBe TransitionField.Label
+        workItem.transitions[1].field shouldBe TransitionField.Assignee
+        workItem.transitions[2].field shouldBe TransitionField.Milestone
+        workItem.transitions[3].field shouldBe TransitionField.State
     }
 
     @Test

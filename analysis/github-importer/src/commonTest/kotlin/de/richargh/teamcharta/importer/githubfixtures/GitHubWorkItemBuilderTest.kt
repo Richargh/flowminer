@@ -1,5 +1,6 @@
 package de.richargh.teamcharta.importer.githubfixtures
 
+import de.richargh.teamcharta.importer.github.app.api.TransitionField
 import de.richargh.teamcharta.importer.github.app.api.WorkItemState
 import de.richargh.teamcharta.importer.github.app.api.WorkItemType
 import io.kotest.matchers.shouldBe
@@ -14,7 +15,7 @@ class GitHubWorkItemBuilderTest {
         val created = Instant.parse("2024-01-01T10:00:00Z")
         val closed = Instant.parse("2024-01-15T10:00:00Z")
         val transition = aStateTransition {
-            field("state")
+            field(TransitionField.State)
             from("open")
             to("closed")
             at(closed)
