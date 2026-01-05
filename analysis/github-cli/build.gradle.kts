@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.assertions)
+    testImplementation(libs.mockwebserver)
 }
 
 // Add github-importer test classes to the test compile and runtime classpath
