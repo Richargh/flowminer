@@ -42,10 +42,10 @@ fun buildIssuesQuery(repoId: RepositoryId, cursor: String?): GraphQLRequest {
         variables["cursor"] = cursor
     }
 
-    val query = """
-        query(${"$"}owner: String!, ${"$"}name: String!, ${"$"}cursor: String) {
-          repository(owner: ${"$"}owner, name: ${"$"}name) {
-            issues(first: 100, states: [OPEN, CLOSED], orderBy: {field: CREATED_AT, direction: DESC}, after: ${"$"}cursor) {
+    val query = $$"""
+        query($owner: String!, $name: String!, $cursor: String) {
+          repository(owner: $owner, name: $name) {
+            issues(first: 100, states: [OPEN, CLOSED], orderBy: {field: CREATED_AT, direction: DESC}, after: $cursor) {
               pageInfo { hasNextPage endCursor }
               nodes {
                 number title state body createdAt closedAt
