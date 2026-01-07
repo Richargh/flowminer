@@ -17,4 +17,4 @@ allprojects {
 
 subprojects {
     // Common configuration for all subprojects can go here
-} 
+}
