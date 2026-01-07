@@ -121,6 +121,11 @@ dist-fmsh:
     ./gradlew :analysis:fmsh:distTar
     @echo "Built: analysis/fmsh/build/distributions/fmsh.tar"
 
+# Build visualization distribution (tar.gz)
+dist-viz: lint-viz
+    cd visualization && npm run dist
+    @echo "Built: visualization/visualization-*.tar.gz"
+
 # =============================================================================
 # CI/CD HELPERS
 # =============================================================================

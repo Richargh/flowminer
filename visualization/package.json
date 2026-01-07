@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "dist": "npm run build && tar -czvf visualization-$npm_package_version.tar.gz dist",
     "preview": "vite preview",
     "lint": "npm run lint:types",
     "lint:types": "tsc",
