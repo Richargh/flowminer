@@ -7,6 +7,10 @@ and this project might soon adhere to [Semantic Versioning](http://semver.org/)
 
 ## [unreleased] (Added 🚀 | Changed | Removed | Fixed 🐞 | Chore 👨‍💻 👩‍💻)
 
+### Chore 👨‍💻 👩‍💻
+
+- **CHANGELOG**: Add changelog to track notable changes
+
 ## [0.0.2] - 2026-01-07
 
 ### Fixed 🐞

@@ -159,11 +159,27 @@ jobs:
       - name: List artifact contents
         run: find artifacts -type f
 
+      - name: Extract changelogs from distributions
+        run: |
+          mkdir -p changelogs
+          tar -xf artifacts/analysis/fmsh/build/distributions/fmsh*.tar --wildcards '*/CHANGELOG.md' -O > changelogs/analysis.md
+          tar -xzf artifacts/visualization/visualization-*.tar.gz CHANGELOG.md -O > changelogs/visualization.md
+
+      - name: Create release notes
+        run: |
+          cat > release-notes.md << 'EOF'
+          # Analysis
+          EOF
+          cat changelogs/analysis.md >> release-notes.md
+          echo -e "\n---\n" >> release-notes.md
+          echo "# Visualization" >> release-notes.md
+          cat changelogs/visualization.md >> release-notes.md
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create ${{ github.ref_name }} \
-            --generate-notes \
+            --notes-file release-notes.md \
             artifacts/analysis/fmsh/build/distributions/fmsh*.tar \
             artifacts/visualization/visualization-*.tar.gz

@@ -58,6 +58,7 @@ distributions {
     main {
         contents {
             from(rootProject.file("LICENSE"))
+            from(rootProject.file("analysis/CHANGELOG.md"))
             from(projectDir.resolve("src/dist")) {
                 into("")
             }
