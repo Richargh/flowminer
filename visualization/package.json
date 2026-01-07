@@ -12,7 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@tanstack/lit-table": "^8.21.3",
+    "@tanstack/lit-table": "8.21.3",
     "echarts": "6.0.0",
     "lit": "3.3.1",
     "flowminer-git-importer": "file:../analysis/git-importer/build/dist/js/productionLibrary",
@@ -22,13 +22,13 @@
     "@tailwindcss/vite": "4.1.18",
     "@vitest/browser": "4.0.16",
     "@vitest/browser-playwright": "4.0.16",
-    "axe-core": "^4.11.0",
+    "axe-core": "4.11.0",
     "daisyui": "5.5.14",
     "playwright": "1.57.0",
     "tailwindcss": "4.1.18",
     "typescript": "5.9.3",
     "vite": "7.3.0",
     "vitest": "4.0.16",
-    "vitest-axe": "^0.1.0"
+    "vitest-axe": "0.1.0"
   }
 }
