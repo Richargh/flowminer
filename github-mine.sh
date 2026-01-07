@@ -5,7 +5,7 @@
 #   ./github-mine.sh --token TOKEN --owner OWNER --repo REPO [--format table|jsonl] [--output FILE]
 #
 # Example:
-#   ./github-mine.sh --token ghp_xxx --owner anthropics --repo claude-code
+#   ./github-mine.sh --token ghp_xxx --owner anthropics --repo claude-code --format jsonl -o project.workitems.fm.jsonl
 
 set -euo pipefail
 

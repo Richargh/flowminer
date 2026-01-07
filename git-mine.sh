@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Usage: ./git-mine.sh <path> --format table [--since "'<time>'"]
-# Example: ./git-mine.sh . --format table --since "'2 weeks ago'"
+# Usage: ./git-mine.sh <path> --format table|jsonl [--since "'<time>'"] [--output FILE]
+# Example: ./git-mine.sh . --format jsonl --since "'1 year ago' -o project.commits.fm.jsonl"
 # Note: Values with spaces need inner quotes due to gradle's --args parsing
 
 set -euo pipefail
