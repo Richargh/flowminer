@@ -36,6 +36,15 @@ jobs:
       - name: Build visualization distribution
         run: just dist-viz
 
+      - name: Upload Gradle build outputs for test-analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build
+          path: |
+            shared/build
+            analysis/**/build
+          retention-days: 1
+
       - name: Upload KMP-JS dist for test-viz
         uses: actions/upload-artifact@v4
         with:
@@ -67,6 +76,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Download Gradle build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: gradle-build
+          path: .
 
       - name: Setup Java and Gradle
         uses: ./.github/actions/setup-java-gradle
