@@ -21,7 +21,7 @@ A tool for analyzing and visualizing software development flow. Data is mined fr
 +
 [source,bash]
 ----
-./git-mine.sh /path/to/repo --format jsonl -o project.commits.fm.jsonl
+./fmsh.sh git-commits /path/to/repo --format jsonl -o project.commits.fm.jsonl
 ----
 
 . Start the visualization server and open in browser:
