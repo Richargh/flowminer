@@ -2,6 +2,9 @@
   "name": "flowminer",
   "version": "0.0.1",
   "private": true,
+  "engines": {
+    "node": ">=24"
+  },
   "workspaces": [
     "visualization",
     "shared/build/dist/js/productionLibrary",

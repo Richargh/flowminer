@@ -9,8 +9,10 @@ A tool for analyzing and visualizing software development flow. Data is mined fr
 
 == Prerequisites
 
-* JDK 21+ (via SDKMAN)
-* Node.js
+* JDK version from link:.sdkmanrc[] (install via link:https://sdkman.io/[SDKMAN])
+** `sdk env install`
+* Node.js version from link:.nvmrc[] (install via link:https://github.com/Schniz/fnm[fnm] or link:https://github.com/nvm-sh/nvm[nvm])
+** `fnm use --install-if-missing`
 * link:https://just.systems[just] command runner
 
 == Usage
