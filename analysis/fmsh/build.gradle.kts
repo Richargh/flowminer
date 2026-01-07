@@ -43,3 +43,12 @@ tasks.test {
 tasks.named<JavaExec>("run") {
     workingDir = rootProject.projectDir
 }
+
+tasks.jar {
+    manifest {
+        attributes(
+            "Implementation-Title" to "fmsh",
+            "Implementation-Version" to project.version
+        )
+    }
+}
