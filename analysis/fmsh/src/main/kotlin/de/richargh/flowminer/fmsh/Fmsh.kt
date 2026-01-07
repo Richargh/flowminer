@@ -5,6 +5,8 @@ import de.richargh.flowminer.importer.githubcli.GitHubCli
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.IVersionProvider
+import picocli.CommandLine.Model.CommandSpec
+import picocli.CommandLine.Spec
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
 
@@ -20,6 +22,9 @@ import kotlin.system.exitProcess
 )
 class Fmsh : Callable<Int> {
 
+    @Spec
+    lateinit var spec: CommandSpec
+
     object ManifestVersionProvider : IVersionProvider {
         override fun getVersion(): Array<String> {
             val pkg = Fmsh::class.java.`package`
@@ -30,7 +35,7 @@ class Fmsh : Callable<Int> {
     }
 
     override fun call(): Int {
-        CommandLine(this).usage(System.out)
+        spec.commandLine().usage(spec.commandLine().out)
         return 0
     }
 }
