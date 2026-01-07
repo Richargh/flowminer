@@ -1,4 +1,4 @@
-import type {BranchIdDto, CommitDto, FileChangeDto} from "teamcharta-git-importer";
+import type {BranchIdDto, CommitDto, FileChangeDto} from "flowminer-git-importer";
 
 /**
  * Type utility to convert KMP types to their JSON-serialized form.

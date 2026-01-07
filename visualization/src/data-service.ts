@@ -1,4 +1,4 @@
-import type {AuthorStatsDto, CommitTimelineDto, WorkItemDurationDto} from 'teamcharta-shared';
+import type {AuthorStatsDto, CommitTimelineDto, WorkItemDurationDto} from 'flowminer-shared';
 
 // Re-export as plain data interfaces that match the DTO structure (excluding copy, hashCode, equals, etc.)
 export type AuthorStats = Pick<AuthorStatsDto, 'name' | 'commitCount' | 'linesAdded' | 'linesDeleted' | 'avgCommitSize'>;

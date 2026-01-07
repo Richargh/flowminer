@@ -45,7 +45,7 @@ kotlin {
         useEsModules()
         browser {
             webpackTask {
-                mainOutputFileName = "teamcharta-github-importer.js"
+                mainOutputFileName = "flowminer-github-importer.js"
             }
             testTask {
                 useKarma {
@@ -59,7 +59,7 @@ kotlin {
         binaries.library()
         generateTypeScriptDefinitions()
         compilerOptions {
-            moduleName.set("teamcharta-github-importer")
+            moduleName.set("flowminer-github-importer")
             useEsClasses.set(true)
         }
     }

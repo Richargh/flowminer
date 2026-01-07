@@ -23,7 +23,7 @@ kotlin {
     js(IR) {
         useEsModules()
         compilerOptions {
-            moduleName.set("teamcharta-shared")
+            moduleName.set("flowminer-shared")
         }
         browser()
         binaries.library()

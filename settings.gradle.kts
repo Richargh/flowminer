@@ -1,4 +1,4 @@
-rootProject.name = "teamcharta"
+rootProject.name = "flowminer"
 include("analysis:jira-importer")
 include("analysis:git-importer")
 include("analysis:github-importer")
