@@ -51,6 +51,12 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout (for release notes script)
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts/extract-release-notes.sh
+          sparse-checkout-cone-mode: false
+
       - name: Download dist artifacts
         uses: actions/download-artifact@v4
         with:
@@ -69,30 +75,13 @@ jobs:
           tar -xzf artifacts/visualization/visualization-*.tar.gz CHANGELOG.md -O > changelogs/visualization.md
 
       - name: Create release notes
-        env:
-          TAG: ${{ inputs.tag }}
-        run: |
-          # Strip 'v' prefix: v0.0.4 -> 0.0.4
-          VER="${TAG#v}"
-
-          # Extract section for this version
-          extract_version() {
-            sed -n "/^## \[${VER}\]/,/^## \[/p" "$1" | sed '$d'
-          }
-
-          echo "# Analysis" > release-notes.md
-          extract_version changelogs/analysis.md >> release-notes.md
-          echo -e "\n---\n" >> release-notes.md
-          echo "# Visualization" >> release-notes.md
-          extract_version changelogs/visualization.md >> release-notes.md
+        run: .github/extract-release-notes.sh ${{ inputs.tag }} changelogs/analysis.md changelogs/visualization.md > release-notes.md
 
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.tag }}
         run: |
-          gh release create "$TAG" \
-            --repo ${{ github.repository }} \
+          gh release create ${{ inputs.tag }} \
             --notes-file release-notes.md \
             artifacts/analysis/fmsh/build/distributions/fmsh*.tar \
             artifacts/visualization/visualization-*.tar.gz
