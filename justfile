@@ -107,6 +107,11 @@ js-test-analysis-project project:
 run-gitcli *args:
     ./gradlew :analysis:gitcli:run --args='{{args}}'
 
+# Run fmsh (Flow-Miner Shell)
+# f.ex. just fmsh 'git-commits . --format table'
+fmsh *args:
+    ./gradlew :analysis:fmsh:run --args='{{args}}' --quiet
+
 # =============================================================================
 # CI/CD HELPERS
 # =============================================================================

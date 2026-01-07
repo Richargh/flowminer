@@ -19,9 +19,9 @@ enum class OutputFormat {
 }
 
 @Command(
-    name = "github-cli",
+    name = "github-workitems",
     mixinStandardHelpOptions = true,
-    version = ["github-cli 1.0"],
+    version = ["github-workitems 1.0"],
     description = ["Fetches GitHub issues and outputs them in various formats."],
     footer = [
         "",
@@ -41,8 +41,8 @@ enum class OutputFormat {
         "  bash:  echo 'export GITHUB_TOKEN=github_pat_xxx' >> ~/.bashrc",
         "",
         "Example:",
-        "  github-cli -t github_pat_xxx --owner octocat --repo hello-world",
-        $$"  github-cli -t $GITHUB_TOKEN --owner octocat --repo hello-world"
+        $$"  github-workitems --format table -t github_pat_xx --owner octocat --repo hello-world",
+        $$"  github-workitems --format jsonl -t $GITHUB_TOKEN --owner octocat --repo hello-world -o project.workitems.fm.jsonl"
     ]
 )
 class GitHubCli : Callable<Int> {

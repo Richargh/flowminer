@@ -4,9 +4,7 @@ import de.richargh.flowminer.importer.git.app.api.Commit
 import de.richargh.flowminer.importer.gitmining.app.GitLogMiner
 import de.richargh.flowminer.importer.gitmining.app.GitRepositoryParser
 import picocli.CommandLine
-import picocli.CommandLine.Command
-import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
+import picocli.CommandLine.*
 import java.io.File
 import java.util.concurrent.Callable
 import kotlin.system.exitProcess
@@ -19,10 +17,15 @@ enum class OutputFormat {
 }
 
 @Command(
-    name = "gitcli",
+    name = "git-commits",
     mixinStandardHelpOptions = true,
-    version = ["gitcli 1.0"],
-    description = ["Parses a git repository and outputs a summary table of branches and commits."]
+    version = ["git-commits 1.0"],
+    description = ["Parses a git repository and outputs a summary table of branches and commits."],
+    footer = [
+        "Example:",
+        $$"  git-commits . --format table",
+        $$"  git-commits . --format jsonl -o project.commits.fm.jsonl"
+    ]
 )
 class GitCli : Callable<Int> {
 
