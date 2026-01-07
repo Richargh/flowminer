@@ -38,7 +38,7 @@ jobs:
 
       - name: Verify dist artifacts exist
         run: |
-          ls -la analysis/fmsh/build/distributions/fmsh.tar
+          ls -la analysis/fmsh/build/distributions/fmsh*.tar
           ls -la visualization/visualization-*.tar.gz
 
       - name: Upload Gradle build outputs for test-analysis
@@ -64,7 +64,7 @@ jobs:
         with:
           name: dist-artifacts
           path: |
-            analysis/fmsh/build/distributions/fmsh.tar
+            analysis/fmsh/build/distributions/fmsh*.tar
             visualization/visualization-*.tar.gz
           retention-days: 1
 
@@ -165,5 +165,5 @@ jobs:
         run: |
           gh release create ${{ github.ref_name }} \
             --generate-notes \
-            artifacts/analysis/fmsh/build/distributions/fmsh.tar \
+            artifacts/analysis/fmsh/build/distributions/fmsh*.tar \
             artifacts/visualization/visualization-*.tar.gz
