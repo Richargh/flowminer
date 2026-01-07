@@ -28,8 +28,6 @@ In particular keep track of the three (sometimes four) documents when doing feat
 | <feature>.plan.md      | How we'll get there from the current state | Constantly              |
 | <feature>.learnings.md | What we discovered                         | As discoveries occur    |
 
-* Use @.claude/skills/planning to create and maintain these documents.
-
 
 In addition, store key architecture decisions as Architecture Decision Records (ADRs). Location @docs/adrs. ALWAYS suggest to write an ADR when we make an architecturally significant decision.
 
