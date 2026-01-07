@@ -131,5 +131,9 @@ dist-viz: lint-viz
 # =============================================================================
 
 # Run Gradle tests with CI optimizations (parallel, no daemon)
+# CI test command optimized for GitHub public runners (4 CPUs, 16 GB RAM)
 test-analysis-ci:
-    ./gradlew allTests test --parallel --no-daemon --continue
+    ./gradlew allTests test --parallel --no-daemon --continue \
+        -Dorg.gradle.jvmargs="-Xmx4g" \
+        -Dkotlin.daemon.jvmargs="-Xmx4g" \
+        -Dorg.gradle.workers.max=4
