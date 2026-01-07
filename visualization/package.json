@@ -1,12 +1,11 @@
 {
   "name": "visualization",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "dist": "npm run build && tar -czvf visualization-$npm_package_version.tar.gz dist",
+    "dist": "npm run build && tar -czvf visualization-$(cat ../VERSION).tar.gz dist",
     "preview": "vite preview",
     "lint": "npm run lint:types",
     "lint:types": "tsc",

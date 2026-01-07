@@ -6,7 +6,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
 }
 
+val projectVersion = file("VERSION").readText().trim()
+
 allprojects {
+    version = projectVersion
     repositories {
         mavenCentral()
     }
