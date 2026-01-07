@@ -1,18 +1,12 @@
-name: Delivery Pipeline
+name: CI
 
 on:
   push:
     branches: ['**']
-    tags: ['v*']
 
 permissions:
-  contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  contents: read
+  actions: write
 
 jobs:
   build:
@@ -66,14 +60,14 @@ jobs:
           path: |
             analysis/fmsh/build/distributions/fmsh*.tar
             visualization/visualization-*.tar.gz
-          retention-days: 1
+          retention-days: 7
 
       - name: Upload visualization dist for Pages
         uses: actions/upload-artifact@v4
         with:
           name: viz-dist
           path: visualization/dist
-          retention-days: 1
+          retention-days: 7
 
   test-analysis:
     needs: build
@@ -119,68 +113,24 @@ jobs:
       - name: Run visualization tests
         run: just test-viz
 
-  deploy-pages:
+  trigger-release:
     needs: [test-analysis, test-viz]
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Download visualization dist
-        uses: actions/download-artifact@v4
-        with:
-          name: viz-dist
-          path: dist
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  release:
-    needs: [test-analysis, test-viz]
-    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - name: Download dist artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-artifacts
-          path: artifacts
-
-      - name: List artifact contents
-        run: find artifacts -type f
-
-      - name: Extract changelogs from distributions
-        run: |
-          mkdir -p changelogs
-          tar -xf artifacts/analysis/fmsh/build/distributions/fmsh*.tar --wildcards '*/CHANGELOG.md' -O > changelogs/analysis.md
-          tar -xzf artifacts/visualization/visualization-*.tar.gz CHANGELOG.md -O > changelogs/visualization.md
-
-      - name: Create release notes
-        run: |
-          cat > release-notes.md << 'EOF'
-          # Analysis
-          EOF
-          cat changelogs/analysis.md >> release-notes.md
-          echo -e "\n---\n" >> release-notes.md
-          echo "# Visualization" >> release-notes.md
-          cat changelogs/visualization.md >> release-notes.md
-
-      - name: Create GitHub Release
+      - name: Check for release tag and trigger release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create ${{ github.ref_name }} \
-            --repo ${{ github.repository }} \
-            --notes-file release-notes.md \
-            artifacts/analysis/fmsh/build/distributions/fmsh*.tar \
-            artifacts/visualization/visualization-*.tar.gz
+          # Check if any v* tag points to this commit
+          TAG=$(gh api repos/${{ github.repository }}/tags --jq '.[] | select(.commit.sha == "${{ github.sha }}") | .name' | grep '^v' | head -1)
+
+          if [[ -n "$TAG" ]]; then
+            echo "Found release tag: $TAG"
+            echo "Triggering release workflow..."
+            gh workflow run release.yml \
+              --repo ${{ github.repository }} \
+              -f tag="$TAG" \
+              -f run-id="${{ github.run_id }}"
+          else
+            echo "No release tag found for commit ${{ github.sha }}, skipping release"
+          fi

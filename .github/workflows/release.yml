@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v0.0.1)'
+        required: true
+        type: string
+      run-id:
+        description: 'CI workflow run ID to download artifacts from'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  actions: read
+
+jobs:
+  deploy-pages:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download visualization dist
+        uses: actions/download-artifact@v4
+        with:
+          name: viz-dist
+          path: dist
+          run-id: ${{ inputs.run-id }}
+          github-token: ${{ github.token }}
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifacts
+          path: artifacts
+          run-id: ${{ inputs.run-id }}
+          github-token: ${{ github.token }}
+
+      - name: List artifact contents
+        run: find artifacts -type f
+
+      - name: Extract changelogs from distributions
+        run: |
+          mkdir -p changelogs
+          tar -xf artifacts/analysis/fmsh/build/distributions/fmsh*.tar --wildcards '*/CHANGELOG.md' -O > changelogs/analysis.md
+          tar -xzf artifacts/visualization/visualization-*.tar.gz CHANGELOG.md -O > changelogs/visualization.md
+
+      - name: Create release notes
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          # Strip 'v' prefix: v0.0.4 -> 0.0.4
+          VER="${TAG#v}"
+
+          # Extract section for this version
+          extract_version() {
+            sed -n "/^## \[${VER}\]/,/^## \[/p" "$1" | sed '$d'
+          }
+
+          echo "# Analysis" > release-notes.md
+          extract_version changelogs/analysis.md >> release-notes.md
+          echo -e "\n---\n" >> release-notes.md
+          echo "# Visualization" >> release-notes.md
+          extract_version changelogs/visualization.md >> release-notes.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          gh release create "$TAG" \
+            --repo ${{ github.repository }} \
+            --notes-file release-notes.md \
+            artifacts/analysis/fmsh/build/distributions/fmsh*.tar \
+            artifacts/visualization/visualization-*.tar.gz
