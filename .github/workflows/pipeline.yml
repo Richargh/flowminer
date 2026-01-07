@@ -36,6 +36,11 @@ jobs:
       - name: Build visualization distribution
         run: just dist-viz
 
+      - name: Verify dist artifacts exist
+        run: |
+          ls -la analysis/fmsh/build/distributions/fmsh.tar
+          ls -la visualization/visualization-*.tar.gz
+
       - name: Upload Gradle build outputs for test-analysis
         uses: actions/upload-artifact@v4
         with:
@@ -150,6 +155,9 @@ jobs:
         with:
           name: dist-artifacts
           path: artifacts
+
+      - name: List artifact contents
+        run: find artifacts -type f
 
       - name: Create GitHub Release
         env:
