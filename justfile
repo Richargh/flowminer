@@ -130,5 +130,6 @@ dist-viz: lint-viz
 # CI/CD HELPERS
 # =============================================================================
 
-# Full CI pipeline (clean build and test everything)
-ci: clean build test
+# Run Gradle tests with CI optimizations (parallel, no daemon)
+test-analysis-ci:
+    ./gradlew allTests test --parallel --no-daemon --continue

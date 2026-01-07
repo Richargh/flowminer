@@ -90,7 +90,7 @@ jobs:
         run: google-chrome --version
 
       - name: Run analysis tests
-        run: just test-analysis
+        run: just test-analysis-ci
 
   test-viz:
     needs: build
