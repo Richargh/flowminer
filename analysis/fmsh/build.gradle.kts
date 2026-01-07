@@ -18,6 +18,7 @@ dependencies {
 
 application {
     mainClass.set("de.richargh.flowminer.fmsh.FmshKt")
+    applicationName = "fmsh"
 }
 
 java {
@@ -51,4 +52,24 @@ tasks.jar {
             "Implementation-Version" to project.version
         )
     }
+}
+
+distributions {
+    main {
+        contents {
+            from(rootProject.file("LICENSE"))
+            from(projectDir.resolve("src/dist")) {
+                into("")
+            }
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+    }
+}
+
+tasks.distZip {
+    enabled = false
+}
+
+tasks.distTar {
+    enabled = true
 }

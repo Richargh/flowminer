@@ -113,6 +113,15 @@ fmsh *args:
     ./gradlew :analysis:fmsh:run --args='{{args}}' --quiet
 
 # =============================================================================
+# DISTRIBUTION COMMANDS
+# =============================================================================
+
+# Build fmsh distribution (tar)
+dist-fmsh:
+    ./gradlew :analysis:fmsh:distTar
+    @echo "Built: analysis/fmsh/build/distributions/fmsh.tar"
+
+# =============================================================================
 # CI/CD HELPERS
 # =============================================================================
 
