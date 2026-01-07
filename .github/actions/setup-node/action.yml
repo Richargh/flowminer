@@ -1,0 +1,19 @@
+name: Setup Node.js
+description: Setup Node.js 24 with npm caching and just
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js 24
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'npm'
+
+    - name: Install just
+      shell: bash
+      run: sudo apt-get update && sudo apt-get install -y just
+
+    - name: Install npm dependencies
+      shell: bash
+      run: npm ci

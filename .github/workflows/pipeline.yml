@@ -1,0 +1,146 @@
+name: Delivery Pipeline
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java and Gradle
+        uses: ./.github/actions/setup-java-gradle
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+
+      - name: Build project
+        run: just build
+
+      - name: Build fmsh distribution
+        run: just dist-fmsh
+
+      - name: Build visualization distribution
+        run: just dist-viz
+
+      - name: Upload KMP-JS dist for test-viz
+        uses: actions/upload-artifact@v4
+        with:
+          name: kmp-js-dist
+          path: |
+            shared/build/dist/js/productionLibrary
+            analysis/git-importer/build/dist/js/productionLibrary
+          retention-days: 1
+
+      - name: Upload dist artifacts for release
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-artifacts
+          path: |
+            analysis/fmsh/build/distributions/fmsh.tar
+            visualization/visualization-*.tar.gz
+          retention-days: 1
+
+      - name: Upload visualization dist for Pages
+        uses: actions/upload-artifact@v4
+        with:
+          name: viz-dist
+          path: visualization/dist
+          retention-days: 1
+
+  test-analysis:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java and Gradle
+        uses: ./.github/actions/setup-java-gradle
+
+      - name: Verify Chrome is installed for KMP Karma tests
+        run: google-chrome --version
+
+      - name: Run analysis tests
+        run: just test-analysis
+
+  test-viz:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download KMP-JS dist
+        uses: actions/download-artifact@v4
+        with:
+          name: kmp-js-dist
+          path: .
+
+      - name: Setup Node.js
+        uses: ./.github/actions/setup-node
+
+      - name: Install Playwright
+        run: npx playwright install chromium --with-deps
+
+      - name: Run visualization tests
+        run: just test-viz
+
+  deploy-pages:
+    needs: [test-analysis, test-viz]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download visualization dist
+        uses: actions/download-artifact@v4
+        with:
+          name: viz-dist
+          path: dist
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  release:
+    needs: [test-analysis, test-viz]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifacts
+          path: artifacts
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --generate-notes \
+            artifacts/analysis/fmsh/build/distributions/fmsh.tar \
+            artifacts/visualization/visualization-*.tar.gz
