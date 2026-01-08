@@ -3,14 +3,14 @@
   "description": [
     "Renovate configuration for flowminer monorepo.",
     "Groups related dependencies to reduce PR noise while keeping updates manageable.",
-    "All PRs require manual approval (no auto-merge)."
+    "All PRs require manual approval (no auto-merge).",
+    "Local Kotlin/JS workspace packages (flowminer-*) are ignored - they're not external dependencies."
   ],
   "baseBranches": ["trunk"],
   "dependencyDashboard": true,
   "rangeStrategy": "pin",
   "automerge": false,
   "ignoreDeps": ["flowminer-git-importer", "flowminer-shared"],
-  "ignoreDepsDescription": "Local Kotlin/JS workspace packages - not external dependencies",
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["before 6am on monday"]
