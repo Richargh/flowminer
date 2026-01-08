@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Release script for teamcharta
-# Usage: ./scripts/prep-release.sh [OPTIONS]
-# Test Usage: ./scripts/prep-release.sh --no-commit-release --no-commit-snapshot --no-tag
+# Usage: ./scripts/release.sh [OPTIONS]
+# Test Usage: ./scripts/release.sh --no-commit-release --no-commit-snapshot --no-tag
 
 # Defaults
 EXPLICIT_VERSION=""
@@ -171,7 +171,21 @@ else
   echo "Skipping tag (--no-tag)"
 fi
 
-# --- Step 5: Prepare next version ---
+# --- Step 5: Push release ---
+
+if [[ "$DO_TAG" == "true" && "$DO_COMMIT_RELEASE" == "true" ]]; then
+  echo ""
+  read -p "Push release commit and tag v$RELEASE_VERSION? [y/N] " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    git push && git push origin "v$RELEASE_VERSION"
+    echo "Pushed release commit and tag"
+  else
+    echo "Skipping push. To push later: git push && git push origin v$RELEASE_VERSION"
+  fi
+fi
+
+# --- Step 6: Prepare next version ---
 
 if [[ "$DO_COMMIT_SNAPSHOT" == "true" ]]; then
   # Increment patch version: x.y.z -> x.y.(z+1)
@@ -179,18 +193,22 @@ if [[ "$DO_COMMIT_SNAPSHOT" == "true" ]]; then
   NEXT_PATCH=$((patch + 1))
   NEXT_VERSION="$major.$minor.$NEXT_PATCH-SNAPSHOT"
 
-  echo "$NEXT_VERSION" > "$VERSION_FILE"
-  echo "Updated VERSION to: $NEXT_VERSION"
+  echo ""
+  read -p "Prepare next version ($NEXT_VERSION)? [y/N] " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "$NEXT_VERSION" > "$VERSION_FILE"
+    echo "Updated VERSION to: $NEXT_VERSION"
 
-  git add "$VERSION_FILE"
-  git commit -m ". v (VERSION) prepare next version"
-  echo "Created snapshot commit"
+    git add "$VERSION_FILE"
+    git commit -m ". v (VERSION) prepare next version"
+    echo "Created snapshot commit"
+  else
+    echo "Skipping snapshot commit"
+  fi
 else
   echo "Skipping snapshot commit (--no-commit-snapshot)"
 fi
 
 echo ""
 echo "Release complete!"
-if [[ "$DO_TAG" == "true" ]]; then
-  echo "To push: git push && git push origin v$RELEASE_VERSION"
-fi
