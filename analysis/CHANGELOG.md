@@ -7,6 +7,13 @@ and this project might soon adhere to [Semantic Versioning](http://semver.org/)
 
 ## [unreleased] (Added 🚀 | Changed | Removed | Fixed 🐞 | Chore 👨‍💻 👩‍💻)
 
+## [0.0.8] - 2026-01-08
+
+### Chore 👨‍💻 👩‍💻
+
+- **Renovate**: Configure dependency groupings and pinning
+- **Release Pipeline**: Add optional "git push" to release script
+
 ## [0.0.7] - 2026-01-08
 
 ### Chore 👨‍💻 👩‍💻
