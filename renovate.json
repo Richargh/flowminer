@@ -90,6 +90,12 @@
         "daisyui",
         "/^@tailwindcss//"
       ]
+    },
+    {
+      "description": "Node engine is a minimum version constraint, not a pinned dependency - managed via .nvmrc instead",
+      "matchDepTypes": ["engines"],
+      "matchDepNames": ["node"],
+      "enabled": false
     }
   ]
 }
