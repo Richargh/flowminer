@@ -7,7 +7,7 @@ and this project might soon adhere to [Semantic Versioning](http://semver.org/)
 
 ## [unreleased] (Added 🚀 | Changed | Removed | Fixed 🐞 | Chore 👨‍💻 👩‍💻)
 
-## [0.0.8] - 2026-01-08
+## [0.0.9] - 2026-01-08
 
 ### Chore 👨‍💻 👩‍💻
 
