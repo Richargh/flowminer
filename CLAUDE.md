@@ -17,7 +17,7 @@ This is a repo containing two distinct but interconnected parts:
 
 ## AI Guides
 
-ALWAYS generate `.md` files ALWAYS inside @docs.
+ALWAYS generate the following `.md` files ALWAYS inside @.drafts.
 
 In particular keep track of the three (sometimes four) documents when doing feature development:
 
