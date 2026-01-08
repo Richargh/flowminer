@@ -3,7 +3,7 @@ kotlin = "2.3.0"
 ksp = "2.3.4"
 picocli = "4.7.5"
 jackson = "2.17.1"
-junit = "5.10.2"
+junit = "5.14.2"
 java = "21"
 kotest = "6.0.7"
 okhttp = "4.12.0"
@@ -12,7 +12,7 @@ kotlinx-serialization = "1.8.0"
 kotlinx-datetime = "0.6.1"
 kotlinx-coroutines = "1.10.2"
 ktor = "3.1.1"
-testBalloon = "0.8.0-Beta2"
+testBalloon = "0.8.0-RC-K2.3.0"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
