@@ -75,7 +75,7 @@ jobs:
           tar -xzf artifacts/visualization/visualization-*.tar.gz CHANGELOG.md -O > changelogs/visualization.md
 
       - name: Create release notes
-        run: .github/extract-release-notes.sh ${{ inputs.tag }} changelogs/analysis.md changelogs/visualization.md > release-notes.md
+        run: .github/scripts/extract-release-notes.sh ${{ inputs.tag }} changelogs/analysis.md changelogs/visualization.md > release-notes.md
 
       - name: Create GitHub Release
         env:
