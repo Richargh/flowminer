@@ -3,7 +3,12 @@
   "baseBranches": ["trunk"],
   "dependencyDashboard": true,
   "rangeStrategy": "pin",
+  "automerge": false,
   "ignoreDeps": ["flowminer-git-importer", "flowminer-shared"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
   "packageRules": [
     {
       "groupName": "kotlin-core",
