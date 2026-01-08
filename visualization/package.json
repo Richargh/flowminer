@@ -22,7 +22,7 @@
     "@tailwindcss/vite": "4.1.18",
     "@vitest/browser": "4.0.16",
     "@vitest/browser-playwright": "4.0.16",
-    "axe-core": "4.11.0",
+    "axe-core": "4.11.1",
     "daisyui": "5.5.14",
     "playwright": "1.57.0",
     "tailwindcss": "4.1.18",
