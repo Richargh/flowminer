@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
   "description": [
     "Renovate configuration for flowminer monorepo.",
     "Groups related dependencies to reduce PR noise while keeping updates manageable.",
@@ -12,6 +13,14 @@
   "dependencyDashboard": true,
   "rangeStrategy": "pin",
   "automerge": false,
+  "minimumReleaseAge": "3 days",
+  "timezone": "Europe/Berlin",
+  "schedule": ["before 6am every weekday"],
+  "prConcurrentLimit": 7,
+  "vulnerabilityAlerts": {
+    "labels": ["security", "dependencies"],
+    "automerge": true
+  },
   "ignoreDeps": [
     "flowminer-git-importer",
     "flowminer-shared"
