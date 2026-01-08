@@ -7,6 +7,13 @@ and this project might soon adhere to [Semantic Versioning](http://semver.org/)
 
 ## [unreleased] (Added 🚀 | Changed | Removed | Fixed 🐞 | Chore 👨‍💻 👩‍💻)
 
+## [0.0.7] - 2026-01-08
+
+### Chore 👨‍💻 👩‍💻
+
+- **Release Pipeline**: Automated release changelog
+- **Renovate**: Initial dependency update workflow
+
 ## [0.0.5] - 2026-01-07
 
 ### Chore 👨‍💻 👩‍💻
