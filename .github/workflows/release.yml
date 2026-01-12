@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (for release notes script)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           sparse-checkout: .github/scripts/extract-release-notes.sh
           sparse-checkout-cone-mode: false
