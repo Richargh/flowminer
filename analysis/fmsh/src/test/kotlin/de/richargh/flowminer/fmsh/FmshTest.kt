@@ -16,6 +16,7 @@ class FmshTest {
         exitCode shouldBe 0
         output shouldContain "git-commits"
         output shouldContain "github-workitems"
+        output shouldContain "gitlab-pipelines"
     }
 
     @Test
@@ -43,6 +44,26 @@ class FmshTest {
         exitCode shouldBe 0
         output shouldContain "github-workitems"
         output shouldContain "GitHub Personal Access Token"
+    }
+
+    @Test
+    fun `fmsh --help shows gitlab-pipelines subcommand`() {
+        val (exitCode, output) = runFmsh("--help")
+
+        exitCode shouldBe 0
+        output shouldContain "gitlab-pipelines"
+    }
+
+    @Test
+    fun `fmsh gitlab-pipelines --help shows gitlab-cli help`() {
+        val (exitCode, output) = runFmsh("gitlab-pipelines", "--help")
+
+        exitCode shouldBe 0
+        output shouldContain "gitlab-pipelines"
+        output shouldContain "GitLab personal access token"
+        output shouldContain "read_api"
+        output shouldContain "GITLAB_TOKEN"
+        output shouldContain "Finding the Project ID"
     }
 
     private fun runFmsh(vararg args: String): Pair<Int, String> {

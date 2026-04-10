@@ -40,12 +40,14 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":analysis:model"))
                 implementation(libs.kotlinx.serialization.json)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
+                implementation(libs.kotest.assertions)
             }
         }
         val jvmMain by getting

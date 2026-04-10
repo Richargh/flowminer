@@ -12,6 +12,7 @@ dependencies {
     implementation(libs.picocli)
     implementation(project(":analysis:gitcli"))
     implementation(project(":analysis:github-cli"))
+    implementation(project(":analysis:gitlab-cli"))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.assertions)
 }
