@@ -7,7 +7,7 @@
 import * as echarts from 'echarts/core';
 
 // Chart types
-import { BarChart, LineChart, RadarChart, ScatterChart, SankeyChart } from 'echarts/charts';
+import { BarChart, BoxplotChart, CustomChart, LineChart, RadarChart, ScatterChart, SankeyChart } from 'echarts/charts';
 
 // Components
 import {
@@ -28,6 +28,8 @@ import { CanvasRenderer } from 'echarts/renderers';
 echarts.use([
   // Charts
   BarChart,
+  BoxplotChart,
+  CustomChart,
   LineChart,
   RadarChart,
   ScatterChart,

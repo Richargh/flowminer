@@ -12,38 +12,58 @@
     <div class="container mx-auto p-4">
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Git Visualization</h1>
-        <div class="flex items-center gap-4">
-          <file-loader></file-loader>
-          <theme-switcher></theme-switcher>
-        </div>
+        <theme-switcher></theme-switcher>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="card bg-base-100 shadow-xl lg:col-span-2">
-          <div class="card-body">
-            <h2 class="card-title">Commit Range</h2>
-            <commit-range-panel id="activity-panel"></commit-range-panel>
+      <div role="tablist" class="tabs tabs-lifted mb-6">
+        <input type="radio" name="main-tabs" role="tab" class="tab" aria-label="Git" checked="checked" />
+        <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-4">
+          <div class="flex justify-end mb-4">
+            <file-loader></file-loader>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card bg-base-100 shadow-xl lg:col-span-2">
+              <div class="card-body">
+                <h2 class="card-title">Commit Range</h2>
+                <commit-range-panel id="activity-panel"></commit-range-panel>
+              </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl lg:col-span-2">
+              <div class="card-body">
+                <h2 class="card-title">Work Item Duration</h2>
+                <work-item-scatter-panel id="scatter-panel"></work-item-scatter-panel>
+              </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl lg:col-span-2">
+              <div class="card-body">
+                <h2 class="card-title">Work Item Duration Distribution</h2>
+                <work-item-duration-panel id="histogram-panel"></work-item-duration-panel>
+              </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl lg:col-span-2">
+              <div class="card-body">
+                <h2 class="card-title">Commits</h2>
+                <commits-table-panel id="commits-table-panel"></commits-table-panel>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="card bg-base-100 shadow-xl lg:col-span-2">
-          <div class="card-body">
-            <h2 class="card-title">Work Item Duration</h2>
-            <work-item-scatter-panel id="scatter-panel"></work-item-scatter-panel>
+        <input type="radio" name="main-tabs" role="tab" class="tab" aria-label="CI Pipelines" />
+        <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-4">
+          <div class="flex justify-end mb-4">
+            <ci-file-loader></ci-file-loader>
           </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-xl lg:col-span-2">
-          <div class="card-body">
-            <h2 class="card-title">Work Item Duration Distribution</h2>
-            <work-item-duration-panel id="histogram-panel"></work-item-duration-panel>
-          </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-xl lg:col-span-2">
-          <div class="card-body">
-            <h2 class="card-title">Commits</h2>
-            <commits-table-panel id="commits-table-panel"></commits-table-panel>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card bg-base-100 shadow-xl lg:col-span-2">
+              <div class="card-body">
+                <h2 class="card-title">Job Duration Statistics</h2>
+                <ci-boxplot-panel id="ci-boxplot-panel"></ci-boxplot-panel>
+              </div>
+            </div>
           </div>
         </div>
       </div>
