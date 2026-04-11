@@ -13,6 +13,7 @@ dependencies {
     implementation(project(":analysis:gitcli"))
     implementation(project(":analysis:github-cli"))
     implementation(project(":analysis:gitlab-cli"))
+    implementation(project(":analysis:jira-cli"))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.assertions)
 }

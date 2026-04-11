@@ -1,45 +1,81 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.application)
-    alias(libs.plugins.ksp)
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation(kotlin("stdlib"))
-    implementation(libs.picocli)
-    implementation(libs.jackson.module.kotlin)
-    implementation(libs.jackson.databind)
-    implementation(libs.jackson.jsr310)
-    implementation(libs.okhttp)
-    implementation(libs.moshi)
-    implementation(libs.moshi.kotlin)
-    ksp(libs.moshi.codegen)
-    testImplementation(libs.junit.jupiter)
-    testImplementation(libs.mockwebserver)
-    testImplementation(libs.kotest.assertions)
-}
-
-application {
-    mainClass.set("de.richargh.teamcharta.importer.jira.JiraImporterKt")
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
-        vendor.set(org.gradle.jvm.toolchain.JvmVendorSpec.ADOPTIUM)
-    }
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.testBalloon)
 }
 
 kotlin {
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get().toInt()))
+        vendor.set(JvmVendorSpec.ADOPTIUM)
+    }
+
+    jvm {
+        testRuns["test"].executionTask.configure {
+            useJUnitPlatform()
+            testLogging {
+                events("skipped", "failed")
+            }
+        }
+    }
+
+    js(IR) {
+        useEsModules()
+        browser {
+            webpackTask {
+                mainOutputFileName = "flowminer-jira-importer.js"
+            }
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+                testLogging {
+                    events("skipped", "failed")
+                }
+            }
+        }
+        binaries.library()
+        generateTypeScriptDefinitions()
+        compilerOptions {
+            moduleName.set("flowminer-jira-importer")
+            useEsClasses.set(true)
+        }
+    }
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.kotest.assertions)
+                implementation(libs.testBalloon.framework.core)
+                implementation(libs.testBalloon.integration.kotest.assertions)
+                implementation(libs.ktor.client.mock)
+                implementation(libs.kotlinx.coroutines.test)
+            }
+        }
+        val jvmMain by getting {
+            dependencies {
+                implementation(libs.ktor.client.java)
+            }
+        }
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test-junit5"))
+                implementation(libs.junit.jupiter)
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation(libs.ktor.client.js)
+            }
+        }
     }
 }
-
-tasks.test {
-    useJUnitPlatform()
-} 

@@ -3,6 +3,7 @@ package de.richargh.flowminer.fmsh
 import de.richargh.flowminer.importer.gitcli.GitCli
 import de.richargh.flowminer.importer.githubcli.GitHubCli
 import de.richargh.flowminer.importer.gitlabcli.GitLabCli
+import de.richargh.flowminer.importer.jiracli.JiraCli
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.IVersionProvider
@@ -19,7 +20,8 @@ import kotlin.system.exitProcess
     subcommands = [
         GitCli::class,
         GitHubCli::class,
-        GitLabCli::class
+        GitLabCli::class,
+        JiraCli::class
     ]
 )
 class Fmsh : Callable<Int> {

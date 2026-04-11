@@ -66,6 +66,25 @@ class FmshTest {
         output shouldContain "Finding the Project ID"
     }
 
+    @Test
+    fun `fmsh --help shows jira-issues subcommand`() {
+        val (exitCode, output) = runFmsh("--help")
+
+        exitCode shouldBe 0
+        output shouldContain "jira-issues"
+    }
+
+    @Test
+    fun `fmsh jira-issues --help shows jira-cli help`() {
+        val (exitCode, output) = runFmsh("jira-issues", "--help")
+
+        exitCode shouldBe 0
+        output shouldContain "jira-issues"
+        output shouldContain "Jira API token"
+        output shouldContain "JIRA_TOKEN"
+        output shouldContain "Jira project key"
+    }
+
     private fun runFmsh(vararg args: String): Pair<Int, String> {
         val cmd = CommandLine(Fmsh())
         val sw = StringWriter()

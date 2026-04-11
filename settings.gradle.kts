@@ -1,5 +1,6 @@
 rootProject.name = "flowminer"
 include("analysis:jira-importer")
+include("analysis:jira-cli")
 include("analysis:git-importer")
 include("analysis:github-importer")
 include("analysis:gitcli")
