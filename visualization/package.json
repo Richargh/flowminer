@@ -20,17 +20,17 @@
     "lit": "3.3.1"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "4.1.18",
-    "@vitest/browser": "4.0.16",
-    "@vitest/browser-playwright": "4.0.16",
+    "@tailwindcss/vite": "4.2.2",
+    "@vitest/browser": "4.1.4",
+    "@vitest/browser-playwright": "4.1.4",
     "axe-core": "4.11.0",
     "daisyui": "5.5.14",
     "dependency-cruiser": "17.3.6",
     "playwright": "1.57.0",
-    "tailwindcss": "4.1.18",
+    "tailwindcss": "4.2.2",
     "typescript": "5.9.3",
-    "vite": "7.3.0",
-    "vitest": "4.0.16",
+    "vite": "8.0.8",
+    "vitest": "4.1.4",
     "vitest-axe": "0.1.0"
   }
 }

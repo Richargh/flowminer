@@ -8,13 +8,13 @@ export default defineConfig({
     ],
     build: {
         target: 'esnext',
-        minify: 'esbuild',
-        rollupOptions: {
+        minify: 'oxc',
+        rolldownOptions: {
             external: [/\.test\.ts$/, /__fixtures__/],
             output: {
-                manualChunks: {
-                    'echarts': ['echarts/core', 'echarts/charts', 'echarts/components', 'echarts/renderers'],
-                    'lit': ['lit'],
+                manualChunks: (id) => {
+                    if (id.includes('/node_modules/echarts')) return 'echarts'
+                    if (id.includes('/node_modules/lit')) return 'lit'
                 },
             },
         },
