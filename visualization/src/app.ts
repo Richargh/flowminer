@@ -6,6 +6,7 @@ import './theme-switcher/theme-switcher';
 import './file-loading/file-loader.ts';
 import './ci-pipeline/ci-file-loader.ts';
 import './ci-pipeline/ci-boxplot-panel.ts';
+import './ci-pipeline/ci-gantt-panel.ts';
 import {loadDefaultData} from './startup/default-data-loader.ts';
 import {loadDefaultCiData} from './startup/default-ci-data-loader.ts';
 
