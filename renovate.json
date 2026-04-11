@@ -49,13 +49,6 @@
       ]
     },
     {
-      "description": "Jackson modules should be updated together",
-      "groupName": "jackson",
-      "matchPackageNames": [
-        "/^com\\.fasterxml\\.jackson/"
-      ]
-    },
-    {
       "description": "JVM test dependencies - safe to update together",
       "groupName": "gradle-testing",
       "matchPackageNames": [

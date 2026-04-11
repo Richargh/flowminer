@@ -88,9 +88,6 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(libs.picocli)
-                implementation(libs.jackson.module.kotlin)
-                implementation(libs.jackson.databind)
-                implementation(libs.jackson.jsr310)
             }
         }
         val jvmTest by getting {
