@@ -529,7 +529,7 @@ class GitHubGraphQLDtosTest {
         issue.timelineItems?.nodes?.size shouldBe 2
         val labeledEvent = issue.timelineItems?.nodes?.get(0) as GraphQLTimelineItem.LabeledEvent
         labeledEvent.label.name shouldBe "bug"
-        val closedEvent = issue.timelineItems?.nodes?.get(1) as GraphQLTimelineItem.ClosedEvent
+        val closedEvent = issue.timelineItems.nodes[1] as GraphQLTimelineItem.ClosedEvent
         closedEvent.actor?.login shouldBe "user"
     }
 
