@@ -17,7 +17,7 @@
     "echarts": "6.0.0",
     "flowminer-git-importer": "file:../analysis/git-importer/build/dist/js/productionLibrary",
     "flowminer-shared": "file:../shared/build/dist/js/productionLibrary",
-    "lit": "3.3.1"
+    "lit": "3.3.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.2.2",
