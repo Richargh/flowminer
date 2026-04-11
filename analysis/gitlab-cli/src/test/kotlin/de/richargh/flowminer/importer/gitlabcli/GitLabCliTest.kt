@@ -12,7 +12,7 @@ import kotlin.io.path.readText
 class GitLabCliTest {
 
     @Test
-    fun `shouldWriteJsonlOutput`(@TempDir tempDir: Path) = runBlocking {
+    fun shouldWriteJsonlOutput(@TempDir tempDir: Path): Unit = runBlocking {
         // given
         val outputFile = tempDir.resolve("output.jsonl")
         val jobs = listOf(
