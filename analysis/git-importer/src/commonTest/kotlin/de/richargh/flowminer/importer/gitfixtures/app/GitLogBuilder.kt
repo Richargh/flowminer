@@ -167,7 +167,7 @@ class GitLogBuilder {
                             parentBranches.any { originOfBranch[it] == branch || originOfBranch[branch] == it }
                     )
             if (shouldAddBefore)
-                entry + before!!.hash()
+                entry + before.hash()
             if (after == null && branch !in deletedBranches) {
                 entry.refBranchTip(branch)
                 // Add origin/HEAD when this is the HEAD commit and branch is origin/*
