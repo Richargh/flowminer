@@ -14,9 +14,9 @@
   "dependencies": {
     "@tanstack/lit-table": "8.21.3",
     "echarts": "6.0.0",
-    "lit": "3.3.1",
     "flowminer-git-importer": "file:../analysis/git-importer/build/dist/js/productionLibrary",
-    "flowminer-shared": "file:../shared/build/dist/js/productionLibrary"
+    "flowminer-shared": "file:../shared/build/dist/js/productionLibrary",
+    "lit": "3.3.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.18",
