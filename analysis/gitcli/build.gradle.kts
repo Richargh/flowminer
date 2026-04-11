@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.assertions)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 // Add git-importer test classes to the test compile and runtime classpath

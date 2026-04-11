@@ -25,6 +25,7 @@ dependencies {
     testImplementation(project(":analysis:git-importer"))
     testImplementation(project(":analysis:github-importer"))
     testImplementation(project(":analysis:jira-importer"))
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.test {

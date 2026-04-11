@@ -17,6 +17,7 @@ dependencies {
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.assertions)
     testImplementation(libs.mockwebserver)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 // Add github-importer test classes to the test compile and runtime classpath

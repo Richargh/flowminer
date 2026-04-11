@@ -16,6 +16,7 @@ dependencies {
     implementation(project(":analysis:jira-cli"))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.kotest.assertions)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 application {
