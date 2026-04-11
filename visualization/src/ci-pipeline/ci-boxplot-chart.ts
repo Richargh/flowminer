@@ -20,6 +20,7 @@ export class CiBoxplotChart extends LitElement {
   private chart: EChartsType | null = null;
   private currentOption: BoxplotChartOption | null = null;
   private resizeObserver: ResizeObserver | null = null;
+  private excludedJobs = new Set<string>();
 
   @property({ type: Array })
   data: BoxplotEntry[] = [];
@@ -30,7 +31,7 @@ export class CiBoxplotChart extends LitElement {
     }
     .chart-container {
       width: 100%;
-      height: 400px;
+      min-height: 300px;
     }
   `;
 
@@ -48,6 +49,12 @@ export class CiBoxplotChart extends LitElement {
         if (width > 0 && height > 0) {
           if (!this.chart) {
             this.chart = echarts.init(container);
+            this.chart.getZr().on('contextmenu', (zrEvent: unknown) => {
+              const e = zrEvent as { event: MouseEvent };
+              e.event.preventDefault();
+              const y = e.event.clientY - container.getBoundingClientRect().top;
+              this.excludeJobAtY(y);
+            });
             this.updateChartWithData();
           } else {
             this.chart.resize();
@@ -64,10 +71,34 @@ export class CiBoxplotChart extends LitElement {
     }
   }
 
+  private excludeJobAtY(y: number): void {
+    if (!this.chart) return;
+    const rawIndex = this.chart.convertFromPixel({ yAxisIndex: 0 }, y);
+    if (rawIndex == null) return;
+    const idx = Math.round(rawIndex as unknown as number);
+    if (!Number.isFinite(idx)) return;
+    const visibleEntries = this.data.filter(d => !this.excludedJobs.has(d.jobName));
+    if (idx < 0 || idx >= visibleEntries.length) return;
+    this.excludedJobs.add(visibleEntries[idx].jobName);
+    this.updateChartWithData();
+  }
+
+  excludeJob(jobName: string): void {
+    this.excludedJobs.add(jobName);
+    this.updateChartWithData();
+  }
+
   private updateChartWithData(): void {
     if (!this.chart) return;
 
-    const entries = this.data;
+    const entries = this.data.filter(e => !this.excludedJobs.has(e.jobName));
+    const container = this.shadowRoot?.querySelector('.chart-container') as HTMLElement | null;
+    if (container) {
+      const height = Math.max(300, entries.length * 28 + 80);
+      container.style.height = `${height}px`;
+      this.chart.resize();
+    }
+
     const yAxisLabels = entries.map(d => truncate(d.jobName, MAX_LABEL_LENGTH));
     const boxplotData = entries.map(d => d.values);
 

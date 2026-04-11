@@ -51,6 +51,20 @@ describe('CiBoxplotChart', () => {
     expect(result).toContain('4.0m');   // max: 240s converts to minutes
   });
 
+  it('should exclude a job from the chart when excludeJob is called', async () => {
+    element.data = mockData;
+    await element.updateComplete;
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    element.excludeJob('build');
+    await element.updateComplete;
+
+    const option = element.getChartOption();
+    const yAxisData = option?.yAxis?.data as string[];
+    expect(yAxisData).not.toContain('build');
+    expect(yAxisData).toContain('test');
+  });
+
   it('should truncate y-axis job names longer than 30 characters', async () => {
     const longName = 'b'.repeat(40);
     element.data = [{ jobName: longName, values: [10, 20, 30, 40, 50] }];
