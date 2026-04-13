@@ -29,7 +29,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Download visualization dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: viz-dist
           path: dist
@@ -58,7 +58,7 @@ jobs:
           sparse-checkout-cone-mode: false
 
       - name: Download dist artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist-artifacts
           path: artifacts
