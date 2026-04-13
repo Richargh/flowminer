@@ -41,7 +41,7 @@ jobs:
           ls -la visualization/visualization-*.tar.gz
 
       - name: Upload Gradle build outputs for test-analysis
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gradle-build
           path: |
@@ -50,7 +50,7 @@ jobs:
           retention-days: 1
 
       - name: Upload KMP-JS dist for test-viz
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: kmp-js-dist
           path: |
@@ -59,7 +59,7 @@ jobs:
           retention-days: 1
 
       - name: Upload dist artifacts for release
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist-artifacts
           path: |
@@ -68,7 +68,7 @@ jobs:
           retention-days: 7
 
       - name: Upload visualization dist for Pages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: viz-dist
           path: visualization/dist
@@ -82,7 +82,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download Gradle build outputs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: gradle-build
           path: .
@@ -104,7 +104,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download KMP-JS dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: kmp-js-dist
           path: .
